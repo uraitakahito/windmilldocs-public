@@ -90,7 +90,7 @@ const docCardsToList = (text, fromFile) =>
     return `- ${link}${desc ? ` —— ${desc}` : ""}`;
   });
 
-const convert = (src) => {
+export const convert = (src) => {
   let s = readFileSync(src, "utf8");
 
   // frontmatter は残す。訳は人が入れる。
@@ -132,6 +132,14 @@ const convert = (src) => {
   return front + banner + s;
 };
 
+// **CLI として呼ばれたときだけ走る。** check-ja.mjs が `convert` を import して
+// 使うので、読み込んだだけで走ってはいけない。
+const invokedDirectly =
+  process.argv[1] !== undefined && process.argv[1].endsWith("mdx-to-ja.mjs");
+if (!invokedDirectly) {
+  // import されただけ。何もしない。
+} else {
+
 const args = process.argv.slice(2);
 const force = args.includes("--force");
 const targets = args.filter((a) => !a.startsWith("--"));
@@ -154,3 +162,4 @@ for (const t of targets) {
   }
 }
 console.log(`  作成 ${made} 本 / 既存はそのまま ${kept} 本`);
+}

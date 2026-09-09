@@ -1,16 +1,15 @@
 ---
-title: TypeScript quickstart
-description: 'How do I write TypeScript scripts in Windmill? Create, test and deploy TypeScript with Bun, Node.js or Deno runtimes.'
+title: TypeScript クイックスタート
+description: 'Windmill で TypeScript のスクリプトを書くには。Bun・Node.js・Deno のランタイムで作り、テストし、配備する。'
 slug: '/getting_started/scripts_quickstart/typescript'
 ---
+
 > **[原文](./index.mdx)の日本語訳。** 相違があれば原文が正。
 > 原典 © Windmill Labs, Inc. — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。この訳も同じライセンスで提供します。
->
-> **未訳。** 以下は原文のままです。
 
-# TypeScript quickstart
+# TypeScript クイックスタート
 
-In this quick start guide, we will write our first script in TypeScript. Windmill uses [Bun](https://bun.sh/), [Nodejs](#nodejs) and [Deno](https://deno.land/) as the available TypeScript runtimes.
+この手引きでは、最初のスクリプトを TypeScript で書きます。Windmill が使える TypeScript のランタイムは [Bun](https://bun.sh/)・[Node.js](#nodejs)・[Deno](https://deno.land/) です。
 
 <iframe
 	style={{ aspectRatio: '16/9' }}
@@ -24,28 +23,28 @@ In this quick start guide, we will write our first script in TypeScript. Windmil
 
 <br/>
 
-This tutorial covers how to create a simple "Hello World" script in TypeScript through Windmill web IDE, with the standard mode of handling dependencies in TypeScript (Lockfile per script inferred from imports). See the dedicated pages to [develop scripts locally](../../../advanced/4_local_development/index.mdx) and other methods of [handling dependencies in TypeScript](../../../advanced/14_dependencies_in_typescript/index.mdx).
+ここでは Windmill の web IDE で、TypeScript の簡単な「Hello World」を作ります。依存関係の扱いは標準の方式（import から推論して、スクリプトごとに lockfile を持つ）です。[手元で開発する](../../../advanced/4_local_development/index.mdx)方法や、[TypeScript で依存関係を扱う](../../../advanced/14_dependencies_in_typescript/index.mdx)他の方式は、それぞれの節を参照してください。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Local development](https://www.windmill.dev/docs/advanced/local_development) —— Develop from various environments such as your terminal, VS Code, and JetBrains IDEs.
-	- [Dependencies in TypeScript](https://www.windmill.dev/docs/advanced/dependencies_in_typescript) —— How to manage dependencies in TypeScript scripts.
+	- [手元での開発](https://www.windmill.dev/docs/advanced/local_development) —— 端末・VS Code・JetBrains の IDE など、さまざまな環境から開発する。
+	- [TypeScript の依存関係](https://www.windmill.dev/docs/advanced/dependencies_in_typescript) —— TypeScript のスクリプトで依存関係をどう扱うか。
 </div>
 
-Scripts are the basic building blocks in Windmill. They can be [run and scheduled](../../../triggers/index.mdx) as standalone, chained together to create [Flows](../../../flows/1_flow_editor.mdx) or displayed with a personalized User Interface as [Apps](../../7_apps_quickstart/index.mdx).
+スクリプトは Windmill の基本の部品です。単体で[実行・スケジュール](../../../triggers/index.mdx)できますし、つなげて[フロー](../../../flows/1_flow_editor.mdx)にすることも、専用の UI を付けて[アプリ](../../7_apps_quickstart/index.mdx)として見せることもできます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Script editor](../../../script_editor/index.mdx) —— All the details on scripts.
-	- [Triggers](../../../triggers/index.mdx) —— Trigger scripts and flows on-demand, by schedule or on external events.
+	- [スクリプトエディタ](../../../script_editor/index.mdx) —— スクリプトのすべて。
+	- [トリガー](../../../triggers/index.mdx) —— スクリプトとフローを、必要なとき・スケジュール・外部の出来事で起こす。
 </div>
 
-Scripts consist of 2 parts:
+スクリプトは 2 つの部分でできています。
 
-- [Code](#code): for TypeScript scripts, it must have at least a main function.
-- [Settings](#settings): settings & metadata about the Script such as its path, summary, description, [JSON Schema](../../../core_concepts/13_json_schema_and_parsing/index.mdx) of its inputs (inferred from its signature).
+- [コード](#コード): TypeScript のスクリプトでは、少なくとも `main` 関数が要ります。
+- [設定](#設定): パス・要約・説明・入力の [JSON Schema](../../../core_concepts/13_json_schema_and_parsing/index.mdx)（署名から推論されます）といった、スクリプトの設定とメタデータ。
 
-When stored in a code repository, those 2 parts are stored separately at `<path>.ts` and `<path>.script.yaml`.
+コードリポジトリに保存すると、この 2 つは `<path>.ts` と `<path>.script.yaml` に分かれて置かれます。
 
-[This](https://hub.windmill.dev/scripts/slack/1284/send-message-to-channel-slack) is a simple example of a script built in TypeScript with Windmill:
+Windmill で TypeScript で組んだスクリプトの簡単な例が[こちら](https://hub.windmill.dev/scripts/slack/1284/send-message-to-channel-slack)にあります。
 
 ```ts
 import { WebClient } from '@slack/web-api';
@@ -66,50 +65,47 @@ export async function main(slack: Slack, channel: string, message: string): Prom
 }
 ```
 
-In this quick start guide, we'll create a script that greets the operator running it.
+この手引きでは、実行した人に挨拶するスクリプトを作ります。
 
-From the Home page, click **New** and select **Script**. This will take you to the first step of script creation: [Metadata](../../../script_editor/settings.mdx#metadata).
+ホーム画面で **新規（New）** をクリックし、**スクリプト（Script）** を選びます。スクリプト作成の最初の段階、[メタデータ](../../../script_editor/settings.mdx#metadata)に進みます。
 
-## Settings
+## 設定
 
 ![New script](../../../../static/images/script_languages.png "New script")
 
-As part of the [settings](../../../script_editor/settings.mdx) menu, each script has metadata associated with it, enabling it to be defined and configured in depth.
+[設定](../../../script_editor/settings.mdx)メニューの一部として、各スクリプトにはメタデータが付いており、細かく定義・設定できます。
 
-- **Summary** (optional) is a short, human-readable summary of the Script. It will be displayed as a title across Windmill. If omitted, the UI will use the `path` by default.
-- **Path** is the Script's unique identifier that consists of the [script's owner](../../../core_concepts/16_roles_and_permissions/index.mdx), and the script's name. The owner can be either a user, or a group ([folder](../../../core_concepts/8_groups_and_folders/index.mdx#folders)).
-- **Description** is where you can give instructions through the [auto-generated UI](../../../core_concepts/6_auto_generated_uis/index.mdx) to users on how to run your Script. It supports markdown.
-- **Language** of the script.
-- **Script kind**: Action (by default), [Trigger](../../../flows/10_flow_trigger.mdx), [Approval](../../../flows/11_flow_approval.mdx), [Error handler](../../../flows/7_flow_error_handler.md) or [Preprocessor](../../../core_concepts/43_preprocessors/index.mdx). This acts as a tag to filter appropriate scripts from the [flow editor](../../6_flows_quickstart/index.mdx).
+- **要約（Summary）**（任意）はスクリプトの短い説明で、人が読むためのものです。Windmill 全体で見出しとして表示されます。省略すると、既定で `path` が使われます。
+- **パス（Path）**はスクリプトを一意に指す識別子で、[スクリプトの所有者](../../../core_concepts/16_roles_and_permissions/index.mdx)と名前からなります。所有者はユーザーか、グループ（[フォルダ](../../../core_concepts/8_groups_and_folders/index.mdx#folders)）です。
+- **説明（Description）**では、[自動生成される UI](../../../core_concepts/6_auto_generated_uis/index.mdx) を通じて、使う人に実行のしかたを伝えられます。markdown が使えます。
+- スクリプトの**言語**。
+- **スクリプトの種類**: アクション（既定）、[トリガー](../../../flows/10_flow_trigger.mdx)、[承認](../../../flows/11_flow_approval.mdx)、[エラーハンドラ](../../../flows/7_flow_error_handler.md)、[前処理](../../../core_concepts/43_preprocessors/index.mdx)。[フローエディタ](../../6_flows_quickstart/index.mdx)で適切なスクリプトを絞り込むための札として働きます。
 
-This menu also has additional settings on [Runtime](../../../script_editor/settings.mdx#runtime), [Generated UI](#generated-ui) and [Triggers](../../../script_editor/settings.mdx#triggers).
+このメニューには [ランタイム](../../../script_editor/settings.mdx#runtime)・[生成される UI](#生成される-ui)・[トリガー](../../../script_editor/settings.mdx#triggers)の設定もあります。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Settings](../../../script_editor/settings.mdx) —— Each script has metadata & settings associated with it, enabling it to be defined and configured in depth.
+	- [設定](../../../script_editor/settings.mdx) —— 各スクリプトにはメタデータと設定が付いており、細かく定義・設定できる。
 </div>
 
-Now click on the code editor on the left side.
+では左側のコードエディタに移ります。
 
-## Code
+## コード
 
-Windmill provides an online editor to work on your Scripts. The left-side is
-the editor itself. The right-side [previews the UI](../../../core_concepts/6_auto_generated_uis/index.mdx) that Windmill will
-generate from the Script's signature - this will be visible to the users of the
-Script. You can preview that UI, provide input values, and [test your script](#instant-preview--testing) there.
+Windmill にはスクリプトを書くためのオンラインエディタがあります。左側がエディタ本体です。右側は、スクリプトの署名から Windmill が[生成する UI の下見](../../../core_concepts/6_auto_generated_uis/index.mdx)で、これがスクリプトを使う人に見えるものです。その UI を確かめ、値を入れて、[その場でテスト](#その場での確認とテスト)できます。
 
 ![Demo TS](./demo_ts.png 'Demo TS')
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Code editor](../../../code_editor/index.mdx) —— The code editor is Windmill's integrated development environment.
-	- [Auto-generated UIs](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill creates auto-generated user interfaces for scripts and flows based on their parameters.
+	- [コードエディタ](../../../code_editor/index.mdx) —— コードエディタは Windmill に統合された開発環境。
+	- [自動生成される UI](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill はスクリプトとフローの引数から、UI を自動で作る。
 </div>
 
-There are two options for runtimes in TypeScript:
+TypeScript のランタイムは 2 つから選べます。
 
-- Bun (with a [Nodejs](#nodejs) mode if needed)
+- Bun（必要なら [Node.js](#nodejs) モードも）
 - [Deno](#deno)
 
-As we picked `TypeScript (Bun)` for this example, Windmill provided some TypeScript boilerplate. Let's take a look:
+この例では `TypeScript (Bun)` を選んだので、Windmill が雛形を用意してくれています。見てみましょう。
 
 ```typescript
 // there are multiple modes to add as header: //nobundling //native //npm //nodejs
@@ -142,37 +138,25 @@ export async function main(
 }
 ```
 
-In Windmill, scripts need to have a `main` function that will be the script's
-entrypoint. There are a few important things to note about the `main`.
+Windmill のスクリプトには、入口となる `main` 関数が要ります。`main` について押さえておくべき点がいくつかあります。
 
-- The main arguments are used for generating
-  1.  the [input spec](../../../core_concepts/13_json_schema_and_parsing/index.mdx) of the Script
-  2.  the [frontend](../../../core_concepts/6_auto_generated_uis/index.mdx) that you see when running the Script as a standalone app.
-- Type annotations are used to generate the UI form, and help pre-validate
-  inputs. While not mandatory, they are highly recommended. You can customize
-  the UI in later steps (but not change the input type!).
+- `main` の引数は次の 2 つを作るのに使われます。
+  1.  スクリプトの[入力仕様](../../../core_concepts/13_json_schema_and_parsing/index.mdx)
+  2.  スクリプトを単体のアプリとして実行したときに見える[画面](../../../core_concepts/6_auto_generated_uis/index.mdx)
+- 型注釈は UI の入力欄を作るのに使われ、入力の事前検査にも役立ちます。必須ではありませんが、強く勧めます。UI は後の段階で調整できます（ただし入力の型は変えられません）。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [JSON schema and parsing](https://www.windmill.dev/docs/core_concepts/json_schema_and_parsing) —— JSON Schemas are used for defining the input specification for scripts and flows, and specifying resource types.
+	- [JSON schema と解釈](https://www.windmill.dev/docs/core_concepts/json_schema_and_parsing) —— JSON Schema は、スクリプトとフローの入力仕様を定め、リソースの型を指定するために使われる。
 </div>
 
-Also take a look at the import statement lines that are commented out.
-In TypeScript, [dependencies](../../../advanced/14_dependencies_in_typescript/index.mdx) and their versions are contained in the script and hence there is no need for any additional steps.
-The TypeScript runtime is Bun, which is 100% compatible with Node.js without any code modifications.
-You can use npm imports directly in Windmill. The last import line imports the Windmill
-client, that is needed for example, to access
-[variables](../../../core_concepts/2_variables_and_secrets/index.mdx) or
-[resources](../../../core_concepts/3_resources_and_types/index.mdx). We won't go
-into that here.
+コメントアウトされた import の行も見てください。TypeScript では[依存関係](../../../advanced/14_dependencies_in_typescript/index.mdx)とその版がスクリプトの中に収まるので、追加の手順は要りません。TypeScript のランタイムは Bun で、コードを一切変えずに Node.js と互換です。npm の import をそのまま書けます。最後の import は Windmill のクライアントで、たとえば[変数](../../../core_concepts/2_variables_and_secrets/index.mdx)や[リソース](../../../core_concepts/3_resources_and_types/index.mdx)を使うときに要ります。ここでは深入りしません。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Dependency management & imports](https://www.windmill.dev/docs/advanced/imports) —— Windmill's strength lies in its ability to run scripts without having to manage a package.json directly.
-	- [TypeScript client](https://www.windmill.dev/docs/advanced/clients/ts_client) —— The TypeScript client for Windmill allows you to interact with the Windmill platform using TypeScript in Bun / Deno runtime.
+	- [依存関係の管理と import](https://www.windmill.dev/docs/advanced/imports) —— package.json を直接管理せずにスクリプトを動かせることが、Windmill の強み。
+	- [TypeScript クライアント](https://www.windmill.dev/docs/advanced/clients/ts_client) —— Bun / Deno のランタイムで、TypeScript から Windmill を操作するためのクライアント。
 </div>
 
-Back to our "Hello World". We can clear up unused import statements, change the
-main to take in the user's name. Let's also return the `name`, maybe we can use
-this later if we use this Script within a [flow](../../../flows/1_flow_editor.mdx) or [app](../../../full_code_apps/index.mdx) and need to pass its result on.
+「Hello World」に戻ります。使っていない import を消し、`main` が利用者の名前を受け取るようにします。`name` を返しておきましょう —— このスクリプトを[フロー](../../../flows/1_flow_editor.mdx)や[アプリ](../../../full_code_apps/index.mdx)の中で使い、結果を次へ渡したくなるかもしれません。
 
 ```typescript
 export async function main(name: string) {
@@ -181,11 +165,11 @@ export async function main(name: string) {
 }
 ```
 
-## Modes
+## モード
 
-### Pre-bundling and nobundling
+### 事前バンドルと nobundling
 
-Windmill [pre-bundles](/changelog/pre-bundle-bun-scripts) your script at deployment time using [Bun bundler](https://bun.sh/docs/bundler). This improve memory usage and speed up the execution time of your script. If you would like to disable this feature, you can add the following comment at the top of your script:
+Windmill は配備の時点で、[Bun のバンドラ](https://bun.sh/docs/bundler)を使ってスクリプトを[事前にバンドル](/changelog/pre-bundle-bun-scripts)します。メモリの使用量が減り、実行が速くなります。これを止めたい場合は、スクリプトの先頭に次のコメントを置きます。
 
 ```ts
 //nobundling
@@ -193,19 +177,19 @@ Windmill [pre-bundles](/changelog/pre-bundle-bun-scripts) your script at deploym
 
 ### Native
 
-Windmill provides a runtime that is more lightweight but supports less features and allow to run scripts in a more lightweight manner with direct bindings to v8. To enable, you can add the following comment at the top of your script:
+Windmill には、機能は少ないぶん軽く、v8 に直接つないでスクリプトを走らせるランタイムもあります。使うには、スクリプトの先頭に次のコメントを置きます。
 
 ```ts
 //native
 ```
 
-To learn more, see [Rest](../6_rest_grapqhql_quickstart/index.mdx) scripts, that are under the hood Bun TypeScripts with a `//native` header.
+詳しくは [Rest](../6_rest_grapqhql_quickstart/index.mdx) のスクリプトを参照してください。あれは中身としては `//native` を付けた Bun の TypeScript です。
 
 ### NodeJS
 
-Windmill provides a true NodeJS compatibility mode. This means that you can run your existing NodeJS code without any modifications.
+Windmill には本物の Node.js 互換モードがあります。既存の Node.js のコードを、手を加えずに動かせます。
 
-The only thing you need to do is to select `TypeScript (Bun)` as the runtime and as the first line, use:
+必要なのは、ランタイムに `TypeScript (Bun)` を選び、先頭行に次を書くことだけです。
 
 ```ts
 //nodejs
@@ -213,26 +197,26 @@ The only thing you need to do is to select `TypeScript (Bun)` as the runtime and
 
 ![Nodejs Compatibility](./nodejs_compatibility.png 'Nodejs Compatibility')
 
-This method is an escape hatch for using another runtime (NodeJS), but it is slower than Deno and Bun since it resorts to Bun under the hood.
+これは別のランタイム（Node.js）を使うための逃げ道ですが、内部で Bun を経由するので Deno や Bun より遅くなります。
 
-This feature is exclusive to [Cloud plans and Self-Hosted Enterprise edition](/pricing).
+この機能は[クラウドプランとセルフホストの Enterprise 版](/pricing)限定です。
 
 ### Npm
 
-Similarly, you can use `npm install` instead of `bun install` to install dependencies. This is useful as an escape hatch for cases not supported by bun:
+同じように、依存関係の導入に `bun install` ではなく `npm install` を使えます。bun が対応していない場合の逃げ道として役立ちます。
 
 ```ts
 //npm
 ```
 
-This is also exclusive to [Cloud plans and Self-Hosted Enterprise edition](/pricing).
+これも[クラウドプランとセルフホストの Enterprise 版](/pricing)限定です。
 
 ### Deno
 
-You can also pick `TypeScript (Deno)` as the language instead of `TypeScript (Bun)`. The walkthrough is the same as with Bun ([above](#code)): a `main` function as entrypoint, an [auto-generated UI](../../../core_concepts/6_auto_generated_uis/index.mdx) from its signature, and [dependencies](../../../advanced/14_dependencies_in_typescript/index.mdx) resolved directly from imports. The differences with Bun are:
+言語として `TypeScript (Bun)` ではなく `TypeScript (Deno)` を選ぶこともできます。流れは Bun と同じ（[上](#コード)を参照）で、入口となる `main` 関数、署名から[自動生成される UI](../../../core_concepts/6_auto_generated_uis/index.mdx)、import から直接解決される[依存関係](../../../advanced/14_dependencies_in_typescript/index.mdx)、という形です。Bun との違いは次のとおりです。
 
-- The resolution of imports is done by [Deno](https://deno.com/runtime), so npm imports use the `npm:` prefix (e.g. `import * as wmill from "npm:windmill-client@1.525.0"`), and `https://` and `jsr:` imports are also supported.
-- The Bun-specific [modes](#modes) (`//nobundling`, `//native`, `//nodejs`, `//npm`) do not apply.
+- import の解決は [Deno](https://deno.com/runtime) が行うので、npm の import には `npm:` を前に付けます（例: `import * as wmill from "npm:windmill-client@1.525.0"`）。`https://` と `jsr:` の import も使えます。
+- Bun 固有の[モード](#モード)（`//nobundling`・`//native`・`//nodejs`・`//npm`）は使えません。
 
 ```typescript
 // Deno uses "npm:" prefix to import from npm (https://deno.land/manual@v1.36.3/node/npm_specifiers)
@@ -249,10 +233,9 @@ export async function main(
 }
 ```
 
-## Instant preview & testing
+## その場での確認とテスト
 
-Look at the UI preview on the right: it was updated to match the input
-signature. Run a test (`Ctrl` + `Enter`) to verify everything works.
+右側の UI の下見を見てください。入力の署名に合わせて更新されています。テストを実行して（`Ctrl` + `Enter`）、動くことを確かめましょう。
 
 <video
 	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
@@ -262,97 +245,90 @@ signature. Run a test (`Ctrl` + `Enter`) to verify everything works.
 
 <br />
 
-You can change how the UI behaves by changing the main signature. For example, if you add a default for the `name` argument, the UI won't consider this field as required anymore.
+`main` の署名を変えれば、UI の振る舞いも変わります。たとえば `name` に既定値を付けると、UI はその欄を必須として扱わなくなります。
 
 ```typescript
 main(name: string = "you")
 ```
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Instant preview & testing](https://www.windmill.dev/docs/core_concepts/instant_preview) —— On top of its integrated editors, Windmill allows users to see and test what they are building directly from the editor, even before deployment.
+	- [その場での確認とテスト](https://www.windmill.dev/docs/core_concepts/instant_preview) —— Windmill は統合されたエディタに加えて、配備の前でも、作っているものをその場で見て試せるようにしている。
 </div>
 
-Now let's go to the last step: the "Generated UI" settings.
+では最後の段階、「生成される UI」の設定に進みます。
 
-## Generated UI
+## 生成される UI
 
-From the Settings menu, the "Generated UI" tab lets you customize the script's arguments.
+設定メニューの「生成される UI（Generated UI）」タブでは、スクリプトの引数を調整できます。
 
-The UI is generated from the Script's main function signature, but you can add additional constraints here. For example, we could use the `Customize property`: add a regex by clicking on `Pattern` to make sure users are providing a name with only alphanumeric characters: `^[A-Za-z0-9]+$`. Let's still allow numbers in case you are some tech billionaire's kid.
+UI はスクリプトの `main` 関数の署名から作られますが、ここで制約を足せます。たとえば `プロパティを調整（Customize property）` から `パターン（Pattern）` をクリックして正規表現を書き、英数字だけの名前を求められます: `^[A-Za-z0-9]+$`。数字も許しておきましょう —— どこかの技術系の富豪の子かもしれませんから。
 
 ![Advanced settings for TypeScript](./customize_ts.png.webp)
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Script kind](../../../script_editor/script_kinds.mdx) —— You can attach additional functionalities to Scripts by specializing them into specific Script kinds.
-	- [Generated UI](../../../script_editor/customize_ui.mdx) —— main function's arguments can be given advanced settings that will affect the inputs' auto-generated UI and JSON Schema.
+	- [スクリプトの種類](../../../script_editor/script_kinds.mdx) —— スクリプトを特定の種類に специализ することで、追加の働きを持たせられる。
+	- [生成される UI](../../../script_editor/customize_ui.mdx) —— main 関数の引数には詳細な設定を与えられ、入力の自動生成 UI と JSON Schema に反映される。
 </div>
 
-## Workflows as code
+## コードとしてのワークフロー
 
-One way to write distributed programs that execute distinct jobs is to use [flows](../../../flows/1_flow_editor.mdx) that chain scripts together.
+別々の仕事を実行する分散プログラムを書く方法の 1 つは、スクリプトをつなぐ[フロー](../../../flows/1_flow_editor.mdx)を使うことです。
 
-Another approach is to write a program that defines the jobs and their dependencies, and then execute that program directly in your script. This is known as [workflows as code](../../../core_concepts/31_workflows_as_code/index.mdx). Wrap your orchestration function with `workflow()` and annotate task functions with `task()`. Each task runs as a separate job with its own logs and timeline entry, while the workflow suspends between tasks (releasing its worker slot).
+もう 1 つは、仕事とその依存関係を定義するプログラムを書き、それをスクリプトの中で直接実行することです。これを[コードとしてのワークフロー](../../../core_concepts/31_workflows_as_code/index.mdx)と呼びます。全体を統べる関数を `workflow()` で包み、個々の仕事の関数に `task()` を付けます。各 task は独自のログと時系列の記録を持つ別の job として走り、その間ワークフローは中断します（worker の枠を解放します）。
 
 ![Flow as code in TypeScript](./flow_as_code_ts.png 'Flow as code in TypeScript')
 
-All details at:
+詳しくは次を参照してください。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Workflows as code](https://www.windmill.dev/docs/core_concepts/workflows_as_code) —— Write distributed workflows in TypeScript or Python with checkpoint-based orchestration, parallel execution, and fault tolerance.
+	- [コードとしてのワークフロー](https://www.windmill.dev/docs/core_concepts/workflows_as_code) —— TypeScript か Python で、チェックポイントに基づく制御・並列実行・障害への耐性を備えた分散ワークフローを書く。
 </div>
 
-## Run!
+## 実行する
 
-We're done! Now let's look at what users of the script will do. Click on the [Deploy](../../../core_concepts/0_draft_and_deploy/index.mdx) button
-to load the script. You'll see the user input form we defined earlier.
+これで完成です。次は、このスクリプトを使う人の側を見てみましょう。[配備（Deploy）](../../../core_concepts/0_draft_and_deploy/index.mdx)ボタンを押して読み込みます。さきほど定義した入力欄が出ます。
 
-Note that Scripts are [versioned](../../../core_concepts/34_versioning/index.mdx#script-versioning) in Windmill, and
-each script version is uniquely identified by a hash.
+Windmill のスクリプトは[版管理されて](../../../core_concepts/34_versioning/index.mdx#script-versioning)おり、各版はハッシュで一意に識別されます。
 
-Fill in the input field, then hit "Run". You should see a run view, as well as
-your logs. All script runs are also available in the [Runs](../../../core_concepts/5_monitor_past_and_future_runs/index.mdx) menu on
-the left.
+入力欄を埋めて「実行（Run）」を押します。実行の様子とログが出ます。すべての実行は左側の[実行履歴](../../../core_concepts/5_monitor_past_and_future_runs/index.mdx)メニューからも見られます。
 
 ![Run hello world in TypeScript](./run_ts.png.webp)
 
-You can also choose to [run the script from the CLI](../../../advanced/3_cli/index.mdx) with the pre-made Command-line interface call.
+用意されたコマンドを使って、[CLI からスクリプトを実行する](../../../advanced/3_cli/index.mdx)こともできます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Triggers](../../../triggers/index.mdx) —— Trigger scripts and flows on-demand, by schedule or on external events.
+	- [トリガー](../../../triggers/index.mdx) —— スクリプトとフローを、必要なとき・スケジュール・外部の出来事で起こす。
 </div>
 
-## Caching
+## キャッシュ
 
-Every bundle on Bun is cached on disk by default. Furthermore if you use the [Distributed cache storage](../../../core_concepts/38_object_storage_in_windmill/index.mdx#instance-object-storage-distributed-cache-for-python-rust-go), it will be available to every other worker, allowing fast startup for every worker.
+Bun のバンドルは既定でディスクにキャッシュされます。さらに[分散キャッシュの保管](../../../core_concepts/38_object_storage_in_windmill/index.mdx#instance-object-storage-distributed-cache-for-python-rust-go)を使えば、他のすべての worker からも使えるようになり、どの worker でも起動が速くなります。
 
-## What's next?
+## 次は
 
-This script is a minimal working example, but there's a few more steps that can be useful in a real-world use case:
+このスクリプトは動く最小の例ですが、実際の用途ではさらにいくつかの段階が役に立ちます。
 
-- Pass [variables and secrets](../../../core_concepts/2_variables_and_secrets/index.mdx)
-  to a script.
-- Connect to [resources](../../../core_concepts/3_resources_and_types/index.mdx).
-- [Trigger that script](../../../triggers/index.mdx) in many ways.
-- Compose scripts in [Flows](../../../flows/1_flow_editor.mdx) or [Apps](../../7_apps_quickstart/index.mdx).
-- You can [share your scripts](../../../misc/1_share_on_hub/index.md) with the community on [Windmill Hub](https://hub.windmill.dev). Once
-  submitted, they will be verified by moderators before becoming available to
-  everyone right within Windmill.
+- スクリプトに[変数と秘密](../../../core_concepts/2_variables_and_secrets/index.mdx)を渡す。
+- [リソース](../../../core_concepts/3_resources_and_types/index.mdx)につなぐ。
+- [スクリプトを起こす](../../../triggers/index.mdx)方法はいくつもあります。
+- スクリプトを[フロー](../../../flows/1_flow_editor.mdx)や[アプリ](../../7_apps_quickstart/index.mdx)に組み合わせる。
+- [Windmill Hub](https://hub.windmill.dev) でスクリプトを[共有](../../../misc/1_share_on_hub/index.md)できます。投稿されたものは、Windmill の中で誰でも使えるようになる前に、管理者が確認します。
 
-Scripts are immutable and there is an hash for each deployment of a given script. Scripts are never overwritten and referring to a script by path is referring to the latest deployed hash at that path.
+スクリプトは不変で、配備するたびにハッシュが付きます。上書きされることはなく、パスでスクリプトを指すことは、そのパスに最後に配備されたハッシュを指すことを意味します。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Versioning](https://www.windmill.dev/docs/core_concepts/versioning#script-versioning) —— Scripts, when deployed, can have a parent script identified by its hash.
+	- [版管理](https://www.windmill.dev/docs/core_concepts/versioning#script-versioning) —— 配備されたスクリプトは、ハッシュで指される親のスクリプトを持ちうる。
 </div>
 
-For each script, a UI is autogenerated from the JSON schema inferred from the script signature, and can be customized further as standalone or embedded into rich UIs using the [App builder](../../7_apps_quickstart/index.mdx).
+各スクリプトには、署名から推論された JSON schema をもとに UI が自動生成されます。それは単体でも調整できますし、[アプリビルダー](../../7_apps_quickstart/index.mdx)で作り込んだ UI に埋め込むこともできます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Auto-generated UIs](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill creates auto-generated user interfaces for scripts and flows based on their parameters.
-	- [Generated UI](../../../script_editor/customize_ui.mdx) —— main function's arguments can be given advanced settings that will affect the inputs' auto-generated UI and JSON Schema.
+	- [自動生成される UI](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill はスクリプトとフローの引数から、UI を自動で作る。
+	- [生成される UI](../../../script_editor/customize_ui.mdx) —— main 関数の引数には詳細な設定を与えられ、入力の自動生成 UI と JSON Schema に反映される。
 </div>
 
-In addition to the UI, sync and async [webhooks](../../../core_concepts/4_webhooks/index.mdx) are generated for each deployment.
+UI に加えて、配備のたびに同期・非同期の [webhook](../../../core_concepts/4_webhooks/index.mdx) も作られます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Webhooks](https://www.windmill.dev/docs/core_concepts/webhooks) —— Trigger scripts and flows from webhooks.
+	- [webhook](https://www.windmill.dev/docs/core_concepts/webhooks) —— webhook からスクリプトとフローを起こす。
 </div>

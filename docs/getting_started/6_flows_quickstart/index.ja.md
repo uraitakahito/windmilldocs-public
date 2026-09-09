@@ -222,7 +222,7 @@ Windmill でフローを起こす方法はいくつもあります。
 <br />
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [フローの起こしかた](https://www.windmill.dev/docs/triggers) —— スクリプトとフローを、必要なとき・スケジュール・外部の出来事で起こす。
+	- [フローの起こしかた](../../triggers/index.mdx) —— スクリプトとフローを、必要なとき・スケジュール・外部の出来事で起こす。
 </div>
 
 ## フローをテストする

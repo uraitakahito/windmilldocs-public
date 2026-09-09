@@ -16,10 +16,8 @@
  * 通る。質のほうは目で読むしかない。そのつもりで使うこと。
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
-import { join, relative, dirname, basename, extname } from "node:path";
-import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync, cpSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { join, relative, basename } from "node:path";
+import { convert } from "./mdx-to-ja.mjs";
 
 const ROOT = process.cwd();
 const DOCS = join(ROOT, "docs");
@@ -72,28 +70,18 @@ const collectJa = (dir) => {
   return out;
 };
 
-/** 原文から骨組みを作り直す。生成器をそのまま使うので、規則の写しを持たない。 */
+/**
+ * 原文から骨組みを作り直す。**生成器の関数をそのまま呼ぶ。**
+ *
+ * 以前は一時ディレクトリに写して生成器を別プロセスで走らせていた。**それは間違い
+ * だった** —— 生成器はリンク先が実在するかを docs ツリー全体で調べるので、隣の
+ * 記事が無い一時ディレクトリでは、解決できるはずのリンクまで本家サイトへ落ちる。
+ * その誤った基準に訳を合わせて、実際に 1 本壊した。
+ */
 const rebuild = (jaPath) => {
   const stem = jaPath.slice(0, -".ja.md".length);
   const src = [".mdx", ".md"].map((e) => stem + e).find((p) => existsSync(p));
-  if (!src) return null;
-
-  const tmp = mkdtempSync(join(tmpdir(), "ja-check-"));
-  try {
-    // 生成器は原文の隣に書くので、原文だけを写した一時の場所で走らせる。
-    const rel = relative(ROOT, src);
-    const dest = join(tmp, rel);
-    cpSync(dirname(src), dirname(dest), { recursive: true });
-    // 既存の .ja.md を消してから作らせる (上書きしない仕様のため)。
-    for (const e of readdirSync(dirname(dest))) {
-      if (e.endsWith(".ja.md")) rmSync(join(dirname(dest), e));
-    }
-    execFileSync(process.execPath, [join(ROOT, "scripts/mdx-to-ja.mjs"), rel], { cwd: tmp });
-    const madePath = join(dirname(dest), basename(dest, extname(dest)) + ".ja.md");
-    return readFileSync(madePath, "utf8");
-  } finally {
-    rmSync(tmp, { recursive: true, force: true });
-  }
+  return src === undefined ? null : convert(src);
 };
 
 const problems = [];
