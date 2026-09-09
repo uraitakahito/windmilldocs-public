@@ -6,9 +6,6 @@ description: How do I build a full-code app with Windmill? Step-by-step guide to
 >
 > **未訳。** 以下は原文のままです。
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
 # Full-code apps quickstart
 
 This guide walks you through building your first [full-code app](../../full_code_apps/index.mdx). We'll create a React app from the Windmill UI, explore the scaffolded code, add a second backend runnable, and wire both into a polished frontend.

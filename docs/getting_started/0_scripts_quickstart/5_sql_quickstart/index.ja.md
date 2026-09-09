@@ -8,9 +8,6 @@ slug: '/getting_started/scripts_quickstart/sql'
 >
 > **未訳。** 以下は原文のままです。
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
 # PostgreSQL, MySQL, MS SQL, BigQuery, Snowflake, Redshift, Oracle, DuckDB
 
 In this quick start guide, we will write our first script in SQL. We will see how to connect a Windmill instance to an external SQL service and then send queries to the database using Windmill Scripts.

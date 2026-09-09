@@ -101,8 +101,14 @@ export const convert = (src) => {
     s = s.slice(fm[0].length);
   }
 
-  // `@site/` と、部品のための import を落とす (292 か所)。
-  s = s.replace(/^import\s+[\s\S]*?from\s+['"](@site|lucide-react|react-icons)[^'"]*['"];?\s*$/gm, "");
+  // MDX の import を落とす。
+  //
+  // `@theme/` も落とす —— `<Tabs>` / `<TabItem>` は下で見出しに変えるので、
+  // import だけが残ると GitHub に生の JS の行として出る (実際に残っていた)。
+  s = s.replace(
+    /^import\s+[\s\S]*?from\s+['"](@site|@theme|lucide-react|react-icons)[^'"]*['"];?\s*$/gm,
+    "",
+  );
 
   s = docCardsToList(s, src);
 
