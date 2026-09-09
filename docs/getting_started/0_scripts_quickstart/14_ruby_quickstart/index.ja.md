@@ -1,0 +1,343 @@
+---
+title: 'Ruby quickstart'
+description: 'How do I write Ruby scripts in Windmill? Create, test and deploy Ruby scripts with gem dependency management.'
+slug: '/getting_started/scripts_quickstart/ruby'
+---
+> **[原文](./index.mdx)の日本語訳。** 相違があれば原文が正。
+> 原典 © Windmill Labs, Inc. — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。この訳も同じライセンスで提供します。
+>
+> **未訳。** 以下は原文のままです。
+
+# Ruby quickstart
+
+In this quick start guide, we will write our first script in [Ruby](https://www.ruby-lang.org/).
+
+<div className="mb-4">
+	<video
+		className="border-2 rounded-xl object-cover w-full h-full dark:border-gray-800"
+		autoPlay
+		loop
+		controls
+		src="/videos/ruby.mp4"
+		alt="Ruby Demo"
+		muted
+	/>
+</div>
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	- [Local development](https://www.windmill.dev/docs/advanced/local_development) —— Develop from various environments such as your terminal, VS Code, and JetBrains IDEs.
+	- [Dependencies in Ruby](https://www.windmill.dev/docs/getting_started/scripts_quickstart/ruby#dependencies-management) —— How to manage dependencies in Ruby scripts.
+</div>
+
+Scripts are the basic building blocks in Windmill. They can be [run and scheduled](../../../triggers/index.mdx) as standalone, chained together to create [Flows](../../../flows/1_flow_editor.mdx) or displayed with a personalized User Interface as [Apps](../../7_apps_quickstart/index.mdx).
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	- [Script editor](../../../script_editor/index.mdx) —— All the details on scripts.
+	- [Triggers](../../../triggers/index.mdx) —— Trigger scripts and flows on-demand, by schedule or on external events.
+</div>
+
+Scripts consist of 2 parts:
+
+- [Code](#code): for Ruby scripts, they can optionally have a main function. Scripts without a main function will execute the entire file.
+- [Settings](#settings): settings & metadata about the Script such as its path, summary, description, [jsonschema](../../../core_concepts/13_json_schema_and_parsing/index.mdx) of its inputs (inferred from its signature).
+
+When stored in a code repository, these 2 parts are stored separately at `<path>.rb` and `<path>.script.yaml`
+
+Windmill automatically manages [dependencies](/docs/getting_started/scripts_quickstart/ruby#dependencies-management) for you.
+When you use gems in your Ruby script through `gemfile` blocks (compatible with bundler/inline syntax),
+Windmill parses these dependencies upon saving the script and automatically generates a Gemfile.lock,
+ensuring that the same version of the script is always executed with the same versions of its dependencies.
+More to it, to remove vendor lock-in barrier you have ability to extract the lockfile and use it outside Windmill if you want.
+
+This is a simple example of a script built in Ruby with Windmill:
+
+```ruby
+require 'windmill/inline'
+
+gemfile do
+  source 'https://rubygems.org'
+  gem 'httparty'
+  gem 'json'
+end
+
+def main(url: "https://httpbin.org/get", message: "Hello from Windmill!")
+  response = HTTParty.get(url, query: { message: message })
+  return {
+    status: response.code,
+    body: JSON.parse(response.body),
+    message: "Request completed successfully"
+  }
+end
+```
+
+In this quick start guide, we'll create a script that greets the operator running it.
+
+From the Home page, click **New** and select **Script**. This will take you to the first step of script creation: Metadata.
+
+## Settings
+
+![Ruby Settings](./ruby-settings.png "Ruby Settings")
+
+As part of the [settings](../../../script_editor/settings.mdx) menu, each script has metadata associated with it, enabling it to be defined and configured in depth.
+
+- **Path** is the Script's unique identifier that consists of the
+  [script's owner](../../../core_concepts/16_roles_and_permissions/index.mdx), and the script's name.
+  The owner can be either a user, or a group ([folder](../../../core_concepts/8_groups_and_folders/index.mdx#folders)).
+- **Summary** (optional) is a short, human-readable summary of the Script. It
+  will be displayed as a title across Windmill. If omitted, the UI will use the `path` by
+  default.
+- **Language** of the script.
+- **Description** is where you can give instructions through the [auto-generated UI](../../../core_concepts/6_auto_generated_uis/index.mdx)
+  to users on how to run your Script. It supports markdown.
+- **Script kind**: Action (by default), [Trigger](../../../flows/10_flow_trigger.mdx), [Approval](../../../flows/11_flow_approval.mdx) or [Error handler](../../../flows/7_flow_error_handler.md). This acts as a tag to filter appropriate scripts from the [flow editor](../../6_flows_quickstart/index.mdx).
+
+This menu also has additional settings on [Runtime](../../../script_editor/settings.mdx#runtime), [Generated UI](#generated-ui) and [Triggers](../../../script_editor/settings.mdx#triggers).
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	- [Settings](../../../script_editor/settings.mdx) —— Each script has metadata & settings associated with it, enabling it to be defined and configured in depth.
+</div>
+
+Now click on the code editor on the left side, and let's build our Hello World!
+
+## Code
+
+Windmill provides an online editor to work on your Scripts. The left-side is
+the editor itself. The right-side [previews the UI](../../../core_concepts/6_auto_generated_uis/index.mdx) that Windmill will
+generate from the Script's signature - this will be visible to the users of the
+Script. You can preview that UI, provide input values, and [test your script](#instant-preview--testing) there.
+
+![Ruby Editor](./ruby-startpage.png "Ruby Editor")
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	- [Code editor](../../../code_editor/index.mdx) —— The code editor is Windmill's integrated development environment.
+	- [Auto-generated UIs](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill creates auto-generated user interfaces for scripts and flows based on their parameters.
+</div>
+
+As we picked `ruby` for this example, Windmill provided some Ruby
+boilerplate. Let's take a look:
+
+```ruby
+# Builtin mini windmill client
+require 'windmill/mini'
+require 'windmill/inline'
+
+# Add your gem dependencies here using gemfile syntax
+gemfile do
+  source 'https://rubygems.org'
+  gem 'httparty', '~> 0.21'
+  gem 'json', '~> 2.6'
+end
+
+# You can import any gem from RubyGems.
+# See here for more info: https://www.windmill.dev/docs/getting_started/scripts_quickstart/ruby#dependencies-management
+
+def main(
+  name = "Nicolas Bourbaki",
+  age = 42,
+  obj = { "even" => "hashes" },
+  l = ["or", "arrays!"]
+)
+  puts "Hello World and a warm welcome especially to #{name}"
+  puts "and its acolytes.. #{age} #{obj} #{l}"
+
+  # retrieve variables, resources using built-in methods
+  begin
+		# Imported from windmill mini client
+    secret = get_variable("f/examples/secret")
+  rescue => e
+    secret = "No secret yet at f/examples/secret!"
+  end
+  puts "The variable at `f/examples/secret`: #{secret}"
+
+  # fetch context variables
+  user = ENV['WM_USERNAME']
+
+  # return value is converted to JSON
+  return {
+    "split" => name.split,
+    "user" => user,
+    "message" => "Hello from Ruby!"
+  }
+end
+```
+
+In Windmill, scripts can optionally have a `main` function that will be the script's
+entrypoint. If no main function is defined, the entire script will be executed. There are a few important things to note about the `main` function:
+
+- The main arguments are used for generating
+  1.  the [input spec](../../../core_concepts/13_json_schema_and_parsing/index.mdx) of the Script
+  2.  the [frontend](../../../core_concepts/6_auto_generated_uis/index.mdx) that you see when running the Script as a standalone app.
+- Default values are used to infer argument types and generate the UI form. String defaults create string inputs, numeric defaults create number inputs, hash/array defaults create appropriate JSON inputs, etc.
+- You can customize the UI in later steps (but not change the input type!).
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	- [JSON schema and parsing](https://www.windmill.dev/docs/core_concepts/json_schema_and_parsing) —— JSON Schemas are used for defining the input specification for scripts and flows, and specifying resource types.
+</div>
+
+The first import line imports the Windmill Ruby client, which provides access to built-in methods for accessing
+[variables](../../../core_concepts/2_variables_and_secrets/index.mdx) and
+[resources](../../../core_concepts/3_resources_and_types/index.mdx).
+
+Back to our Hello World. We can clean up the boilerplate, change the
+main to take in the user's name. Let's also return the `name`, maybe we can use
+this later if we use this Script within a [flow](../../../flows/1_flow_editor.mdx) or [app](../../../full_code_apps/index.mdx) and need to pass its result on.
+
+```ruby
+def main(name = "World")
+  puts "Hello #{name}! Greetings from Ruby!"
+  return name
+end
+```
+
+## Instant preview & testing
+
+Look at the UI preview on the right: it was updated to match the input
+signature. Run a test (`Ctrl` + `Enter`) to verify everything works.
+
+You can change how the UI behaves by changing the main signature. For example,
+if you remove the default for the `name` argument, the UI will consider this field
+as required.
+
+```ruby
+def main(name)
+```
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	- [Instant preview & testing](https://www.windmill.dev/docs/core_concepts/instant_preview) —— On top of its integrated editors, Windmill allows users to see and test what they are building directly from the editor, even before deployment.
+</div>
+
+Now let's go to the last step: the "Generated UI" settings.
+
+## Generated UI
+
+From the Settings menu, the "Generated UI" tab lets you customize the script's arguments.
+
+The UI is generated from the Script's main function signature, but you can add additional constraints here. For example, we could use the `Customize property`: add a regex by clicking on `Pattern` to make sure users are providing a name with only alphanumeric characters: `^[A-Za-z0-9]+$`. Let's still allow numbers in case you are some tech billionaire's kid.
+
+![Generated UI](./customize-ui.png "Generated UI")
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	- [Script kind](../../../script_editor/script_kinds.mdx) —— You can attach additional functionalities to Scripts by specializing them into specific Script kinds.
+	- [Generated UI](../../../script_editor/customize_ui.mdx) —— main function's arguments can be given advanced settings that will affect the inputs' auto-generated UI and JSON Schema.
+</div>
+
+## Run!
+
+We're done! Now let's look at what users of the script will do. Click on the [Deploy](../../../core_concepts/0_draft_and_deploy/index.mdx) button
+to load the script. You'll see the user input form we defined earlier.
+
+Note that Scripts are [versioned](../../../core_concepts/34_versioning/index.mdx#script-versioning) in Windmill, and
+each script version is uniquely identified by a hash.
+
+Fill in the input field, then hit "Run". You should see a run view, as well as
+your logs. All script runs are also available in the [Runs](../../../core_concepts/5_monitor_past_and_future_runs/index.mdx) menu on
+the left.
+
+You can also choose to [run the script from the CLI](../../../advanced/3_cli/index.mdx) with the pre-made Command-line interface call.
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	- [Triggers](../../../triggers/index.mdx) —— Trigger scripts and flows on-demand, by schedule or on external events.
+</div>
+
+## Dependencies management
+
+Ruby dependencies are managed using a `gemfile` block that is fully compatible with bundler/inline syntax. The gemfile block must include a single global source:
+
+```ruby
+require 'windmill/inline'
+
+gemfile do
+  source 'https://rubygems.org'
+  gem 'httparty', '~> 0.21'
+  gem 'redis', '>= 4.0'
+  gem 'activerecord', '7.0.0'
+  gem 'pg', require: 'pg'
+  gem 'dotenv', require: false
+end
+```
+
+### Private gem sources
+
+You can use private gem repositories using different syntax options:
+
+**Option 1: Per-gem source specification**
+```ruby
+require 'windmill/inline'
+
+gemfile do
+  source 'https://rubygems.org'
+  gem 'httparty'
+  gem 'private-gem', source: 'https://gems.example.com'
+end
+```
+
+**Option 2: Source block syntax**
+```ruby
+require 'windmill/inline'
+
+gemfile do
+  source 'https://rubygems.org'
+  
+  source 'https://gems.example.com' do
+    gem 'private-gem-1'
+    gem 'private-gem-2'
+  end
+end
+```
+
+For authentication with private sources, specify the source URL without credentials in your script. For [Enterprise Edition](/pricing) users, add the authenticated URL to Ruby repositories in instance settings. Navigate to **Instance Settings > Registries > Ruby Repos** and add:
+
+```
+https://admin:123@gems.example.com/
+```
+
+![Ruby Private repos Instance Settings](./ruby-gems-instance-settings.png "Ruby Private repos Instance Settings")
+
+Windmill will automatically match the source URL from your script with the authenticated URL from settings and handle authentication seamlessly.
+
+### Network configuration
+
+- **TLS/SSL**: Automatically handled as long as the remote certificate is trusted by the system
+- **Proxy**: Proxy environment variables are automatically handled during lockfile generation, gem installation, and runtime stages
+
+Windmill will automatically:
+- Parse your gemfile block when you save the script
+- Generate a Gemfile and Gemfile.lock
+- Install dependencies in an isolated environment
+- Cache dependencies for faster execution
+
+## Caching
+
+Every gem dependency in Ruby is cached on disk by default. Furthermore if you use the [Distributed cache storage](../../../core_concepts/38_object_storage_in_windmill/index.mdx#instance-object-storage-distributed-cache-for-python-rust-go), it will be available to every other worker, allowing fast startup for every worker.
+
+## What's next?
+
+This script is a minimal working example, but there's a few more steps that can be useful in a real-world use case:
+
+- Pass [variables and secrets](../../../core_concepts/2_variables_and_secrets/index.mdx)
+  to a script.
+- Connect to [resources](../../../core_concepts/3_resources_and_types/index.mdx).
+- [Trigger that script](../../../triggers/index.mdx) in many ways.
+- Compose scripts in [Flows](../../../flows/1_flow_editor.mdx), [low-code apps](../../../apps/0_app_editor/index.mdx) or [full-code apps](../../../full_code_apps/index.mdx).
+- You can [share your scripts](../../../misc/1_share_on_hub/index.md) with the community on [Windmill Hub](https://hub.windmill.dev). Once
+  submitted, they will be verified by moderators before becoming available to
+  everyone right within Windmill.
+
+Scripts are immutable and there is a hash for each deployment of a given script. Scripts are never overwritten and referring to a script by path is referring to the latest deployed hash at that path.
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	- [Versioning](https://www.windmill.dev/docs/core_concepts/versioning#script-versioning) —— Scripts, when deployed, can have a parent script identified by its hash.
+</div>
+
+For each script, a UI is autogenerated from the jsonschema inferred from the script signature, and can be customized further as standalone or embedded into rich UIs using the [App builder](../../7_apps_quickstart/index.mdx).
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	- [Auto-generated UIs](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill creates auto-generated user interfaces for scripts and flows based on their parameters.
+	- [Generated UI](../../../script_editor/customize_ui.mdx) —— main function's arguments can be given advanced settings that will affect the inputs' auto-generated UI and JSON Schema.
+</div>
+
+In addition to the UI, sync and async [webhooks](../../../core_concepts/4_webhooks/index.mdx) are generated for each deployment.
+
+<div className="grid grid-cols-2 gap-6 mb-4">
+	- [Webhooks](https://www.windmill.dev/docs/core_concepts/webhooks) —— Trigger scripts and flows from webhooks.
+</div>

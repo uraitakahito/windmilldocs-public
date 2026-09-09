@@ -1,0 +1,22 @@
+# gitleaks の設定。既定の規則をすべて継承したうえで、**1 点だけ**除外する。
+[extend]
+useDefault = true
+
+[[rules]]
+id = "private-key"
+description = "Private Key"
+regex = '''-----BEGIN[ A-Z]*PRIVATE KEY[ A-Z]*-----'''
+
+  [rules.allowlist]
+  description = """
+  日本語訳 (.ja.md) に写る、原文の例示内容。
+
+  Windmill のドキュメントには SSH 鍵の「形」を見せる例示がいくつかあり、訳文を
+  作るときにそのまま写る。**同じ内容は既に原文の .mdx に入っていて、この repo に
+  コミット済み** (docs/getting_started/0_scripts_quickstart/10_ansible_quickstart/
+  index.mdx。本家の sync commit 由来)。つまり訳が新しく持ち込むものではない。
+
+  除外は **.ja.md かつ private-key の規則だけ** に絞る。他の規則も、他の拡張子も
+  除外しない —— 訳文に本物の秘密が混ざる経路を塞いだままにするため。
+  """
+  paths = ['''docs/.*\.ja\.md$''']

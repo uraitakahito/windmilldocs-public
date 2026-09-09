@@ -39,10 +39,31 @@ git diff <前の .source-sha 時点の main>..main -- docs/
 
 ## 訳の置き場所
 
+**原文の隣に `.ja.md` として置く。**
+
 ```
-docs/                                            英語 (本家のまま、触らない)
-i18n/ja/docusaurus-plugin-content-docs/current/  訳したものだけ
+docs/getting_started/index.mdx      原文 (本家のまま、触らない)
+docs/getting_started/index.ja.md    訳
 ```
 
-Docusaurus の i18n は**訳が無いページを英語に落とす**ので、401 本のうち数本だけ
-訳した状態が正常。`crawler/` の docs-site と違い、en/ja の 1:1 は要求されない。
+別ツリーにすると 904 件の画像参照と 4135 件のリンクが壊れるため。同じ
+ディレクトリなら、どちらもそのまま動く。
+
+**上流の merge で衝突しない。** 本家は `.ja.md` を触らないので、`git merge main`
+では英語だけが更新される。
+
+## 原文が動いたとき、どこを訳し直すか
+
+```sh
+# 前回追随した時点から、原文がどう変わったか
+git diff <前の main の commit>..main -- docs/
+
+# 訳が古くなったページを名指しする (原文が新しいものだけ)
+for f in $(git diff --name-only <前>..main -- docs/ | grep -E '\.mdx?$'); do
+  ja="${f%.*}.ja.md"
+  [ -f "$ja" ] && echo "要更新: $ja"
+done
+```
+
+**訳と原文のずれは、この差分でしか分からない。** 目次 (`docs/INDEX.ja.md`) は
+「訳済みか骨組みか」しか区別しないので、**古い訳は「訳済み」に見える**。
