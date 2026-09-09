@@ -1,16 +1,15 @@
 ---
-title: 'Ruby quickstart'
-description: 'How do I write Ruby scripts in Windmill? Create, test and deploy Ruby scripts with gem dependency management.'
+title: 'Ruby クイックスタート'
+description: 'Windmill で Ruby のスクリプトを書くには。gem による依存関係の管理とあわせて、作り、テストし、配備する。'
 slug: '/getting_started/scripts_quickstart/ruby'
 ---
+
 > **[原文](./index.mdx)の日本語訳。** 相違があれば原文が正。
 > 原典 © Windmill Labs, Inc. — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。この訳も同じライセンスで提供します。
->
-> **未訳。** 以下は原文のままです。
 
-# Ruby quickstart
+# Ruby クイックスタート
 
-In this quick start guide, we will write our first script in [Ruby](https://www.ruby-lang.org/).
+この手引きでは、最初のスクリプトを [Ruby](https://www.ruby-lang.org/) で書きます。
 
 <div className="mb-4">
 	<video
@@ -26,31 +25,27 @@ In this quick start guide, we will write our first script in [Ruby](https://www.
 
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Local development](https://www.windmill.dev/docs/advanced/local_development) —— Develop from various environments such as your terminal, VS Code, and JetBrains IDEs.
-	- [Dependencies in Ruby](https://www.windmill.dev/docs/getting_started/scripts_quickstart/ruby#dependencies-management) —— How to manage dependencies in Ruby scripts.
+	- [手元での開発](https://www.windmill.dev/docs/advanced/local_development) —— 端末・VS Code・JetBrains の IDE など、さまざまな環境から開発する。
+	- [Ruby の依存関係](https://www.windmill.dev/docs/getting_started/scripts_quickstart/ruby#dependencies-management) —— Ruby のスクリプトで依存関係をどう扱うか。
 </div>
 
-Scripts are the basic building blocks in Windmill. They can be [run and scheduled](../../../triggers/index.mdx) as standalone, chained together to create [Flows](../../../flows/1_flow_editor.mdx) or displayed with a personalized User Interface as [Apps](../../7_apps_quickstart/index.mdx).
+スクリプトは Windmill の基本の部品です。単体で[実行・スケジュール](../../../triggers/index.mdx)できますし、つなげて[フロー](../../../flows/1_flow_editor.mdx)にすることも、専用の UI を付けて[アプリ](../../7_apps_quickstart/index.mdx)として見せることもできます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Script editor](../../../script_editor/index.mdx) —— All the details on scripts.
-	- [Triggers](../../../triggers/index.mdx) —— Trigger scripts and flows on-demand, by schedule or on external events.
+	- [スクリプトエディタ](../../../script_editor/index.mdx) —— スクリプトのすべて。
+	- [トリガー](../../../triggers/index.mdx) —— スクリプトとフローを、必要なとき・スケジュール・外部の出来事で起こす。
 </div>
 
-Scripts consist of 2 parts:
+スクリプトは 2 つの部分でできています。
 
-- [Code](#code): for Ruby scripts, they can optionally have a main function. Scripts without a main function will execute the entire file.
-- [Settings](#settings): settings & metadata about the Script such as its path, summary, description, [jsonschema](../../../core_concepts/13_json_schema_and_parsing/index.mdx) of its inputs (inferred from its signature).
+- [コード](#コード): Ruby のスクリプトでは、`main` 関数は任意です。`main` 関数が無いスクリプトは、ファイル全体が実行されます。
+- [設定](#設定): パス・要約・説明・入力の [JSON Schema](../../../core_concepts/13_json_schema_and_parsing/index.mdx)（署名から推論されます）といった、スクリプトの設定とメタデータ。
 
-When stored in a code repository, these 2 parts are stored separately at `<path>.rb` and `<path>.script.yaml`
+コードリポジトリに保存すると、この 2 つは `<path>.rb` と `<path>.script.yaml` に分かれて置かれます。
 
-Windmill automatically manages [dependencies](/docs/getting_started/scripts_quickstart/ruby#dependencies-management) for you.
-When you use gems in your Ruby script through `gemfile` blocks (compatible with bundler/inline syntax),
-Windmill parses these dependencies upon saving the script and automatically generates a Gemfile.lock,
-ensuring that the same version of the script is always executed with the same versions of its dependencies.
-More to it, to remove vendor lock-in barrier you have ability to extract the lockfile and use it outside Windmill if you want.
+[依存関係](/docs/getting_started/scripts_quickstart/ruby#dependencies-management)は Windmill が自動で扱います。Ruby のスクリプトで `gemfile` ブロック（bundler/inline の書き方に対応しています）を使って gem を指定すると、保存時に Windmill がそれを読み取り、Gemfile.lock を自動で作ります。これにより、同じ版のスクリプトは常に同じ版の依存関係で実行されます。さらに、特定の製品に縛られないよう、lockfile を取り出して Windmill の外で使うこともできます。
 
-This is a simple example of a script built in Ruby with Windmill:
+Windmill で Ruby で組んだスクリプトの簡単な例を挙げます。
 
 ```ruby
 require 'windmill/inline'
@@ -71,51 +66,42 @@ def main(url: "https://httpbin.org/get", message: "Hello from Windmill!")
 end
 ```
 
-In this quick start guide, we'll create a script that greets the operator running it.
+この手引きでは、実行した人に挨拶するスクリプトを作ります。
 
-From the Home page, click **New** and select **Script**. This will take you to the first step of script creation: Metadata.
+ホーム画面で **新規（New）** をクリックし、**スクリプト（Script）** を選びます。スクリプト作成の最初の段階、メタデータに進みます。
 
-## Settings
+## 設定
 
 ![Ruby Settings](./ruby-settings.png "Ruby Settings")
 
-As part of the [settings](../../../script_editor/settings.mdx) menu, each script has metadata associated with it, enabling it to be defined and configured in depth.
+[設定](../../../script_editor/settings.mdx)メニューの一部として、各スクリプトにはメタデータが付いており、細かく定義・設定できます。
 
-- **Path** is the Script's unique identifier that consists of the
-  [script's owner](../../../core_concepts/16_roles_and_permissions/index.mdx), and the script's name.
-  The owner can be either a user, or a group ([folder](../../../core_concepts/8_groups_and_folders/index.mdx#folders)).
-- **Summary** (optional) is a short, human-readable summary of the Script. It
-  will be displayed as a title across Windmill. If omitted, the UI will use the `path` by
-  default.
-- **Language** of the script.
-- **Description** is where you can give instructions through the [auto-generated UI](../../../core_concepts/6_auto_generated_uis/index.mdx)
-  to users on how to run your Script. It supports markdown.
-- **Script kind**: Action (by default), [Trigger](../../../flows/10_flow_trigger.mdx), [Approval](../../../flows/11_flow_approval.mdx) or [Error handler](../../../flows/7_flow_error_handler.md). This acts as a tag to filter appropriate scripts from the [flow editor](../../6_flows_quickstart/index.mdx).
+- **パス（Path）**はスクリプトを一意に指す識別子で、[スクリプトの所有者](../../../core_concepts/16_roles_and_permissions/index.mdx)と名前からなります。所有者はユーザーか、グループ（[フォルダ](../../../core_concepts/8_groups_and_folders/index.mdx#folders)）です。
+- **要約（Summary）**（任意）はスクリプトの短い説明で、人が読むためのものです。Windmill 全体で見出しとして表示されます。省略すると、既定で `path` が使われます。
+- スクリプトの**言語**。
+- **説明（Description）**では、[自動生成される UI](../../../core_concepts/6_auto_generated_uis/index.mdx) を通じて、使う人に実行のしかたを伝えられます。markdown が使えます。
+- **スクリプトの種類**: アクション（既定）、[トリガー](../../../flows/10_flow_trigger.mdx)、[承認](../../../flows/11_flow_approval.mdx)、[エラーハンドラ](../../../flows/7_flow_error_handler.md)。[フローエディタ](../../6_flows_quickstart/index.mdx)で適切なスクリプトを絞り込むための札として働きます。
 
-This menu also has additional settings on [Runtime](../../../script_editor/settings.mdx#runtime), [Generated UI](#generated-ui) and [Triggers](../../../script_editor/settings.mdx#triggers).
+このメニューには [ランタイム](../../../script_editor/settings.mdx#runtime)・[生成される UI](#生成される-ui)・[トリガー](../../../script_editor/settings.mdx#triggers)の設定もあります。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Settings](../../../script_editor/settings.mdx) —— Each script has metadata & settings associated with it, enabling it to be defined and configured in depth.
+	- [設定](../../../script_editor/settings.mdx) —— 各スクリプトにはメタデータと設定が付いており、細かく定義・設定できる。
 </div>
 
-Now click on the code editor on the left side, and let's build our Hello World!
+では左側のコードエディタに移り、Hello World を作りましょう。
 
-## Code
+## コード
 
-Windmill provides an online editor to work on your Scripts. The left-side is
-the editor itself. The right-side [previews the UI](../../../core_concepts/6_auto_generated_uis/index.mdx) that Windmill will
-generate from the Script's signature - this will be visible to the users of the
-Script. You can preview that UI, provide input values, and [test your script](#instant-preview--testing) there.
+Windmill にはスクリプトを書くためのオンラインエディタがあります。左側がエディタ本体です。右側は、スクリプトの署名から Windmill が[生成する UI の下見](../../../core_concepts/6_auto_generated_uis/index.mdx)で、これがスクリプトを使う人に見えるものです。その UI を確かめ、値を入れて、[その場でテスト](#その場での確認とテスト)できます。
 
 ![Ruby Editor](./ruby-startpage.png "Ruby Editor")
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Code editor](../../../code_editor/index.mdx) —— The code editor is Windmill's integrated development environment.
-	- [Auto-generated UIs](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill creates auto-generated user interfaces for scripts and flows based on their parameters.
+	- [コードエディタ](../../../code_editor/index.mdx) —— コードエディタは Windmill に統合された開発環境。
+	- [自動生成される UI](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill はスクリプトとフローの引数から、UI を自動で作る。
 </div>
 
-As we picked `ruby` for this example, Windmill provided some Ruby
-boilerplate. Let's take a look:
+この例では `ruby` を選んだので、Windmill が Ruby の雛形を用意してくれています。見てみましょう。
 
 ```ruby
 # Builtin mini windmill client
@@ -162,26 +148,21 @@ def main(
 end
 ```
 
-In Windmill, scripts can optionally have a `main` function that will be the script's
-entrypoint. If no main function is defined, the entire script will be executed. There are a few important things to note about the `main` function:
+Windmill のスクリプトでは、入口となる `main` 関数は任意です。`main` 関数が無ければ、スクリプト全体が実行されます。`main` について押さえておくべき点がいくつかあります。
 
-- The main arguments are used for generating
-  1.  the [input spec](../../../core_concepts/13_json_schema_and_parsing/index.mdx) of the Script
-  2.  the [frontend](../../../core_concepts/6_auto_generated_uis/index.mdx) that you see when running the Script as a standalone app.
-- Default values are used to infer argument types and generate the UI form. String defaults create string inputs, numeric defaults create number inputs, hash/array defaults create appropriate JSON inputs, etc.
-- You can customize the UI in later steps (but not change the input type!).
+- `main` の引数は次の 2 つを作るのに使われます。
+  1.  スクリプトの[入力仕様](../../../core_concepts/13_json_schema_and_parsing/index.mdx)
+  2.  スクリプトを単体のアプリとして実行したときに見える[画面](../../../core_concepts/6_auto_generated_uis/index.mdx)
+- 引数の型は既定値から推論され、UI の入力欄が作られます。文字列の既定値なら文字列の欄、数値なら数値の欄、ハッシュや配列ならそれに応じた JSON の欄、といった具合です。
+- UI は後の段階で調整できます（ただし入力の型は変えられません）。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [JSON schema and parsing](https://www.windmill.dev/docs/core_concepts/json_schema_and_parsing) —— JSON Schemas are used for defining the input specification for scripts and flows, and specifying resource types.
+	- [JSON schema と解釈](https://www.windmill.dev/docs/core_concepts/json_schema_and_parsing) —— JSON Schema は、スクリプトとフローの入力仕様を定め、リソースの型を指定するために使われる。
 </div>
 
-The first import line imports the Windmill Ruby client, which provides access to built-in methods for accessing
-[variables](../../../core_concepts/2_variables_and_secrets/index.mdx) and
-[resources](../../../core_concepts/3_resources_and_types/index.mdx).
+最初の import は Windmill の Ruby クライアントで、[変数](../../../core_concepts/2_variables_and_secrets/index.mdx)や[リソース](../../../core_concepts/3_resources_and_types/index.mdx)を使うための組み込みのメソッドが手に入ります。
 
-Back to our Hello World. We can clean up the boilerplate, change the
-main to take in the user's name. Let's also return the `name`, maybe we can use
-this later if we use this Script within a [flow](../../../flows/1_flow_editor.mdx) or [app](../../../full_code_apps/index.mdx) and need to pass its result on.
+Hello World に戻ります。雛形を整理して、`main` が利用者の名前を受け取るようにします。`name` を返しておきましょう —— このスクリプトを[フロー](../../../flows/1_flow_editor.mdx)や[アプリ](../../../full_code_apps/index.mdx)の中で使い、結果を次へ渡したくなるかもしれません。
 
 ```ruby
 def main(name = "World")
@@ -190,59 +171,52 @@ def main(name = "World")
 end
 ```
 
-## Instant preview & testing
+## その場での確認とテスト
 
-Look at the UI preview on the right: it was updated to match the input
-signature. Run a test (`Ctrl` + `Enter`) to verify everything works.
+右側の UI の下見を見てください。入力の署名に合わせて更新されています。テストを実行して（`Ctrl` + `Enter`）、動くことを確かめましょう。
 
-You can change how the UI behaves by changing the main signature. For example,
-if you remove the default for the `name` argument, the UI will consider this field
-as required.
+`main` の署名を変えれば、UI の振る舞いも変えられます。たとえば `name` 引数の既定値を消すと、UI はこの欄を必須として扱います。
 
 ```ruby
 def main(name)
 ```
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Instant preview & testing](https://www.windmill.dev/docs/core_concepts/instant_preview) —— On top of its integrated editors, Windmill allows users to see and test what they are building directly from the editor, even before deployment.
+	- [その場での確認とテスト](https://www.windmill.dev/docs/core_concepts/instant_preview) —— Windmill は統合されたエディタに加えて、配備の前でも、作っているものをその場で見て試せるようにしている。
 </div>
 
-Now let's go to the last step: the "Generated UI" settings.
+では最後の段階、「生成される UI」の設定に進みます。
 
-## Generated UI
+## 生成される UI
 
-From the Settings menu, the "Generated UI" tab lets you customize the script's arguments.
+設定メニューの「生成される UI（Generated UI）」タブでは、スクリプトの引数を調整できます。
 
-The UI is generated from the Script's main function signature, but you can add additional constraints here. For example, we could use the `Customize property`: add a regex by clicking on `Pattern` to make sure users are providing a name with only alphanumeric characters: `^[A-Za-z0-9]+$`. Let's still allow numbers in case you are some tech billionaire's kid.
+UI はスクリプトの `main` 関数の署名から作られますが、ここで制約を足せます。たとえば `プロパティを調整（Customize property）` から `パターン（Pattern）` をクリックして正規表現を書き、英数字だけの名前を求められます: `^[A-Za-z0-9]+$`。数字も許しておきましょう —— どこかの技術系の富豪の子かもしれませんから。
 
 ![Generated UI](./customize-ui.png "Generated UI")
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Script kind](../../../script_editor/script_kinds.mdx) —— You can attach additional functionalities to Scripts by specializing them into specific Script kinds.
-	- [Generated UI](../../../script_editor/customize_ui.mdx) —— main function's arguments can be given advanced settings that will affect the inputs' auto-generated UI and JSON Schema.
+	- [スクリプトの種類](../../../script_editor/script_kinds.mdx) —— スクリプトを特定の種類に絞ることで、追加の働きを持たせられる。
+	- [生成される UI](../../../script_editor/customize_ui.mdx) —— main 関数の引数には詳細な設定を与えられ、入力の自動生成 UI と JSON Schema に反映される。
 </div>
 
-## Run!
+## 実行する
 
-We're done! Now let's look at what users of the script will do. Click on the [Deploy](../../../core_concepts/0_draft_and_deploy/index.mdx) button
-to load the script. You'll see the user input form we defined earlier.
+これで完成です。次は、このスクリプトを使う人の側を見てみましょう。[配備（Deploy）](../../../core_concepts/0_draft_and_deploy/index.mdx)ボタンを押して読み込みます。さきほど定義した入力欄が出ます。
 
-Note that Scripts are [versioned](../../../core_concepts/34_versioning/index.mdx#script-versioning) in Windmill, and
-each script version is uniquely identified by a hash.
+Windmill のスクリプトは[版管理されて](../../../core_concepts/34_versioning/index.mdx#script-versioning)おり、各版はハッシュで一意に識別されます。
 
-Fill in the input field, then hit "Run". You should see a run view, as well as
-your logs. All script runs are also available in the [Runs](../../../core_concepts/5_monitor_past_and_future_runs/index.mdx) menu on
-the left.
+入力欄を埋めて「実行（Run）」を押します。実行の様子とログが出ます。すべての実行は左側の[実行履歴](../../../core_concepts/5_monitor_past_and_future_runs/index.mdx)メニューからも見られます。
 
-You can also choose to [run the script from the CLI](../../../advanced/3_cli/index.mdx) with the pre-made Command-line interface call.
+用意されたコマンドを使って、[CLI からスクリプトを実行する](../../../advanced/3_cli/index.mdx)こともできます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Triggers](../../../triggers/index.mdx) —— Trigger scripts and flows on-demand, by schedule or on external events.
+	- [トリガー](../../../triggers/index.mdx) —— スクリプトとフローを、必要なとき・スケジュール・外部の出来事で起こす。
 </div>
 
-## Dependencies management
+## 依存の管理
 
-Ruby dependencies are managed using a `gemfile` block that is fully compatible with bundler/inline syntax. The gemfile block must include a single global source:
+Ruby の依存関係は、bundler/inline の書き方とそのまま互換な `gemfile` ブロックで管理します。gemfile ブロックには、全体で使う取得元（source）を 1 つだけ書きます。
 
 ```ruby
 require 'windmill/inline'
@@ -257,11 +231,11 @@ gemfile do
 end
 ```
 
-### Private gem sources
+### 非公開の gem の取得元
 
-You can use private gem repositories using different syntax options:
+非公開の gem リポジトリも使えます。書き方はいくつかあります。
 
-**Option 1: Per-gem source specification**
+**その 1: gem ごとに取得元を指定する**
 ```ruby
 require 'windmill/inline'
 
@@ -272,7 +246,7 @@ gemfile do
 end
 ```
 
-**Option 2: Source block syntax**
+**その 2: source ブロックでまとめる**
 ```ruby
 require 'windmill/inline'
 
@@ -286,7 +260,7 @@ gemfile do
 end
 ```
 
-For authentication with private sources, specify the source URL without credentials in your script. For [Enterprise Edition](/pricing) users, add the authenticated URL to Ruby repositories in instance settings. Navigate to **Instance Settings > Registries > Ruby Repos** and add:
+非公開の取得元で認証が要る場合は、スクリプトには資格情報を含まない URL を書きます。[Enterprise 版](/pricing)をお使いなら、認証情報付きの URL をインスタンスの設定にある Ruby のリポジトリに登録します。**インスタンスの設定（Instance Settings）> レジストリ（Registries）> Ruby Repos** と進み、次を追加します。
 
 ```
 https://admin:123@gems.example.com/
@@ -294,51 +268,48 @@ https://admin:123@gems.example.com/
 
 ![Ruby Private repos Instance Settings](./ruby-gems-instance-settings.png "Ruby Private repos Instance Settings")
 
-Windmill will automatically match the source URL from your script with the authenticated URL from settings and handle authentication seamlessly.
+Windmill は、スクリプトに書かれた取得元の URL と、設定に登録された認証情報付きの URL を自動で突き合わせ、認証を引き受けます。
 
-### Network configuration
+### ネットワークの設定
 
-- **TLS/SSL**: Automatically handled as long as the remote certificate is trusted by the system
-- **Proxy**: Proxy environment variables are automatically handled during lockfile generation, gem installation, and runtime stages
+- **TLS/SSL**: 相手の証明書がシステムに信頼されていれば、自動で処理されます
+- **プロキシ**: プロキシの環境変数は、lockfile の生成・gem の導入・実行のいずれの段階でも自動で扱われます
 
-Windmill will automatically:
-- Parse your gemfile block when you save the script
-- Generate a Gemfile and Gemfile.lock
-- Install dependencies in an isolated environment
-- Cache dependencies for faster execution
+Windmill は次のことを自動で行います。
+- スクリプトを保存したときに gemfile ブロックを読み取る
+- Gemfile と Gemfile.lock を作る
+- 隔離された環境に依存関係を導入する
+- 依存関係をキャッシュして実行を速くする
 
-## Caching
+## キャッシュ
 
-Every gem dependency in Ruby is cached on disk by default. Furthermore if you use the [Distributed cache storage](../../../core_concepts/38_object_storage_in_windmill/index.mdx#instance-object-storage-distributed-cache-for-python-rust-go), it will be available to every other worker, allowing fast startup for every worker.
+Ruby の gem は既定でディスクにキャッシュされます。さらに[分散キャッシュの保管](../../../core_concepts/38_object_storage_in_windmill/index.mdx#instance-object-storage-distributed-cache-for-python-rust-go)を使えば、他のすべての worker からも使えるようになり、どの worker でも起動が速くなります。
 
-## What's next?
+## 次は
 
-This script is a minimal working example, but there's a few more steps that can be useful in a real-world use case:
+このスクリプトは動く最小の例ですが、実際の用途ではさらにいくつかの段階が役に立ちます。
 
-- Pass [variables and secrets](../../../core_concepts/2_variables_and_secrets/index.mdx)
-  to a script.
-- Connect to [resources](../../../core_concepts/3_resources_and_types/index.mdx).
-- [Trigger that script](../../../triggers/index.mdx) in many ways.
-- Compose scripts in [Flows](../../../flows/1_flow_editor.mdx), [low-code apps](../../../apps/0_app_editor/index.mdx) or [full-code apps](../../../full_code_apps/index.mdx).
-- You can [share your scripts](../../../misc/1_share_on_hub/index.md) with the community on [Windmill Hub](https://hub.windmill.dev). Once
-  submitted, they will be verified by moderators before becoming available to
-  everyone right within Windmill.
+- スクリプトに[変数と秘密](../../../core_concepts/2_variables_and_secrets/index.mdx)を渡す。
+- [リソース](../../../core_concepts/3_resources_and_types/index.mdx)につなぐ。
+- [スクリプトを起こす](../../../triggers/index.mdx)方法はいくつもあります。
+- スクリプトを[フロー](../../../flows/1_flow_editor.mdx)・[ローコードのアプリ](../../../apps/0_app_editor/index.mdx)・[フルコードのアプリ](../../../full_code_apps/index.mdx)に組み合わせる。
+- [Windmill Hub](https://hub.windmill.dev) でスクリプトを[共有](../../../misc/1_share_on_hub/index.md)できます。投稿されたものは、Windmill の中で誰でも使えるようになる前に、管理者が確認します。
 
-Scripts are immutable and there is a hash for each deployment of a given script. Scripts are never overwritten and referring to a script by path is referring to the latest deployed hash at that path.
+スクリプトは不変で、配備するたびにハッシュが付きます。上書きされることはなく、パスでスクリプトを指すことは、そのパスに最後に配備されたハッシュを指すことを意味します。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Versioning](https://www.windmill.dev/docs/core_concepts/versioning#script-versioning) —— Scripts, when deployed, can have a parent script identified by its hash.
+	- [版管理](https://www.windmill.dev/docs/core_concepts/versioning#script-versioning) —— 配備されたスクリプトは、ハッシュで指される親のスクリプトを持ちうる。
 </div>
 
-For each script, a UI is autogenerated from the jsonschema inferred from the script signature, and can be customized further as standalone or embedded into rich UIs using the [App builder](../../7_apps_quickstart/index.mdx).
+各スクリプトには、署名から推論された JSON schema をもとに UI が自動生成されます。それは単体でも調整できますし、[アプリビルダー](../../7_apps_quickstart/index.mdx)で作り込んだ UI に埋め込むこともできます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Auto-generated UIs](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill creates auto-generated user interfaces for scripts and flows based on their parameters.
-	- [Generated UI](../../../script_editor/customize_ui.mdx) —— main function's arguments can be given advanced settings that will affect the inputs' auto-generated UI and JSON Schema.
+	- [自動生成される UI](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill はスクリプトとフローの引数から、UI を自動で作る。
+	- [生成される UI](../../../script_editor/customize_ui.mdx) —— main 関数の引数には詳細な設定を与えられ、入力の自動生成 UI と JSON Schema に反映される。
 </div>
 
-In addition to the UI, sync and async [webhooks](../../../core_concepts/4_webhooks/index.mdx) are generated for each deployment.
+UI に加えて、配備のたびに同期・非同期の [webhook](../../../core_concepts/4_webhooks/index.mdx) も作られます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Webhooks](https://www.windmill.dev/docs/core_concepts/webhooks) —— Trigger scripts and flows from webhooks.
+	- [webhook](https://www.windmill.dev/docs/core_concepts/webhooks) —— webhook からスクリプトとフローを起こす。
 </div>

@@ -107,6 +107,16 @@ const rebuild = (jaPath) => {
   return src === undefined ? null : convert(src);
 };
 
+/** その行がコードフェンスの中か。 */
+const inFenceAt = (text, index) => {
+  let infence = false;
+  const lines = text.split("\n");
+  for (let i = 0; i < index && i < lines.length; i += 1) {
+    if (/^\s*```/.test(lines[i])) infence = !infence;
+  }
+  return infence;
+};
+
 const problems = [];
 let checked = 0;
 let skipped = 0;
@@ -173,6 +183,22 @@ for (const ja of collectJa(DOCS)) {
     for (const [url, m] of to) {
       const n = from.get(url) ?? 0;
       if (m > n) problems.push(`${rel}: 原文より多い${what} → ${url} (原文 ${n} 回 / 訳 ${m} 回)`);
+    }
+  }
+
+  // **日本語のはずの散文に、別の文字体系が紛れていないか。**
+  //
+  // 訳しているときに、キリル文字やハングルが 1 語だけ混ざることがある
+  // (「特化」のつもりが「специализ」、「形」のつもりが「형」—— どちらも実際に
+  // 出荷済みの訳から見つかった)。読めば分かるはずのものだが、長い file では
+  // 見落とす。機械なら確実に見つかる。
+  //
+  // コードブロックの中は見ない —— 原文のコードに何が書いてあってもこちらの
+  // 落ち度ではないため。
+  for (const [i, line] of text.split("\n").entries()) {
+    const stray = /[\uac00-\ud7af\u0400-\u04ff]+/.exec(line);
+    if (stray !== null && !inFenceAt(text, i)) {
+      problems.push(`${rel}: ${i + 1} 行目に日本語でない文字が紛れている: ${JSON.stringify(stray[0])}`);
     }
   }
 

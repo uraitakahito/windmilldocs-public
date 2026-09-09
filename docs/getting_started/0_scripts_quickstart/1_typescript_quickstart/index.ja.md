@@ -267,7 +267,7 @@ UI はスクリプトの `main` 関数の署名から作られますが、ここ
 ![Advanced settings for TypeScript](./customize_ts.png.webp)
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [スクリプトの種類](../../../script_editor/script_kinds.mdx) —— スクリプトを特定の種類に специализ することで、追加の働きを持たせられる。
+	- [スクリプトの種類](../../../script_editor/script_kinds.mdx) —— スクリプトを特定の種類に特化させて、機能を足せる。
 	- [生成される UI](../../../script_editor/customize_ui.mdx) —— main 関数の引数には詳細な設定を与えられ、入力の自動生成 UI と JSON Schema に反映される。
 </div>
 

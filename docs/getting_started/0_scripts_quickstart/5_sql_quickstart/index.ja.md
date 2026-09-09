@@ -1,23 +1,21 @@
 ---
 title: 'Quickstart PostgreSQL, MySQL, MS SQL, BigQuery, Snowflake'
-description: 'How do I run SQL queries in Windmill? Connect to PostgreSQL, MySQL, BigQuery, Snowflake and other databases.'
+description: 'Windmill で SQL の問い合わせを実行するには。PostgreSQL・MySQL・BigQuery・Snowflake などのデータベースにつなぐ。'
 slug: '/getting_started/scripts_quickstart/sql'
 ---
 > **[原文](./index.mdx)の日本語訳。** 相違があれば原文が正。
 > 原典 © Windmill Labs, Inc. — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。この訳も同じライセンスで提供します。
->
-> **未訳。** 以下は原文のままです。
 
 # PostgreSQL, MySQL, MS SQL, BigQuery, Snowflake, Redshift, Oracle, DuckDB
 
-In this quick start guide, we will write our first script in SQL. We will see how to connect a Windmill instance to an external SQL service and then send queries to the database using Windmill Scripts.
+このクイックスタートでは、最初のスクリプトを SQL で書きます。Windmill のインスタンスを外部の SQL のサービスにつなぎ、Windmill のスクリプトからデータベースへ問い合わせるところまでを見ます。
 
 ![Windmill & PostgreSQL, MySQL, BigQuery and Snowflake](./sqls.png)
 
-This tutorial covers how to create a simple script through Windmill web IDE. See the dedicated page to [develop scripts locally](../../../advanced/4_local_development/index.mdx).
+ここでは Windmill の web IDE で簡単なスクリプトを作ります。手元で書きたい場合は[手元での開発](../../../advanced/4_local_development/index.mdx)のページを参照してください。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Local development](https://www.windmill.dev/docs/advanced/local_development) —— Develop from various environments such as your terminal, VS Code, and JetBrains IDEs.
+	- [手元での開発](https://www.windmill.dev/docs/advanced/local_development) —— 端末、VS Code、JetBrains の IDE など、好きな場所で書く。
 </div>
 
 <video
@@ -29,59 +27,54 @@ This tutorial covers how to create a simple script through Windmill web IDE. See
 
 <br />
 
-Windmill supports [PostgreSQL](https://www.postgresql.org/), [MySQL](https://www.mysql.com/), [Microsoft SQL Server](https://www.microsoft.com/sql-server), [BigQuery](https://cloud.google.com/bigquery) and [Snowflake](https://www.snowflake.com/). In any case, it requires creating a dedicated resource.
+Windmill は [PostgreSQL](https://www.postgresql.org/)、[MySQL](https://www.mysql.com/)、[Microsoft SQL Server](https://www.microsoft.com/sql-server)、[BigQuery](https://cloud.google.com/bigquery)、[Snowflake](https://www.snowflake.com/) に対応しています。いずれの場合も、専用のリソースを作る必要があります。
 
-PostgreSQL, MySQL, BigQuery, Snowflake and DuckDB are available as dedicated languages on all editions, including the community edition. Although all users can use Oracle DB and MS SQL through resources and [community-available languages](../index.mdx) (TypeScript, Python, Go, Bash etc.), only instances under [Enterprise edition](/pricing) and cloud workspaces can use Oracle DB and MS SQL runtimes as a dedicated language.
+PostgreSQL、MySQL、BigQuery、Snowflake、DuckDB は、community edition を含むすべての版で専用の言語として使えます。Oracle DB と MS SQL も、リソースと[誰でも使える言語](../index.mdx)（TypeScript、Python、Go、Bash など）を通せば誰でも使えますが、専用の言語として使えるのは [Enterprise edition](/pricing) のインスタンスと cloud のワークスペースだけです。
 
-## Create resource
+## リソースを作る
 
-Windmill provides integrations with many different apps and services with the use
-of [Resources](../../../core_concepts/3_resources_and_types/index.mdx). Resources are rich objects in JSON that allow to store configuration and credentials.
+Windmill は[リソース](../../../core_concepts/3_resources_and_types/index.mdx)を通して、さまざまなアプリやサービスとつながります。リソースは設定と資格情報を収める、中身のある JSON の値です。
 
-Each Resource has a _Resource Type_ ([PostgreSQL](https://hub.windmill.dev/resource_types/114/postgresql), [MySQL](https://hub.windmill.dev/resource_types/111/mysql), [MS SQL](https://hub.windmill.dev/resource_types/132/ms_sql_server), [BigQuery](https://hub.windmill.dev/resource_types/108/bigquery), [Snowflake](https://hub.windmill.dev/resource_types/107/snowflake))
-that defines the schema that the resource of this type needs to implement. Schemas implement the
-[JSON Schema specification](https://json-schema.org/).
+リソースにはそれぞれ _リソース型_（[PostgreSQL](https://hub.windmill.dev/resource_types/114/postgresql)、[MySQL](https://hub.windmill.dev/resource_types/111/mysql)、[MS SQL](https://hub.windmill.dev/resource_types/132/ms_sql_server)、[BigQuery](https://hub.windmill.dev/resource_types/108/bigquery)、[Snowflake](https://hub.windmill.dev/resource_types/107/snowflake)）
+があり、その型のリソースが満たすべき schema を定めています。schema は [JSON Schema の仕様](https://json-schema.org/)に従います。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Resources and resource types](https://www.windmill.dev/docs/core_concepts/resources_and_types) —— Resources are structured configurations and connections to third-party systems, with Resource types defining the schema for each Resource.
+	- [リソースとリソース型](https://www.windmill.dev/docs/core_concepts/resources_and_types) —— リソースは外部の仕組みへの設定と接続を形にしたもの。リソース型がそれぞれの schema を定める。
 </div>
 
 :::tip
 
-You can find a list of all the officially supported Resource types on
-[Windmill Hub](https://hub.windmill.dev/resource_types).
+公式に対応しているリソース型の一覧は [Windmill Hub](https://hub.windmill.dev/resource_types) にあります。
 
 :::
 
 :::tip
 
-You can pin a resource to an SQL query by adding a `-- database resource_path` line to your script. The query will automatically use the resource without having to specify it in the autogenerated user interface.
+スクリプトに `-- database resource_path` の行を足せば、SQL の問い合わせにリソースを固定できます。自動生成される画面で指定しなくても、その問い合わせがそのリソースを使うようになります。
 
 :::
 
 ### PostgreSQL
 
-To be able to connect to a [PostgreSQL](https://www.postgresql.org/) instance ([Supabase](../../../integrations/supabase.md), [Neon.tech](../../../integrations/neon.md), etc.), we'll need to define a Resource with the `PostgreSQL` Resource Type first.
+[PostgreSQL](https://www.postgresql.org/) のインスタンス（[Supabase](../../../integrations/supabase.md)、[Neon.tech](../../../integrations/neon.md) など）につなぐには、まず `PostgreSQL` のリソース型でリソースを定義します。
 
-Head to the [Resources](../../../core_concepts/3_resources_and_types/index.mdx) page, click on
-"Add resource" in the top right corner and select the `PostgreSQL` type.
+[リソース](../../../core_concepts/3_resources_and_types/index.mdx)のページへ行き、右上の「リソースを追加（Add resource）」をクリックして `PostgreSQL` の型を選びます。
 
 ![Select PostgreSQL Resource Type](../../../assets/integrations/psql-1-resources.png.webp)
 
-Fill out the form with the information of your PostgreSQL instance and "Test connection" if needed.
+PostgreSQL のインスタンスの情報をフォームに埋め、必要なら「接続を試す（Test connection）」を押します。
 
 ![Paste in Resource Values](../../../assets/integrations/psql-2-postgres-rt.png.webp)
 
 :::tip
 
-For testing purposes, you can use the sample PostgreSQL Resource provided to
-every user. It is available under the path `f/examples/demo_windmillshowcases`.
+試すだけなら、誰にでも用意されている見本の PostgreSQL のリソースが使えます。`f/examples/demo_windmillshowcases` のパスにあります。
 
 :::
 
-#### PostgreSQL: Add a Supabase database
+#### PostgreSQL: Supabase のデータベースを足す
 
-Windmill provides a wizard to easily add a [Supabase](../../../integrations/supabase.md) database through PostgreSQL.
+Windmill には、[Supabase](../../../integrations/supabase.md) のデータベースを PostgreSQL 経由で手軽に足すための案内があります。
 
 <video
 	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
@@ -91,143 +84,139 @@ Windmill provides a wizard to easily add a [Supabase](../../../integrations/supa
 
 <br />
 
-When creating a new PostgreSQL resource, just "Add a Supabase DB". This will lead you to a Supabase page where
-you need to pick your organization. Then on Windmill pick a database, fill with database password and that's it.
+新しい PostgreSQL のリソースを作るとき、「Supabase の DB を足す（Add a Supabase DB）」を押すだけです。Supabase のページに移るので組織を選び、Windmill に戻ってデータベースを選び、データベースのパスワードを入れれば終わりです。
 
-#### Use SQL to build on external APIs using Sequin
+#### Sequin を使い、外部の API の上に SQL で組み立てる
 
-With [Sequin](https://sequin.io), developers can build on top of third-party services like Salesforce or HubSpot using SQL. More details at:
+[Sequin](https://sequin.io) を使うと、Salesforce や HubSpot のような外部のサービスの上に SQL で組み立てられます。詳しくは、
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Use SQL to build on external APIs using Sequin](https://www.windmill.dev/docs/misc/guides/sequin) —— With Sequin, developers can build on top of third-party services like Salesforce or HubSpot using SQL.
+	- [Sequin を使い、外部の API の上に SQL で組み立てる](https://www.windmill.dev/docs/misc/guides/sequin) —— Sequin を使うと、Salesforce や HubSpot のような外部のサービスの上に SQL で組み立てられる。
 </div>
 
 ### MySQL
 
-To be able to connect to a [MySQL](https://www.mysql.com/) instance, we'll need to define a Resource with the `MySQL` Resource Type first.
+[MySQL](https://www.mysql.com/) のインスタンスにつなぐには、まず `MySQL` のリソース型でリソースを定義します。
 
-Head to the [Resources](../../../core_concepts/3_resources_and_types/index.mdx) page, click on
-"Add resource" in the top right corner and select the `MySQL` type.
+[リソース](../../../core_concepts/3_resources_and_types/index.mdx)のページへ行き、右上の「リソースを追加（Add resource）」をクリックして `MySQL` の型を選びます。
 
 ![Select MySQL Resource Type](./select_mysql.png.webp)
 
-Fill out the form with the information of your MySQL instance and "Test connection" if needed.
+MySQL のインスタンスの情報をフォームに埋め、必要なら「接続を試す（Test connection）」を押します。
 
 ![Paste in Resource Values](./fill_mysql.png.webp)
 
-| Property | Type   | Description     | Default | Required | Where to Find                                                                          |
+| 項目 | 型 | 意味 | 既定 | 必須 | どこで分かるか |
 | -------- | ------ | --------------- | ------- | -------- | -------------------------------------------------------------------------------------- |
-| host     | string | Instance host   |         | false    | Your hosting provider's control panel or in your server's MySQL configuration file     |
-| port     | number | Instance port   | 3306    | false    | Your hosting provider's control panel or in your server's MySQL configuration file     |
-| user     | string | Username        |         | true     | Created in MySQL (e.g., via phpMyAdmin or MySQL Workbench) or provided by your hosting |
-| database | string | Database name   |         | true     | Created in MySQL (e.g., via phpMyAdmin or MySQL Workbench) or provided by your hosting |
-| password | string | User's password |         | true     | Created in MySQL (e.g., via phpMyAdmin or MySQL Workbench) or provided by your hosting |
+| host | string | インスタンスのホスト |  | false | 契約先の管理画面か、サーバの MySQL の設定ファイル |
+| port | number | インスタンスのポート | 3306 | false | 契約先の管理画面か、サーバの MySQL の設定ファイル |
+| user | string | 利用者名 |  | true | MySQL で作る（phpMyAdmin や MySQL Workbench など）か、契約先から渡される |
+| database | string | データベース名 |  | true | MySQL で作る（phpMyAdmin や MySQL Workbench など）か、契約先から渡される |
+| password | string | 利用者のパスワード |  | true | MySQL で作る（phpMyAdmin や MySQL Workbench など）か、契約先から渡される |
 
 ### MS SQL
 
-To be able to connect to a [Microsoft SQL Server](https://www.microsoft.com/sql-server) instance, we'll need to define a Resource with the `ms_sql_server` Resource Type first.
+[Microsoft SQL Server](https://www.microsoft.com/sql-server) のインスタンスにつなぐには、まず `ms_sql_server` のリソース型でリソースを定義します。
 
-Head to the [Resources](../../../core_concepts/3_resources_and_types/index.mdx) page, click on
-"Add resource" in the top right corner and select the `ms_sql_server` type.
+[リソース](../../../core_concepts/3_resources_and_types/index.mdx)のページへ行き、右上の「リソースを追加（Add resource）」をクリックして `ms_sql_server` の型を選びます。
 
 ![Select MySQL Resource Type](./select_mssql.png.webp)
 
-Fill out the form with the information of your MS SQL instance and "Test connection" if needed.
+MS SQL のインスタンスの情報をフォームに埋め、必要なら「接続を試す（Test connection）」を押します。
 
 ![Paste in Resource Values](./fill_mssql.png.webp)
 
-| Property  | Type   | Description              | Default | Required | Where to Find                                                                                   |
+| 項目 | 型 | 意味 | 既定 | 必須 | どこで分かるか |
 | --------- | ------ | ------------------------ | ------- | -------- | ----------------------------------------------------------------------------------------------- |
-| host      | string | Instance host            |         | true     | Your hosting provider's control panel or in your server's MS SQL configuration file             |
-| port      | number | Instance port            |         | false    | Your hosting provider's control panel or in your server's MS SQL configuration file             |
-| user      | string | Username                 |         | false    | Created in MS SQL (e.g., via SQL Server Management Studio) or provided by your hosting          |
-| dbname    | string | Database name            |         | true     | Created in MS SQL (e.g., via SQL Server Management Studio) or provided by your hosting          |
-| password  | string | User's password, or `ms_entraid` to authenticate as the worker's [Azure workload identity](../../../integrations/mssql.md#azure-workload-identity-for-azure-sql) | | false | Created in MS SQL (e.g., via SQL Server Management Studio) or provided by your hosting |
-| integrated_auth | bool | Use Windows Integrated Authentication | false | false | Enable to use the worker's Kerberos credentials instead of username/password |
-| aad_token | object | OAuth token AD           |         | false    | Requires OAuth setup in Windmill      |
-| instance_name | string | Named instance      |         | false    | For named SQL Server instances (e.g., `MSSQLSERVER`) |
-| encrypt   | bool   | Enable TLS encryption    | true    | false    | Set to false only for local development |
-| trust_cert| bool   | Trust server certificate | true    | false    | If true, the server certificate will be trusted even if it is not signed by a trusted authority |
-| ca_cert   | string | CA certificate           |         | false    | CA certificate to verify the server certificate. [More information on MS SQL certificates](https://learn.microsoft.com/en-us/sql/linux/sql-server-linux-docker-container-security?view=sql-server-ver16#encrypt-connections-to-sql-server-linux-containers) |
+| host | string | インスタンスのホスト |  | true | 契約先の管理画面か、サーバの MS SQL の設定ファイル |
+| port | number | インスタンスのポート |  | false | 契約先の管理画面か、サーバの MS SQL の設定ファイル |
+| user | string | 利用者名 |  | false | MS SQL で作る（SQL Server Management Studio など）か、契約先から渡される |
+| dbname | string | データベース名 |  | true | MS SQL で作る（SQL Server Management Studio など）か、契約先から渡される |
+| password | string | 利用者のパスワード。worker の [Azure workload identity](../../../integrations/mssql.md#azure-workload-identity-for-azure-sql) として認証するなら `ms_entraid` | | false | MS SQL で作る（SQL Server Management Studio など）か、契約先から渡される |
+| integrated_auth | bool | Windows 統合認証を使う | false | false | 利用者名とパスワードの代わりに worker の Kerberos の資格情報を使うとき |
+| aad_token | object | AD の OAuth トークン |  | false | Windmill 側で OAuth の用意が要る |
+| instance_name | string | 名前付きインスタンス |  | false | 名前付きの SQL Server のインスタンス向け（`MSSQLSERVER` など） |
+| encrypt | bool | TLS で暗号化する | true | false | false にするのは手元での開発のときだけ |
+| trust_cert| bool | サーバの証明書を信頼する | true | false | true にすると、信頼された認証局の署名が無くてもサーバの証明書を信頼する |
+| ca_cert | string | CA の証明書 |  | false | サーバの証明書を検証するための CA の証明書。[MS SQL の証明書について詳しくは](https://learn.microsoft.com/en-us/sql/linux/sql-server-linux-docker-container-security?view=sql-server-ver16#encrypt-connections-to-sql-server-linux-containers) |
 
-#### Authentication methods
+#### 認証のしかた
 
-MS SQL Server supports four authentication methods:
+MS SQL Server は 4 とおりの認証に対応しています。
 
-1. **Username/Password**: Provide `user` and `password` fields.
-2. **Azure AD (Entra)**: Use the `aad_token` field with OAuth.
-3. **Azure workload identity**: Set `password` to `ms_entraid` on an AKS worker that has a [workload identity](../../../integrations/mssql.md#azure-workload-identity-for-azure-sql).
-4. **Windows Integrated Authentication (Kerberos)**: Enable `integrated_auth`.
+1. **利用者名とパスワード**: `user` と `password` の欄を埋めます。
+2. **Azure AD (Entra)**: `aad_token` の欄と OAuth を使います。
+3. **Azure workload identity**: [workload identity](../../../integrations/mssql.md#azure-workload-identity-for-azure-sql) を持つ AKS の worker で、`password` を `ms_entraid` にします。
+4. **Windows 統合認証 (Kerberos)**: `integrated_auth` を有効にします。
 
-#### Windows Integrated Authentication
+#### Windows 統合認証
 
-For enterprise environments using Active Directory, enable `integrated_auth` to use Kerberos authentication. When enabled, the worker's service account credentials are used instead of username/password.
+Active Directory を使う企業の環境では、`integrated_auth` を有効にすると Kerberos による認証が使えます。有効にすると、利用者名とパスワードの代わりに worker のサービスアカウントの資格情報が使われます。
 
-**Requirements:**
-- The worker must have a valid Kerberos ticket (e.g., via `kinit` or a keytab)
-- The worker must have access to a valid `/etc/krb5.conf` with the correct realm configuration
-- The service account must have permissions on the target database
+**必要なもの:**
+- worker が有効な Kerberos のチケットを持っていること（`kinit` か keytab による）
+- worker が、realm の設定が正しい `/etc/krb5.conf` を読めること
+- サービスアカウントが対象のデータベースへの権限を持っていること
 
-**Docker/Kubernetes setup:**
-1. Mount a keytab file to the worker container
-2. Configure `/etc/krb5.conf` with your realm settings
-3. Optionally run `kinit` at container startup or use `KRB5_KTNAME` environment variable
+**Docker / Kubernetes での用意:**
+1. keytab のファイルを worker のコンテナに mount する
+2. `/etc/krb5.conf` に realm の設定を書く
+3. 必要なら、コンテナの起動時に `kinit` を走らせるか、環境変数 `KRB5_KTNAME` を使う
 
-To specify the application intent for read-only requests, add `-- ApplicationIntent=ReadOnly` to the script.
+読み取り専用の要求であることを伝えるには、スクリプトに `-- ApplicationIntent=ReadOnly` を足します。
 
 :::info Azure AD (Entra)
-When using domain credentials via Entra (Azure Active Directory) you need to add the scope `https://database.windows.net//.default` to the [Windmill OAuth instance setting](../../../advanced/27_setup_oauth/index.mdx#azure-oauth).
+Entra (Azure Active Directory) 経由でドメインの資格情報を使うときは、[Windmill の OAuth のインスタンス設定](../../../advanced/27_setup_oauth/index.mdx#azure-oauth)に `https://database.windows.net//.default` のスコープを足す必要があります。
 
-On AKS, [Azure workload identity](../../../integrations/mssql.md#azure-workload-identity-for-azure-sql) avoids the OAuth setup entirely: set the resource password to `ms_entraid` and the worker authenticates as its own managed identity. The same applies to [Azure Database for PostgreSQL](../../../integrations/postgresql.md#azure-workload-identity-for-azure-database-for-postgresql).
+AKS では [Azure workload identity](../../../integrations/mssql.md#azure-workload-identity-for-azure-sql) を使えば OAuth の用意がまったく要りません。リソースのパスワードを `ms_entraid` にすれば、worker は自身の managed identity として認証します。[Azure Database for PostgreSQL](../../../integrations/postgresql.md#azure-workload-identity-for-azure-database-for-postgresql) でも同じです。
 :::
 
 ### BigQuery
 
-To be able to connect to a [BigQuery](https://cloud.google.com/bigquery) instance, we'll need to define a Resource with the `BigQuery` Resource Type first.
+[BigQuery](https://cloud.google.com/bigquery) のインスタンスにつなぐには、まず `BigQuery` のリソース型でリソースを定義します。
 
-Head to the [Resources](../../../core_concepts/3_resources_and_types/index.mdx) page, click on
-"Add resource" in the top right corner and select the `BigQuery` type.
+[リソース](../../../core_concepts/3_resources_and_types/index.mdx)のページへ行き、右上の「リソースを追加（Add resource）」をクリックして `BigQuery` の型を選びます。
 
 ![Select BigQuery Resource Type](./select_bigquery.png.webp)
 
-| Property                    | Type   | Description                                    | Required |
+| 項目 | 型 | 意味 | 必須 |
 | --------------------------- | ------ | ---------------------------------------------- | -------- |
-| auth_provider_x509_cert_url | string | Auth provider X.509 certificate URL.           | false    |
-| client_x509_cert_url        | string | Client X.509 certificate URL.                  | false    |
-| private_key_id              | string | ID of the private key used for authentication. | false    |
-| client_email                | string | Email associated with the service account.     | false    |
-| private_key                 | string | Private key used for authentication.           | false    |
-| project_id                  | string | Google Cloud project ID.                       | true     |
-| token_uri                   | string | OAuth 2.0 token URI.                           | false    |
-| client_id                   | string | Client ID used for OAuth 2.0 authentication.   | false    |
-| auth_uri                    | string | OAuth 2.0 authorization URI.                   | false    |
-| type                        | string | Type of the authentication method.             | false    |
+| auth_provider_x509_cert_url | string | 認証の提供元の X.509 証明書の URL。 | false |
+| client_x509_cert_url | string | クライアントの X.509 証明書の URL。 | false |
+| private_key_id | string | 認証に使う秘密鍵の ID。 | false |
+| client_email | string | サービスアカウントに結び付いたメールアドレス。 | false |
+| private_key | string | 認証に使う秘密鍵。 | false |
+| project_id | string | Google Cloud の project の ID。 | true |
+| token_uri | string | OAuth 2.0 のトークンの URI。 | false |
+| client_id | string | OAuth 2.0 の認証に使うクライアント ID。 | false |
+| auth_uri | string | OAuth 2.0 の認可の URI。 | false |
+| type | string | 認証のしかたの種類。 | false |
 
-Here's a step-by-step guide on where to find each detail.
+それぞれの値がどこにあるかを、順に見ていきます。
 
-1. **Service account creation**:
+1. **サービスアカウントを作る**:
 
-   - Go to the [Google Cloud Console](https://console.cloud.google.com/).
-   - Select the appropriate project from the top menu.
-   - In the left navigation pane, go to "IAM & Admin" > "Service accounts".
-   - Click on the "+ CREATE SERVICE ACCOUNT" button.
-   - Provide a name and optional description for the service account.
-   - Click "Create".
+   - [Google Cloud Console](https://console.cloud.google.com/) を開きます。
+   - 上のメニューから対象の project を選びます。
+   - 左のナビゲーションで「IAM & Admin」>「Service accounts」へ進みます。
+   - 「+ CREATE SERVICE ACCOUNT」のボタンを押します。
+   - サービスアカウントの名前と、必要なら説明を入れます。
+   - 「Create」を押します。
 
-2. **Assign roles**:
+2. **ロールを割り当てる**:
 
-   - After creating the service account, you'll be prompted to grant roles to it. Select "BigQuery" roles such as "BigQuery Admin" or "BigQuery Data Editor" based on your needs.
-   - Click "Continue" and "Done" to create the service account.
+   - サービスアカウントを作ると、ロールを与えるよう促されます。用途に応じて「BigQuery Admin」や「BigQuery Data Editor」などの BigQuery のロールを選びます。
+   - 「Continue」「Done」を押すとサービスアカウントができます。
 
-3. **Generate key**:
+3. **鍵を作る**:
 
-   - In the "Service accounts" section, find the newly created service account in the list.
-   - Click on the three dots on the right and select "Manage keys", then "Add Key".
-   - Choose the key type as "JSON" and click "Create".
+   - 「Service accounts」の一覧で、いま作ったサービスアカウントを探します。
+   - 右の 3 点をクリックして「Manage keys」、続いて「Add Key」を選びます。
+   - 鍵の種類に「JSON」を選び、「Create」を押します。
 
-4. **Properties Details**:
+4. **各項目の値**:
 
-   Once you've generated the key, the downloaded JSON file will contain all the required properties.
+   鍵を作ると、ダウンロードされる JSON のファイルに必要な項目がすべて入っています。
 
 <video
 	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
@@ -236,147 +225,145 @@ Here's a step-by-step guide on where to find each detail.
 />
 
 <br />
-You can directly "Test connection" if needed.
+必要なら、そのまま「接続を試す（Test connection）」を押せます。
 
 ### Snowflake
 
-To be able to connect to [Snowflake](https://www.snowflake.com/), you can choose to either setup [OAuth for Snowflake](../../../advanced/27_setup_oauth/index.mdx#oauth) or by defining a Snowflake Resource.
+[Snowflake](https://www.snowflake.com/) につなぐには、[Snowflake の OAuth](../../../advanced/27_setup_oauth/index.mdx#oauth) を用意するか、Snowflake のリソースを定義するかのどちらかを選べます。
 
-If a Snowflake OAuth connection is present, you can create a new Resource by heading to [Resources](../../../core_concepts/3_resources_and_types/index.mdx), clicking on "Add Resource" in the top right corner and selecting `snowflake_oauth`. Take a look at [this guide](../../../misc/9_guides/snowflake_app_with_user_roles/index.mdx#sample-app-setup) to learn more about how to build an App with Snowflake OAuth integration.
+Snowflake の OAuth の接続があるなら、[リソース](../../../core_concepts/3_resources_and_types/index.mdx)へ行き、右上の「リソースを追加（Add Resource）」をクリックして `snowflake_oauth` を選べば、新しいリソースを作れます。Snowflake の OAuth を使ったアプリの作り方は[この手引き](../../../misc/9_guides/snowflake_app_with_user_roles/index.mdx#sample-app-setup)を参照してください。
 
-If you do not wish to use OAuth, click on "Add Resource" in the top right corner and select the `Snowflake` type instead.
+OAuth を使いたくなければ、右上の「リソースを追加（Add Resource）」をクリックして `Snowflake` の型を選びます。
 
 ![Select Snowflake Resource Type](./select_snowflake.png.webp)
 
-| Property           | Type   | Description                                                            | Required |
+| 項目 | 型 | 意味 | 必須 |
 | ------------------ | ------ | ---------------------------------------------------------------------- | -------- |
-| account_identifier | string | Snowflake account identifier in the format `<orgname>-<account_name>`. | true     |
-| private_key        | string | Private key used for authentication.                                   | true     |
-| public_key         | string | Public key used for authentication.                                    | true     |
-| warehouse          | string | Snowflake warehouse to be used for queries.                            | false    |
-| username           | string | Username for Snowflake login.                                          | true     |
-| database           | string | Name of the Snowflake database to connect to.                          | true     |
-| schema             | string | Schema within the Snowflake database.                                  | false    |
-| role               | string | Role to be assumed upon connection.                                    | false    |
+| account_identifier | string | `<orgname>-<account_name>` の形の Snowflake のアカウントの識別子。 | true |
+| private_key | string | 認証に使う秘密鍵。 | true |
+| public_key | string | 認証に使う公開鍵。 | true |
+| warehouse | string | 問い合わせに使う Snowflake の warehouse。 | false |
+| username | string | Snowflake にログインする利用者名。 | true |
+| database | string | つなぐ Snowflake の database の名前。 | true |
+| schema | string | その database の中の schema。 | false |
+| role | string | つなぐときに引き受けるロール。 | false |
 
-Here's a step-by-step guide on where to find each detail.
+それぞれの値がどこにあるかを、順に見ていきます。
 
-1. **Account identifier**:
+1. **アカウントの識別子**:
 
-   The account identifier typically follows the format: `<orgname>-<account_name>`. You can find it in the Snowflake web interface:
+   アカウントの識別子はたいてい `<orgname>-<account_name>` の形です。Snowflake の web の画面で見つかります。
 
-   - Log in to your Snowflake account.
-   - The account identifier can often be found in the URL or at the top of the Snowflake interface after you log in (in the format `https://app.snowflake.com/orgname/account_name/`).
+   - Snowflake のアカウントにログインします。
+   - ログイン後、識別子は URL か画面の上のほうに出ていることが多いです（`https://app.snowflake.com/orgname/account_name/` の形）。
 
-   [Snowflake Documentation on Account Identifier](https://docs.snowflake.com/en/user-guide/admin-account-identifier)
+   [アカウントの識別子についての Snowflake のドキュメント](https://docs.snowflake.com/en/user-guide/admin-account-identifier)
 
-2. **Username**:
+2. **利用者名**:
 
-   The username is the Snowflake user you will use to connect to the database. You will need to create a user if you don't have one:
+   利用者名は、データベースにつなぐのに使う Snowflake の利用者です。無ければ作る必要があります。
 
-   - In the Snowflake web interface, go to the "ACCOUNT" tab.
-   - Select "Users" from the left navigation pane.
-   - Click the "+ CREATE USER" button to create a new user with a username and password.
+   - Snowflake の web の画面で「ACCOUNT」のタブへ行きます。
+   - 左のナビゲーションで「Users」を選びます。
+   - 「+ CREATE USER」のボタンを押し、利用者名とパスワードを決めて新しい利用者を作ります。
 
-3. **Public key and private key**:
+3. **公開鍵と秘密鍵**:
 
-   To create the public and private keys, you will need to generate them using a tool like OpenSSL:
+   公開鍵と秘密鍵は、OpenSSL のような道具で作る必要があります。
 
-   - Open a terminal window.
-   - Use OpenSSL to generate a public and private key pair. The exact commands may vary based on your operating system.
-   - For example, to generate a public key: `openssl rsa -pubout -in private_key.pem -out public_key.pem`
+   - 端末を開きます。
+   - OpenSSL で公開鍵と秘密鍵の組を作ります。正確なコマンドは OS によって変わります。
+   - 例えば公開鍵を作るには: `openssl rsa -pubout -in private_key.pem -out public_key.pem`
 
-   Once you have the keys, you can copy the content and paste them into the respective fields in your configuration.
+   鍵ができたら、中身を写して設定のそれぞれの欄に貼ります。
 
-   [Snowflake Documentation on Key Pair Authentication & Key Pair Rotation](https://docs.snowflake.com/en/user-guide/key-pair-auth)
+   [鍵の組による認証と鍵の入れ替えについての Snowflake のドキュメント](https://docs.snowflake.com/en/user-guide/key-pair-auth)
 
-4. **Warehouse, schema, database, and role**:
+4. **warehouse・schema・database・role**:
 
-   These parameters are specific to your Snowflake environment and will depend on how your Snowflake instance is configured:
+   これらは Snowflake の環境ごとのもので、インスタンスをどう設定したかによります。
 
-   - `warehouse`: The name of the Snowflake warehouse you want to connect to.
-   - `schema`: The name of the Snowflake schema you want to use.
-   - `database`: The name of the Snowflake database you want to connect to.
-   - `role`: The role you want to use for authentication.
+   - `warehouse`: つなぎたい Snowflake の warehouse の名前。
+   - `schema`: 使いたい Snowflake の schema の名前。
+   - `database`: つなぎたい Snowflake の database の名前。
+   - `role`: 認証に使いたいロール。
 
-   You can find these details in the Snowflake web interface:
+   これらは Snowflake の web の画面で見つかります。
 
-   - Log in to your Snowflake account.
-   - You can find the names of warehouses, schemas, databases, and roles in the interface or by running SQL queries.
+   - Snowflake のアカウントにログインします。
+   - warehouse・schema・database・role の名前は、画面で見るか、SQL を実行すれば分かります。
 
-You can directly "Test connection" if needed.
+必要なら、そのまま「接続を試す（Test connection）」を押せます。
 
 ### Amazon Redshift
 
-To connect to an Amazon Redshift instance, we need to add the corresponding resource. Redshift is compatible with Windmill's PostgreSQL resources and scripts, so we'll start by adding a new PostgreSQL resource type.
+Amazon Redshift のインスタンスにつなぐには、対応するリソースを足します。Redshift は Windmill の PostgreSQL のリソースとスクリプトと互換があるので、まず PostgreSQL のリソース型を新しく足すところから始めます。
 
 ![Select PostgreSQL Resource Type](../../../assets/integrations/psql-1-resources.png.webp)
 
-Get the required values from the AWS console under CLUSTERS > your Redshift cluster.
+必要な値は AWS のコンソールの CLUSTERS > 対象の Redshift のクラスタから取れます。
 
 ![AWS Redshift Cluster Screen](../../../assets/integrations/redshift-aws-console.png)
 
-Find the value named 'endpoint' it should look like this:
+'endpoint' という値を探してください。こういう形をしているはずです。
 
 ```
 default-workgroup.475893240789.us-east-1.redshift-serverless.amazonaws.com:5439/dev
 ```
-From there you can deduce your host, port and database name:
+ここから host、port、database の名前が分かります。
 
 - host: default-workgroup.475893240789.us-east-1.redshift-serverless.amazonaws.com
 - port: 5439
 - dbname: dev
 
-Now you can fill those values in Windmill, fill also the user and password for the db and press "Test connection" to check that it's working.
+これらの値を Windmill に入れ、db の利用者名とパスワードも入れて、「接続を試す（Test connection）」で動くことを確かめます。
 
 ![Fill in the required values](../../../assets/integrations/redshift-resource-filled.png)
 
-Once it's working press save and you have successfully added your Redshift instance as a PostgreSQL resource!
+うまくいったら保存してください。これで Redshift のインスタンスを PostgreSQL のリソースとして足せました。
 
 ### Oracle
 
-To be able to connect to an [Oracle database](https://www.oracle.com/database/), you need to define an Oracle resource.
+[Oracle のデータベース](https://www.oracle.com/database/)につなぐには、Oracle のリソースを定義する必要があります。
 
-Head to the [Resources](../../../core_concepts/3_resources_and_types/index.mdx) page, click on
-"Add resource" in the top right corner and select the `Oracle` type.
+[リソース](../../../core_concepts/3_resources_and_types/index.mdx)のページへ行き、右上の「リソースを追加（Add resource）」をクリックして `Oracle` の型を選びます。
 
 ![Select Oracle Resource Type](./select_oracle.png)
 
-| Property  | Type   | Description     | Required |
+| 項目 | 型 | 意味 | 必須 |
 | --------- | ------ | --------------- | -------- |
-| database  | string | Database name   | true     |
-| user      | string | Username        | true     |
-| password  | string | User's password | true     |
+| database | string | データベース名 | true |
+| user | string | 利用者名 | true |
+| password | string | 利用者のパスワード | true |
 
-Here's a step-by-step guide on where to find each detail.
+それぞれの値がどこにあるかを、順に見ていきます。
 
-1. **Database**: The name of the Oracle database you want to connect to. This can be found in your Oracle database configuration or by consulting your database administrator.
+1. **Database**: つなぎたい Oracle のデータベースの名前です。Oracle の設定を見るか、データベースの管理者に訊けば分かります。
 
-2. **Username**: The username for Oracle login. You will need to create a user if you don't have one:
+2. **Username**: Oracle にログインする利用者名です。無ければ作る必要があります。
 
-   - In the Oracle database interface, go to the "Users" section.
-   - Create a new user with a username and password.
+   - Oracle の画面で「Users」の節へ行きます。
+   - 利用者名とパスワードを決めて新しい利用者を作ります。
 
-3. **Password**: The password associated with the Oracle username.
+3. **Password**: その利用者名に対応するパスワードです。
 
-You can directly "Test connection" if needed.
+必要なら、そのまま「接続を試す（Test connection）」を押せます。
 
 ### DuckDB
 
-DuckDB scripts run in-memory out-of-the-box.
+DuckDB のスクリプトは、何もしなくてもメモリ上で動きます。
 
-## Create script
+## スクリプトを作る
 
-Next, let's create a script that will use the newly created Resource. From the Home page,
-click **New** and select **Script**. Name the Script, give it a summary, and select your preferred language, [PostgreSQL](#postgresql-1), [MySQL](#mysql-1), [MS SQL](#ms-sql-1), [BigQuery](#bigquery-1), [Snowflake](#snowflake-1).
+次に、いま作ったリソースを使うスクリプトを作ります。ホーム画面で **新規（New）** をクリックし、**スクリプト（Script）** を選びます。名前と要約を付け、好きな言語を選んでください —— [PostgreSQL](#postgresql-1)、[MySQL](#mysql-1)、[MS SQL](#ms-sql-1)、[BigQuery](#bigquery-1)、[Snowflake](#snowflake-1)。
 
 ![Script creation first step](../../../assets/integrations/sql_new_script.png.webp)
 
-You can also give more details to your script, in the [settings section](../../../script_editor/settings.mdx), you can also get back to that later at any point.
+スクリプトの詳細は[設定の節](../../../script_editor/settings.mdx)で足せます。あとからいつでも戻れます。
 
 ### PostgreSQL
 
-Arguments need to be passed in the given format:
+引数はこの形で渡します。
 
 ```sql
 -- $1 name1 = default arg
@@ -384,9 +371,9 @@ Arguments need to be passed in the given format:
 INSERT INTO demo VALUES ($1::TEXT, $2::INT) RETURNING *
 ```
 
-"name1", "name2" being the names of the arguments, and "default arg" the optional default value.
+「name1」「name2」が引数の名前、「default arg」が任意の既定値です。
 
-Database resource can be specified from the UI or directly within script with a line `-- database resource_path`.
+データベースのリソースは、画面から選ぶことも、スクリプトの中に `-- database resource_path` の 1 行を書いて直に指定することもできます。
 
 <video
 	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
@@ -396,7 +383,7 @@ Database resource can be specified from the UI or directly within script with a 
 
 <br/>
 
-You can then write your prepared statement.
+あとは prepared statement を書くだけです。
 
 <video
 	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
@@ -406,7 +393,7 @@ You can then write your prepared statement.
 
 ### MySQL
 
-Arguments need to be passed in the given format:
+引数はこの形で渡します。
 
 ```sql
 -- :name1 (text) = default arg
@@ -414,9 +401,9 @@ Arguments need to be passed in the given format:
 INSERT INTO demo VALUES (:name1, :name2)
 ```
 
-"name1", "name2" being the names of the arguments, and "default arg" the optional default value.
+「name1」「name2」が引数の名前、「default arg」が任意の既定値です。
 
-Database resource can be specified from the UI or directly within script with a line `-- database resource_path`.
+データベースのリソースは、画面から選ぶことも、スクリプトの中に `-- database resource_path` の 1 行を書いて直に指定することもできます。
 
 <video
 	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
@@ -425,13 +412,13 @@ Database resource can be specified from the UI or directly within script with a 
 />
 
 <br/>
-You can then write your prepared statement.
+あとは prepared statement を書くだけです。
 
 ![Mysql statement](./mysql_statement.png.webp)
 
 ### MS SQL
 
-Arguments need to be passed in the given format:
+引数はこの形で渡します。
 
 ```sql
 -- @P1 name1 (varchar) = default arg
@@ -439,9 +426,9 @@ Arguments need to be passed in the given format:
 INSERT INTO demo VALUES (@P1, @P2)
 ```
 
-"name1", "name2" being the names of the arguments, and "default arg" the optional default value.
+「name1」「name2」が引数の名前、「default arg」が任意の既定値です。
 
-Database resource can be specified from the UI or directly within script with a line `-- database resource_path`.
+データベースのリソースは、画面から選ぶことも、スクリプトの中に `-- database resource_path` の 1 行を書いて直に指定することもできます。
 
 <video
 	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
@@ -450,13 +437,13 @@ Database resource can be specified from the UI or directly within script with a 
 />
 
 <br/>
-You can then write your prepared statement.
+あとは prepared statement を書くだけです。
 
 ![Mysql statement](./mssql_statement.png.webp)
 
 ### BigQuery
 
-Arguments need to be passed in the given format:
+引数はこの形で渡します。
 
 ```sql
 -- @name1 (string) = default arg
@@ -465,9 +452,9 @@ Arguments need to be passed in the given format:
 INSERT INTO `demodb.demo` VALUES (@name1, @name2, @name3)
 ```
 
-"name1", "name2", "name3" being the names of the arguments, "default arg" the optional default value and `string`, `integer` and `string[]` the types.
+「name1」「name2」「name3」が引数の名前、「default arg」が任意の既定値、`string`・`integer`・`string[]` が型です。
 
-Database resource can be specified from the UI or directly within script with a line `-- database resource_path`.
+データベースのリソースは、画面から選ぶことも、スクリプトの中に `-- database resource_path` の 1 行を書いて直に指定することもできます。
 
 <video
 	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
@@ -476,7 +463,7 @@ Database resource can be specified from the UI or directly within script with a 
 />
 
 <br/>
-You can then write your prepared statement.
+あとは prepared statement を書くだけです。
 
 <video
 	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
@@ -486,7 +473,7 @@ You can then write your prepared statement.
 
 ### Snowflake
 
-Arguments need to be passed in the given format:
+引数はこの形で渡します。
 
 ```sql
 -- ? name1 (varchar) = default arg
@@ -494,9 +481,9 @@ Arguments need to be passed in the given format:
 INSERT INTO demo VALUES (?, ?)
 ```
 
-"name1", "name2" being the names of the arguments, "default arg" the optional default value and `varchar` & `int` the types.
+「name1」「name2」が引数の名前、「default arg」が任意の既定値、`varchar` と `int` が型です。
 
-Database resource can be specified from the UI or directly within script with a line `-- database resource_path`.
+データベースのリソースは、画面から選ぶことも、スクリプトの中に `-- database resource_path` の 1 行を書いて直に指定することもできます。
 
 <video
 	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
@@ -505,15 +492,15 @@ Database resource can be specified from the UI or directly within script with a 
 />
 
 <br/>
-You can then write your prepared statement.
+あとは prepared statement を書くだけです。
 
 ![Snowflake statement](./snowflake_statement.png.webp)
 
 ### Amazon Redshift
 
-Since Redshift is compatible with Windmill's PostgreSQL, you can follow the same instructions as for [PostgreSQL scripts](#postgresql-1). Make sure to select your Redshift instance as a resource.
+Redshift は Windmill の PostgreSQL と互換があるので、[PostgreSQL のスクリプト](#postgresql-1)と同じ手順で進められます。リソースには Redshift のインスタンスを選んでください。
 
-Remember when using a a Redshift resource, you should write valid Redshift, and not PostgreSQL. For example the `RETURNING *` syntax is not supported, so you may want to change the default script to something like:
+Redshift のリソースを使うときは、PostgreSQL ではなく Redshift として正しい SQL を書く必要があることに注意してください。例えば `RETURNING *` は使えないので、既定のスクリプトをこう変えるとよいでしょう。
 
 ```sql
 -- $1 name1 = default arg
@@ -521,11 +508,11 @@ Remember when using a a Redshift resource, you should write valid Redshift, and 
 INSERT INTO demo VALUES ($1::TEXT, $2::INT)
 ```
 
-Learn more about [the differences here](https://docs.aws.amazon.com/redshift/latest/dg/c_redshift-and-postgres-sql.html).
+違いについては[こちら](https://docs.aws.amazon.com/redshift/latest/dg/c_redshift-and-postgres-sql.html)で詳しく説明されています。
 
 ### Oracle
 
-Arguments need to be passed in the given format:
+引数はこの形で渡します。
 
 ```sql
 -- database f/your/path
@@ -536,54 +523,54 @@ INSERT INTO demo VALUES (:name1, :name2);
 UPDATE demo SET col2 = :name3 WHERE col2 = :name2;
 ```
 
-"name1", "name2", "name3" being the names of the arguments, and "default arg" the optional default value.
+「name1」「name2」「name3」が引数の名前、「default arg」が任意の既定値です。
 
 ### DuckDB
 
-DuckDB arguments need to be passed in the given format:
+DuckDB の引数はこの形で渡します。
 ```sql
 -- $name1 (text) = default arg
 -- $name2 (int)
 INSERT INTO demo VALUES ($name1, $name2)
 ```
-"name1", "name2" being the names of the arguments, and "default arg" the optional default value.  
+「name1」「name2」が引数の名前、「default arg」が任意の既定値です。  
 
-You can pass a file on S3 as an argument of type s3object. This will substitute it with the correct 's3:///...' path at runtime.
-You can then query this file using the standard read_csv/read_parquet/read_json functions :
+S3 のファイルを s3object の型の引数として渡せます。実行時に正しい 's3:///...' のパスに置き換えられます。
+そのファイルは read_csv / read_parquet / read_json といったいつもの関数で読めます。
 ```sql
 -- $file (s3object)
 SELECT * FROM read_parquet($file)
 ```
 
-The other native SQL dialects (PostgreSQL, MSSQL, MySQL, BigQuery, Snowflake) also accept `(s3object)` arguments, but bind the file's contents as a JSON parameter that the user SQL reads with the dialect's JSON-table function (`OPENJSON`, `jsonb_to_recordset`, `JSON_TABLE`, ...). See [Native SQL ↔ S3](../../../core_concepts/65_sql_to_s3_streaming/index.mdx#reading-s3-files-as-parameters).
+他の SQL の方言（PostgreSQL、MSSQL、MySQL、BigQuery、Snowflake）も `(s3object)` の引数を受け付けますが、こちらはファイルの中身を JSON の引数として渡し、SQL 側がその方言の JSON を表にする関数（`OPENJSON`、`jsonb_to_recordset`、`JSON_TABLE` など）で読む形になります。[SQL と S3](../../../core_concepts/65_sql_to_s3_streaming/index.mdx#reading-s3-files-as-parameters)を参照してください。
 
-Alternatively, you can reference files on the workspace directly using s3:// notation.
+あるいは、ワークスペースのファイルを s3:// の書き方で直に指せます。
 
-For primary workspace storage:
+主となるワークスペースの保管先の場合:
 ```sql
 SELECT * FROM read_parquet('s3:///path/to/file.parquet')
 ```
 
-For secondary storage:
+副の保管先の場合:
 ```sql
 SELECT * FROM read_parquet('s3://<secondary_storage>/path/to/file.parquet')
 ```
 
-This notation also works with glob patterns:
+この書き方は glob の模様でも使えます。
 ```sql
 SELECT * FROM read_parquet('s3:///myfiles/*.parquet')
 ```
 
-The s3:// notation now uses the Windmill [S3 Proxy](../../../core_concepts/38_object_storage_in_windmill/index.mdx#s3-proxy) by default.
+s3:// の書き方は、いまは既定で Windmill の [S3 Proxy](../../../core_concepts/38_object_storage_in_windmill/index.mdx#s3-proxy) を通ります。
 
-You can also attach to other database resources (BigQuery, PostgreSQL and MySQL). We use the official and community DuckDB extensions under the hood :
+他のデータベースのリソース（BigQuery、PostgreSQL、MySQL）に attach することもできます。裏では DuckDB の公式・有志の拡張を使っています。
 ```sql
 ATTACH '$res:u/demo/amazed_postgresql' AS db (TYPE postgres);
 SELECT * FROM db.public.friends;
 ```
 
 
-Database resource can be specified from the UI or directly within the script with a line `-- database resource_path`.
+データベースのリソースは、画面から選ぶことも、スクリプトの中に `-- database resource_path` の 1 行を書いて直に指定することもできます。
 
 <video
 	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
@@ -592,25 +579,25 @@ Database resource can be specified from the UI or directly within the script wit
 />
 
 <br/>
-You can then write your prepared statement.
+あとは prepared statement を書くだけです。
 
-## Result collection
+## 結果の集め方
 
-You can choose what the script will return with the `result_collection` directive :
+`result_collection` の指示で、スクリプトが何を返すかを選べます。
 
-| Collection strategies             | Output                                   |
+| 集め方                            | 返るもの                                 |
 | --------------------------------- | ---------------------------------------- |
-| last_statement_all_rows (default) | Array of records                         |
-| last_statement_first_row          | Record                                   |
-| last_statement_all_rows_scalar    | Array of scalars                         |
-| last_statement_first_row_scalar   | Scalar                                   |
-| all_statements_all_rows           | Array of array of records                |
-| all_statements_first_row          | Array of records                         |
-| all_statements_all_rows_scalar    | Array of array of scalars                |
-| all_statements_first_row_scalar   | Array of scalars                         |
-| legacy (deprecated)               | Behavior before introduction of the flag |
+| last_statement_all_rows（既定）   | レコードの配列                           |
+| last_statement_first_row          | レコード                                 |
+| last_statement_all_rows_scalar    | 単一の値の配列                           |
+| last_statement_first_row_scalar   | 単一の値                                 |
+| all_statements_all_rows           | レコードの配列の配列                     |
+| all_statements_first_row          | レコードの配列                           |
+| all_statements_all_rows_scalar    | 単一の値の配列の配列                     |
+| all_statements_first_row_scalar   | 単一の値の配列                           |
+| legacy（非推奨）                  | この指示が入る前の挙動                   |
 
-Examples:
+例:
 
 ```sql
 -- result_collection=all_statements_first_row_scalar
@@ -634,26 +621,26 @@ SELECT * FROM my_table;
 ```
 
 
-## Contextual variables
+## 文脈の変数
 
-You can use [contextual variables](../../../core_concepts/47_environment_variables/index.mdx#contextual-variables) in your queries. They need to be wrapped in `%%` like this:
+問い合わせの中で[文脈の変数](../../../core_concepts/47_environment_variables/index.mdx#contextual-variables)を使えます。こうして `%%` で囲む必要があります。
 
 ```sql
 SELECT '%%WM_WORKSPACE%%'
 ```
 
-## Raw queries
+## 生の問い合わせ
 
-### Safe interpolated arguments
+### 安全に埋め込む引数
 
-To allow more flexibility than with prepared statements, Windmill offers the possibility to do safe string interpolation in your queries thanks to [backend schema validation](../../../core_concepts/13_json_schema_and_parsing/index.mdx#backend-schema-validation). This allows you to use script parameters for elements you would usually not be able to, such as table or column names. In order to avoid SQL injections however, these parameters are checked at runtime and the job will fail if any of these rules is not followed:
+prepared statement より自由にしたい場合のために、Windmill は[サーバ側での schema の検証](../../../core_concepts/13_json_schema_and_parsing/index.mdx#backend-schema-validation)を使って、問い合わせに文字列を安全に埋め込めるようにしています。これにより、表や列の名前のような、普通なら引数にできないところにもスクリプトの引数を使えます。ただし SQL の注入を防ぐため、これらの引数は実行時に検査され、次のどれかに反すると job が失敗します。
 
-- The parameter is a non-empty string.
-- The characters are all either alphabetical (ASCII only), numeric, or an underscore (`_`). Meaning no whitespace or symbol is allowed.
-- The string does not start with a number.
-- If the parameter is an enum, it must be one of the defined variants.
+- 引数が空でない文字列であること。
+- 文字が英字（ASCII のみ）・数字・下線（`_`）のいずれかだけであること。つまり空白も記号も許されません。
+- 数字で始まらないこと。
+- 引数が列挙なら、定義した候補のどれかであること。
 
-These rules are strict enough to protect from any kind of unexpected injection, but lenient enough to have some powerful use cases. Let's look at an example:
+この決まりは、思わぬ注入を防ぐには十分に厳しく、それでいて役に立つ使い方ができる程度にはゆるやかです。例を見てみましょう。
 
 ```sql
 -- :daily_minimum_calories (int)
@@ -662,9 +649,9 @@ These rules are strict enough to protect from any kind of unexpected injection, 
 SELECT name, calories FROM %%table_name%% WHERE calories > daily_minimum_calories
 ```
 
-In this example the argument `table_name` is defined as a string that can be either `"fruits"`, `"vegetables"` or `"cereals"`, and the user of the script can then choose which table to query by setting this argument. If the user of the script tries to query a different table, the job will fail before making a connection to the DB, and thus protecting potentially sensitive data.
+この例では、引数 `table_name` は `"fruits"`・`"vegetables"`・`"cereals"` のいずれかを取る文字列として定義されていて、スクリプトを使う人はこの引数でどの表に問い合わせるかを選べます。別の表を指そうとすると、DB につなぐ前に job が失敗するので、見せたくないデータが守られます。
 
-It the enum variants are omitted, the field is considered to be a regular string and only the other rules apply:
+列挙の候補を書かなければ、その欄は普通の文字列として扱われ、他の決まりだけが効きます。
 
 ```sql
 -- :daily_minimum_calories (int)
@@ -673,12 +660,12 @@ It the enum variants are omitted, the field is considered to be a regular string
 SELECT name, calories FROM %%table_name%% WHERE calories > daily_minimum_calories
 ```
 
-Keep in mind that this means users of this script can try this query against all existent and non-existent tables of the database.
+この場合、スクリプトを使う人がデータベースの在る表・無い表すべてに対してこの問い合わせを試せる、ということに注意してください。
 
 
-### Unsafe interpolation on a REST script
+### REST のスクリプトでの危うい埋め込み
 
-A more convenient but less secure option is to execute raw queries with a TypeScript, Deno or Python client. You can for instance do string interpolation to make the name of the table a parameter of your script: `SELECT * FROM ${table}`. However this is dangerous since the string is directly interpolated and this open the door for [SQL injections](https://en.wikipedia.org/wiki/SQL_injection). Use with care and only in trusted environment.
+もっと手軽ですが安全でないやり方として、TypeScript・Deno・Python のクライアントから生の問い合わせを実行する手があります。例えば文字列を埋め込んで、表の名前をスクリプトの引数にできます: `SELECT * FROM ${table}`。ただし文字列がそのまま埋め込まれるので危険で、[SQL の注入](https://en.wikipedia.org/wiki/SQL_injection)の入り口になります。信頼できる環境でのみ、気を付けて使ってください。
 
 #### PostgreSQL
 
@@ -733,7 +720,7 @@ export async function main(query = 'SELECT * FROM demo', pg_resource: Postgresql
 }
 ```
 
-View script on [Windmill Hub](https://hub.windmill.dev/scripts/postgresql/7105/execute-arbitrary-query-and-return-results-postgresql).
+スクリプトを [Windmill Hub](https://hub.windmill.dev/scripts/postgresql/7105/execute-arbitrary-query-and-return-results-postgresql).
 
 
 #### TypeScript (Deno)
@@ -775,7 +762,7 @@ export function pgClient(db: any) {
 }
 ```
 
-View script on [Windmill Hub](https://hub.windmill.dev/scripts/postgresql/1294/execute-query-and-return-results-postgresql).
+スクリプトを [Windmill Hub](https://hub.windmill.dev/scripts/postgresql/1294/execute-query-and-return-results-postgresql).
 
 
 #### Python
@@ -827,19 +814,18 @@ def main(query: str, db_config: postgresql) -> Dict[str, Any]:
     return result
 ```
 
-View script on [Windmill Hub](https://hub.windmill.dev/scripts/postgresql/7106/execute-arbitrary-query-postgresql).
+スクリプトを [Windmill Hub](https://hub.windmill.dev/scripts/postgresql/7106/execute-arbitrary-query-postgresql).
 
 
 :::tip
 
-You can find more Script examples related to PostgreSQL on
-[Windmill Hub](https://hub.windmill.dev/?app=postgresql).
+PostgreSQL に関するスクリプトの例は [Windmill Hub](https://hub.windmill.dev/?app=postgresql) にもっとあります。
 
 :::
 
 #### MySQL
 
-The same logic goes for MySQL.
+MySQL でも同じです。
 
 
 #### TypeScript (Bun)
@@ -895,7 +881,7 @@ export async function main(mysqlResource: Mysql, query: string): Promise<any> {
 }
 ```
 
-View script on [Windmill Hub](https://hub.windmill.dev/scripts/mysql/7108/execute-arbitrary-query-mysql).
+スクリプトを [Windmill Hub](https://hub.windmill.dev/scripts/mysql/7108/execute-arbitrary-query-mysql).
 
 
 #### TypeScript (Deno)
@@ -952,7 +938,7 @@ export async function main(
 
 ```
 
-View script on [Windmill Hub](https://hub.windmill.dev/scripts/mysql/7107/execute-arbitrary-query-mysql).
+スクリプトを [Windmill Hub](https://hub.windmill.dev/scripts/mysql/7107/execute-arbitrary-query-mysql).
 
 
 #### Python
@@ -999,18 +985,16 @@ def main(mysql_credentials: mysql, query: str) -> str:
     return str(result[0])
 ```
 
-View script on [Windmill Hub](https://hub.windmill.dev/scripts/mysql/7109/execute-arbitrary-query-mysql).
+スクリプトを [Windmill Hub](https://hub.windmill.dev/scripts/mysql/7109/execute-arbitrary-query-mysql).
 
 
-And so on for [MS SQL](#ms-sql), [BigQuery](#bigquery) and [Snowflake](#snowflake).
+[MS SQL](#ms-sql)、[BigQuery](#bigquery)、[Snowflake](#snowflake) も同様です。
 
-## Customize your script
+## スクリプトを調整する
 
-After you're done, click on "[Deploy](../../../core_concepts/0_draft_and_deploy/index.mdx)", which will save it to your workspace. You can now use this Script in your [Flows](../../../flows/1_flow_editor.mdx), [app](../../../full_code_apps/index.mdx) or as standalone.
+できあがったら「[配備（Deploy）](../../../core_concepts/0_draft_and_deploy/index.mdx)」をクリックすると、ワークスペースに保存されます。これでこのスクリプトを[フロー](../../../flows/1_flow_editor.mdx)や[アプリ](../../../full_code_apps/index.mdx)の中で使えますし、単体でも使えます。
 
-Feel free to customize your script's metadata ([path](../../../core_concepts/16_roles_and_permissions/index.mdx#path), name, description),
-runtime ([concurrency limits](../../../script_editor/concurrency_limit.mdx), [worker group](../../../script_editor/settings.mdx#worker-group-tag),
-[cache](../../../core_concepts/24_caching/index.md), [dedicated workers](../../../core_concepts/25_dedicated_workers/index.mdx)) and [generated UI](../../../script_editor/customize_ui.mdx).
+スクリプトのメタデータ（[パス](../../../core_concepts/16_roles_and_permissions/index.mdx#path)、名前、説明）、実行のしかた（[同時実行の上限](../../../script_editor/concurrency_limit.mdx)、[worker のグループ](../../../script_editor/settings.mdx#worker-group-tag)、[キャッシュ](../../../core_concepts/24_caching/index.md)、[専用の worker](../../../core_concepts/25_dedicated_workers/index.mdx)）、[生成される UI](../../../script_editor/customize_ui.mdx) は自由に調整してください。
 
 ![Customize SQL](./customize_sql.png 'Customize SQL')
 
@@ -1019,41 +1003,38 @@ runtime ([concurrency limits](../../../script_editor/concurrency_limit.mdx), [wo
 	- [Generated UI](../../../script_editor/customize_ui.mdx) —— main function's arguments can be given advanced settings that will affect the inputs' auto-generated UI and JSON Schema.
 </div>
 
-## What's next?
+## 次は
 
-Those scripts are minimal working examples, but there's a few more steps that can be useful in a real-world use case:
+これらのスクリプトは動く最小の例ですが、実際に使うにはもう少し段が要ります。
 
-- Pass [variables and secrets](../../../core_concepts/2_variables_and_secrets/index.mdx)
-  to a script.
-- Connect to [resources](../../../core_concepts/3_resources_and_types/index.mdx).
-- [Trigger that script](../../../triggers/index.mdx) in many ways.
-- Compose scripts in [Flows](../../../flows/1_flow_editor.mdx), [low-code apps](../../../apps/0_app_editor/index.mdx) or [full-code apps](../../../full_code_apps/index.mdx) (in particular, [Database studio](#database-studio) to visualize and manage your databases in apps).
-- You can [share your scripts](../../../misc/1_share_on_hub/index.md) with the community on [Windmill Hub](https://hub.windmill.dev). Once
-  submitted, they will be verified by moderators before becoming available to
-  everyone right within Windmill.
+- スクリプトに[変数と秘密](../../../core_concepts/2_variables_and_secrets/index.mdx)を渡す。
+- [リソース](../../../core_concepts/3_resources_and_types/index.mdx)につなぐ。
+- いろいろなやり方で[そのスクリプトを起こす](../../../triggers/index.mdx)。
+- [フロー](../../../flows/1_flow_editor.mdx)、[ローコードのアプリ](../../../apps/0_app_editor/index.mdx)、[フルコードのアプリ](../../../full_code_apps/index.mdx)にスクリプトを組み合わせる（特に、アプリの中でデータベースを見て触るための [Database studio](#database-studio)）。
+- [Windmill Hub](https://hub.windmill.dev) で、みんなに[スクリプトを公開](../../../misc/1_share_on_hub/index.md)できます。出すと、まず取りまとめ役が確かめ、そのあと Windmill の中から誰でも使えるようになります。
 
-Scripts are immutable and there is a hash for each deployment of a given script. Scripts are never overwritten and referring to a script by path is referring to the latest deployed hash at that path.
+スクリプトは書き換えられないもので、配備のたびに hash が付きます。上書きされることはなく、パスで指すというのは、そのパスに最後に配備された hash を指すという意味です。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Versioning](https://www.windmill.dev/docs/core_concepts/versioning#script-versioning) —— Scripts, when deployed, can have a parent script identified by its hash.
+	- [版の管理](https://www.windmill.dev/docs/core_concepts/versioning#script-versioning) —— 配備されたスクリプトは、hash で指される親のスクリプトを持てる。
 </div>
 
-For each script, a UI is autogenerated from the JSON schema inferred from the script signature, and can be customized further as standalone or embedded into rich UIs using the [App builder](../../7_apps_quickstart/index.mdx).
+スクリプトごとに、署名から推測した JSON schema をもとに UI が自動生成されます。単体で細かく調整することも、[アプリの作成画面](../../7_apps_quickstart/index.mdx)で作り込んだ UI に埋め込むこともできます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Auto-generated UIs](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill creates auto-generated user interfaces for scripts and flows based on their parameters.
+	- [自動生成される UI](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill はスクリプトとフローの引数から UI を自動で作る。
 	- [Generated UI](../../../script_editor/customize_ui.mdx) —— main function's arguments can be given advanced settings that will affect the inputs' auto-generated UI and JSON Schema.
 </div>
 
-In addition to the UI, sync and async [webhooks](../../../core_concepts/4_webhooks/index.mdx) are generated for each deployment.
+UI に加えて、配備ごとに同期・非同期の [webhook](../../../core_concepts/4_webhooks/index.mdx) が作られます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Webhooks](https://www.windmill.dev/docs/core_concepts/webhooks) —— Trigger scripts and flows from webhooks.
+	- [webhook](https://www.windmill.dev/docs/core_concepts/webhooks) —— webhook からスクリプトとフローを起こす。
 </div>
 
 ## Database studio
 
-From Windmill's [low-code app editor](../../../apps/0_app_editor/index.mdx) (legacy), you can also use the [Database studio](../../../apps/4_app_configuration_settings/database_studio.mdx) component to visualize and manage your databases (PostgreSQL / MySQL / MS SQL / Snowflake / BigQuery are all supported).
+Windmill の[ローコードのアプリエディタ](../../../apps/0_app_editor/index.mdx)（旧来のもの）では、[Database studio](../../../apps/4_app_configuration_settings/database_studio.mdx) の部品を使ってデータベースを見て触ることもできます（PostgreSQL / MySQL / MS SQL / Snowflake / BigQuery のすべてに対応）。
 
 ![Database studio](../../../assets/apps/4_app_component_library/db_studio.png "Database studio")
 
@@ -1069,22 +1050,22 @@ From Windmill's [low-code app editor](../../../apps/0_app_editor/index.mdx) (leg
 
 <br/>
 
-The Database studio component allows you to:
-- Display the content of a table.
-- Edit the content of a table by directly editing the cells (only when the cell is editable).
-- Add a new row.
-- Delete a row.
+Database studio の部品でできることは、
+- 表の中身を見る。
+- 升目を直に編集して、表の中身を書き換える（編集できる升目に限る）。
+- 行を足す。
+- 行を消す。
 
-All details at:
+詳しくは、
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Database studio](https://www.windmill.dev/docs/apps/app_configuration_settings/database_studio) —— The Database studio is a web-based database management tool that leverages Ag Grid for table display and interaction
+	- [Database studio](https://www.windmill.dev/docs/apps/app_configuration_settings/database_studio) —— Ag Grid で表を見せて操作する、web のデータベース管理の道具。
 </div>
 
-## Streaming large query results to S3 (Enterprise feature)
+## 大きな結果を S3 へ流す（Enterprise の機能）
 
-Sometimes, your SQL script will return too much data which exceeds the 10 000 rows query limit within Windmill. In this case, you will want to use the s3 flag to stream your query result to a file.
+SQL のスクリプトが返すデータが多すぎて、Windmill の 10,000 行という上限を超えることがあります。そういうときは s3 のフラグを使い、結果をファイルへ流し込みます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-  - [SQL to S3 streaming](https://www.windmill.dev/docs/core_concepts/sql_to_s3_streaming) —— Stream an SQL query large result to a workspace storage file
+  - [SQL の結果を S3 へ流す](https://www.windmill.dev/docs/core_concepts/sql_to_s3_streaming) —— SQL の大きな結果を、ワークスペースの保管先のファイルへ流し込む。
 </div>

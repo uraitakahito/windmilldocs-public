@@ -6,13 +6,23 @@ Windmill のドキュメントを個人的に日本語へ訳したものです�
 
 **このファイルは生成物です。** `node scripts/build-ja-index.mjs` で作り直せます。
 
-## 訳済み（11 本）
+## 訳済み（21 本）
 
 - [Windmill をはじめる](./getting_started/00_how_to_use_windmill/index.ja.md)
+- [Ansible quickstart](./getting_started/0_scripts_quickstart/10_ansible_quickstart/index.ja.md)
+- [C# クイックスタート](./getting_started/0_scripts_quickstart/11_csharp_quickstart/index.ja.md)
+- [Java クイックスタート](./getting_started/0_scripts_quickstart/13_java_quickstart/index.ja.md)
+- [Ruby クイックスタート](./getting_started/0_scripts_quickstart/14_ruby_quickstart/index.ja.md)
+- [R クイックスタート](./getting_started/0_scripts_quickstart/15_rlang_quickstart/index.ja.md)
 - [TypeScript クイックスタート](./getting_started/0_scripts_quickstart/1_typescript_quickstart/index.ja.md)
 - [Python クイックスタート](./getting_started/0_scripts_quickstart/2_python_quickstart/index.ja.md)
 - [Go クイックスタート](./getting_started/0_scripts_quickstart/3_go_quickstart/index.ja.md)
 - [Bash / PowerShell / Nu クイックスタート](./getting_started/0_scripts_quickstart/4_bash_quickstart/index.ja.md)
+- [Quickstart PostgreSQL, MySQL, MS SQL, BigQuery, Snowflake](./getting_started/0_scripts_quickstart/5_sql_quickstart/index.ja.md)
+- [Rest / GraphQL クイックスタート](./getting_started/0_scripts_quickstart/6_rest_grapqhql_quickstart/index.ja.md)
+- [Docker クイックスタート](./getting_started/0_scripts_quickstart/7_docker_quickstart/index.ja.md)
+- [PHP クイックスタート](./getting_started/0_scripts_quickstart/8_php_quickstart/index.ja.md)
+- [Rust クイックスタート](./getting_started/0_scripts_quickstart/9_rust_quickstart/index.ja.md)
 - [スクリプトのクイックスタート](./getting_started/0_scripts_quickstart/index.ja.md)
 - [パイプラインのクイックスタート](./getting_started/10_pipeline_quickstart/index.ja.md)
 - [フローのクイックスタート](./getting_started/6_flows_quickstart/index.ja.md)
@@ -20,19 +30,9 @@ Windmill のドキュメントを個人的に日本語へ訳したものです�
 - [フルコードのアプリのクイックスタート](./getting_started/9_full_code_apps_quickstart/index.ja.md)
 - [Windmill とは](./intro.ja.md)
 
-## 骨組みのみ（本文は英語）（11 本）
+## 骨組みのみ（本文は英語）（1 本）
 
-- [Ansible quickstart](./getting_started/0_scripts_quickstart/10_ansible_quickstart/index.ja.md)
-- [C# quickstart](./getting_started/0_scripts_quickstart/11_csharp_quickstart/index.ja.md)
-- [Java quickstart](./getting_started/0_scripts_quickstart/13_java_quickstart/index.ja.md)
-- [Ruby quickstart](./getting_started/0_scripts_quickstart/14_ruby_quickstart/index.ja.md)
-- [R quickstart](./getting_started/0_scripts_quickstart/15_rlang_quickstart/index.ja.md)
 - [dbt quickstart](./getting_started/0_scripts_quickstart/16_dbt_quickstart/index.ja.md)
-- [Quickstart PostgreSQL, MySQL, MS SQL, BigQuery, Snowflake](./getting_started/0_scripts_quickstart/5_sql_quickstart/index.ja.md)
-- [Rest / GraphQL quickstart](./getting_started/0_scripts_quickstart/6_rest_grapqhql_quickstart/index.ja.md)
-- [Docker quickstart](./getting_started/0_scripts_quickstart/7_docker_quickstart/index.ja.md)
-- [PHP quickstart](./getting_started/0_scripts_quickstart/8_php_quickstart/index.ja.md)
-- [Rust quickstart](./getting_started/0_scripts_quickstart/9_rust_quickstart/index.ja.md)
 
 ---
 

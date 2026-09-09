@@ -1,16 +1,15 @@
 ---
-title: 'PHP quickstart'
-description: 'How do I write PHP scripts in Windmill? Create, test and deploy PHP scripts with Composer dependency management.'
+title: 'PHP クイックスタート'
+description: 'Windmill で PHP のスクリプトを書くには。Composer による依存関係の管理とあわせて、作り、テストし、配備する。'
 slug: '/getting_started/scripts_quickstart/php'
 ---
+
 > **[原文](./index.mdx)の日本語訳。** 相違があれば原文が正。
 > 原典 © Windmill Labs, Inc. — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。この訳も同じライセンスで提供します。
->
-> **未訳。** 以下は原文のままです。
 
-# PHP quickstart
+# PHP クイックスタート
 
-In this quick start guide, we will write our first script in php.
+この手引きでは、最初のスクリプトを PHP で書きます。
 
 <iframe
 	style={{ aspectRatio: '16/9' }}
@@ -24,29 +23,29 @@ In this quick start guide, we will write our first script in php.
 
 <br/>
 
-This tutorial covers how to create a simple script through Windmill web IDE. See the dedicated page to [develop scripts locally](../../../advanced/4_local_development/index.mdx).
+ここでは Windmill の web IDE で簡単なスクリプトを作ります。[手元で開発する](../../../advanced/4_local_development/index.mdx)方法は、専用の節を参照してください。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Local development](https://www.windmill.dev/docs/advanced/local_development) —— Develop from various environments such as your terminal, VS Code, and JetBrains IDEs.
+	- [手元での開発](https://www.windmill.dev/docs/advanced/local_development) —— 端末・VS Code・JetBrains の IDE など、さまざまな環境から開発する。
 </div>
 
-Scripts are the basic building blocks in Windmill. They can be [run and scheduled](../../../triggers/index.mdx) as standalone, chained together to create [Flows](../../../flows/1_flow_editor.mdx) or displayed with a personalized User Interface as [Apps](../../7_apps_quickstart/index.mdx).
+スクリプトは Windmill の基本の部品です。単体で[実行・スケジュール](../../../triggers/index.mdx)できますし、つなげて[フロー](../../../flows/1_flow_editor.mdx)にすることも、専用の UI を付けて[アプリ](../../7_apps_quickstart/index.mdx)として見せることもできます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Script editor](../../../script_editor/index.mdx) —— All the details on scripts.
-	- [Triggers](../../../triggers/index.mdx) —— Trigger scripts and flows on-demand, by schedule or on external events.
+	- [スクリプトエディタ](../../../script_editor/index.mdx) —— スクリプトのすべて。
+	- [トリガー](../../../triggers/index.mdx) —— スクリプトとフローを、必要なとき・スケジュール・外部の出来事で起こす。
 </div>
 
-Scripts consist of 2 parts:
+スクリプトは 2 つの部分でできています。
 
-- [Code](#code): for php scripts, it must have at least a main function.
-- [Settings](#settings): settings & metadata about the Script such as its path, summary, description, [JSON Schema](../../../core_concepts/13_json_schema_and_parsing/index.mdx) of its inputs (inferred from its signature).
+- [コード](#コード): PHP のスクリプトでは、少なくとも `main` 関数が要ります。
+- [設定](#設定): パス・要約・説明・入力の [JSON Schema](../../../core_concepts/13_json_schema_and_parsing/index.mdx)（署名から推論されます）といった、スクリプトの設定とメタデータ。
 
-When stored in a code repository, these 2 parts are stored separately at `<path>.php` and `<path>.script.yaml`
+コードリポジトリに保存すると、この 2 つは `<path>.php` と `<path>.script.yaml` に分かれて置かれます。
 
-Windmill automatically manages [dependencies](../../../advanced/6_imports/index.mdx) for you. When you import libraries in your php script, Windmill parses these imports upon saving the script and automatically generates a list of dependencies. It then spawns a dependency job to associate these Composer packages with a lockfile, ensuring that the same version of the script is always executed with the same versions of its dependencies.
+[依存関係](../../../advanced/6_imports/index.mdx)は Windmill が自動で扱います。PHP のスクリプトでライブラリを import すると、保存時に Windmill がその import を読み取り、依存関係の一覧を自動で作ります。そのうえで依存解決の job を起こし、Composer のパッケージを lockfile に結び付けます。これにより、同じ版のスクリプトは常に同じ版の依存関係で実行されます。
 
-This is a simple example of a script built in php with Windmill:
+Windmill で PHP で組んだスクリプトの簡単な例を挙げます。
 
 ```
 <?php
@@ -69,44 +68,40 @@ function main(
 }
 ```
 
-From the Home page, click **New** and select **Script**. This will take you to the first step of script creation: [Metadata](../../../script_editor/settings.mdx#metadata).
+ホーム画面で **新規（New）** をクリックし、**スクリプト（Script）** を選びます。スクリプト作成の最初の段階、[メタデータ](../../../script_editor/settings.mdx#metadata)に進みます。
 
-## Settings
+## 設定
 
 ![New script](../../../../static/images/script_languages.png "New script")
 
-As part of the [settings](../../../script_editor/settings.mdx) menu, each script has metadata associated with it, enabling it to be defined and configured in depth.
+[設定](../../../script_editor/settings.mdx)メニューの一部として、各スクリプトにはメタデータが付いており、細かく定義・設定できます。
 
-- **Summary** (optional) is a short, human-readable summary of the Script. It will be displayed as a title across Windmill. If omitted, the UI will use the `path` by default.
-- **Path** is the Script's unique identifier that consists of the [script's owner](../../../core_concepts/16_roles_and_permissions/index.mdx), and the script's name. The owner can be either a user, or a group ([folder](../../../core_concepts/8_groups_and_folders/index.mdx#folders)).
-- **Description** is where you can give instructions through the [auto-generated UI](../../../core_concepts/6_auto_generated_uis/index.mdx) to users on how to run your Script. It supports markdown.
-- **Language** of the script.
-- **Script kind**: Action (by default), [Trigger](../../../flows/10_flow_trigger.mdx), [Approval](../../../flows/11_flow_approval.mdx), [Error handler](../../../flows/7_flow_error_handler.md) or [Preprocessor](../../../core_concepts/43_preprocessors/index.mdx). This acts as a tag to filter appropriate scripts from the [flow editor](../../6_flows_quickstart/index.mdx).
+- **要約（Summary）**（任意）はスクリプトの短い説明で、人が読むためのものです。Windmill 全体で見出しとして表示されます。省略すると、既定で `path` が使われます。
+- **パス（Path）**はスクリプトを一意に指す識別子で、[スクリプトの所有者](../../../core_concepts/16_roles_and_permissions/index.mdx)と名前からなります。所有者はユーザーか、グループ（[フォルダ](../../../core_concepts/8_groups_and_folders/index.mdx#folders)）です。
+- **説明（Description）**では、[自動生成される UI](../../../core_concepts/6_auto_generated_uis/index.mdx) を通じて、使う人に実行のしかたを伝えられます。markdown が使えます。
+- スクリプトの**言語**。
+- **スクリプトの種類**: アクション（既定）、[トリガー](../../../flows/10_flow_trigger.mdx)、[承認](../../../flows/11_flow_approval.mdx)、[エラーハンドラ](../../../flows/7_flow_error_handler.md)、[前処理](../../../core_concepts/43_preprocessors/index.mdx)。[フローエディタ](../../6_flows_quickstart/index.mdx)で適切なスクリプトを絞り込むための札として働きます。
 
-This menu also has additional settings on [Runtime](../../../script_editor/settings.mdx#runtime), [Generated UI](#generated-ui) and [Triggers](../../../script_editor/settings.mdx#triggers).
+このメニューには [ランタイム](../../../script_editor/settings.mdx#runtime)・[生成される UI](#生成される-ui)・[トリガー](../../../script_editor/settings.mdx#triggers)の設定もあります。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Settings](../../../script_editor/settings.mdx) —— Each script has metadata & settings associated with it, enabling it to be defined and configured in depth.
+	- [設定](../../../script_editor/settings.mdx) —— 各スクリプトにはメタデータと設定が付いており、細かく定義・設定できる。
 </div>
 
-Now click on the code editor on the left side.
+では左側のコードエディタに移ります。
 
-## Code
+## コード
 
-Windmill provides an online editor to work on your Scripts. The left-side is
-the editor itself. The right-side [previews the UI](../../../core_concepts/6_auto_generated_uis/index.mdx) that Windmill will
-generate from the Script's signature - this will be visible to the users of the
-Script. You can preview that UI, provide input values, and [test your script](#instant-preview--testing) there.
+Windmill にはスクリプトを書くためのオンラインエディタがあります。左側がエディタ本体です。右側は、スクリプトの署名から Windmill が[生成する UI の下見](../../../core_concepts/6_auto_generated_uis/index.mdx)で、これがスクリプトを使う人に見えるものです。その UI を確かめ、値を入れて、[その場でテスト](#その場での確認とテスト)できます。
 
 ![Editor for php](./editor_php.png "Editor for php")
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Code editor](../../../code_editor/index.mdx) —— The code editor is Windmill's integrated development environment.
-	- [Auto-generated UIs](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill creates auto-generated user interfaces for scripts and flows based on their parameters.
+	- [コードエディタ](../../../code_editor/index.mdx) —— コードエディタは Windmill に統合された開発環境。
+	- [自動生成される UI](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill はスクリプトとフローの引数から、UI を自動で作る。
 </div>
 
-As we picked `php` for this example, Windmill provided some php
-boilerplate. Let's take a look:
+この例では `php` を選んだので、Windmill が PHP の雛形を用意してくれています。見てみましょう。
 
 ```php
 <?php
@@ -129,21 +124,18 @@ function main(
 }
 ```
 
-In Windmill, scripts need to have a `main` function that will be the script's
-entrypoint. There are a few important things to note about the `main`.
+Windmill のスクリプトには、入口となる `main` 関数が要ります。`main` について押さえておくべき点がいくつかあります。
 
-- The main arguments are used for generating
-  1.  the [input spec](../../../core_concepts/13_json_schema_and_parsing/index.mdx) of the Script
-  2.  the [frontend](../../../core_concepts/6_auto_generated_uis/index.mdx) that you see when running the Script as a standalone app.
-- Type annotations are used to generate the UI form, and help pre-validate
-  inputs. While not mandatory, they are highly recommended. You can customize
-  the UI in later steps (but not change the input type!).
+- `main` の引数は次の 2 つを作るのに使われます。
+  1.  スクリプトの[入力仕様](../../../core_concepts/13_json_schema_and_parsing/index.mdx)
+  2.  スクリプトを単体のアプリとして実行したときに見える[画面](../../../core_concepts/6_auto_generated_uis/index.mdx)
+- 型注釈は UI の入力欄を作るのに使われ、入力の事前検査にも役立ちます。必須ではありませんが、強く勧めます。UI は後の段階で調整できます（ただし入力の型は変えられません）。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [JSON schema and parsing](https://www.windmill.dev/docs/core_concepts/json_schema_and_parsing) —— JSON Schemas are used for defining the input specification for scripts and flows, and specifying resource types.
+	- [JSON schema と解釈](https://www.windmill.dev/docs/core_concepts/json_schema_and_parsing) —— JSON Schema は、スクリプトとフローの入力仕様を定め、リソースの型を指定するために使われる。
 </div>
 
-Packages can be installed using composer. Just uncomment the `require` lines and add the packages you need. Windmill will install them for you:
+パッケージは composer で入れられます。`require` の行のコメントを外して、必要なパッケージを書き足すだけです。あとは Windmill が入れてくれます。
 
 ```php
 <?php
@@ -166,10 +158,9 @@ function main(
 
 ```
 
-## Instant preview & testing
+## その場での確認とテスト
 
-Look at the UI preview on the right: it was updated to match the input
-signature. Run a test (`Ctrl` + `Enter`) to verify everything works.
+右側の UI の下見を見てください。入力の署名に合わせて更新されています。テストを実行して（`Ctrl` + `Enter`）、動くことを確かめましょう。
 
 <video
 	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
@@ -179,80 +170,73 @@ signature. Run a test (`Ctrl` + `Enter`) to verify everything works.
 
 <br />
 
-You can change how the UI behaves by changing the main signature. For example, if you add a default for the `name` argument, the UI won't consider this field as required anymore.
+`main` の署名を変えれば、UI の振る舞いも変わります。たとえば `name` に既定値を付けると、UI はその欄を必須として扱わなくなります。
 
 ```php
 function main(string $e = "default value")
 ```
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Instant preview & testing](https://www.windmill.dev/docs/core_concepts/instant_preview) —— On top of its integrated editors, Windmill allows users to see and test what they are building directly from the editor, even before deployment.
+	- [その場での確認とテスト](https://www.windmill.dev/docs/core_concepts/instant_preview) —— Windmill は統合されたエディタに加えて、配備の前でも、作っているものをその場で見て試せるようにしている。
 </div>
 
-Now let's go to the last step: the "Generated UI" settings.
+では最後の段階、「生成される UI」の設定に進みます。
 
-## Generated UI
+## 生成される UI
 
-From the Settings menu, the "Generated UI" tab lets you customize the script's arguments.
+設定メニューの「生成される UI（Generated UI）」タブでは、スクリプトの引数を調整できます。
 
-The UI is generated from the Script's main function signature, but you can add additional constraints here. For example, we could use the `Customize property`: add a regex by clicking on `Pattern` to make sure users are providing a name with only alphanumeric characters: `^[A-Za-z0-9]+$`. Let's still allow numbers in case you are some tech billionaire's kid.
+UI はスクリプトの `main` 関数の署名から作られますが、ここで制約を足せます。たとえば `プロパティを調整（Customize property）` から `パターン（Pattern）` をクリックして正規表現を書き、英数字だけの名前を求められます: `^[A-Za-z0-9]+$`。数字も許しておきましょう —— どこかの技術系の富豪の子かもしれませんから。
 
 ![Advanced settings for php](./customize_php.png "Advanced settings for php")
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Script kind](../../../script_editor/script_kinds.mdx) —— You can attach additional functionalities to Scripts by specializing them into specific Script kinds.
-	- [Generated UI](../../../script_editor/customize_ui.mdx) —— main function's arguments can be given advanced settings that will affect the inputs' auto-generated UI and JSON Schema.
+	- [スクリプトの種類](../../../script_editor/script_kinds.mdx) —— スクリプトを特定の種類に絞ることで、追加の働きを持たせられる。
+	- [生成される UI](../../../script_editor/customize_ui.mdx) —— main 関数の引数には詳細な設定を与えられ、入力の自動生成 UI と JSON Schema に反映される。
 </div>
 
-## Run!
+## 実行する
 
-We're done! Now let's look at what users of the script will do. Click on the [Deploy](../../../core_concepts/0_draft_and_deploy/index.mdx) button
-to load the script. You'll see the user input form we defined earlier.
+これで完成です。次は、このスクリプトを使う人の側を見てみましょう。[配備（Deploy）](../../../core_concepts/0_draft_and_deploy/index.mdx)ボタンを押して読み込みます。さきほど定義した入力欄が出ます。
 
-Note that Scripts are [versioned](../../../core_concepts/34_versioning/index.mdx#script-versioning) in Windmill, and
-each script version is uniquely identified by a hash.
+Windmill のスクリプトは[版管理されて](../../../core_concepts/34_versioning/index.mdx#script-versioning)おり、各版はハッシュで一意に識別されます。
 
-Fill in the input field, then hit "Run". You should see a run view, as well as
-your logs. All script runs are also available in the [Runs](../../../core_concepts/5_monitor_past_and_future_runs/index.mdx) menu on
-the left.
+入力欄を埋めて「実行（Run）」を押します。実行の様子とログが出ます。すべての実行は左側の[実行履歴](../../../core_concepts/5_monitor_past_and_future_runs/index.mdx)メニューからも見られます。
 
 ![Run in php](./run_php.png "Run in php")
 
-You can also choose to [run the script from the CLI](../../../advanced/3_cli/index.mdx) with the pre-made Command-line interface call.
+用意されたコマンドを使って、[CLI からスクリプトを実行する](../../../advanced/3_cli/index.mdx)こともできます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Triggers](../../../triggers/index.mdx) —— Trigger scripts and flows on-demand, by schedule or on external events.
+	- [トリガー](../../../triggers/index.mdx) —— スクリプトとフローを、必要なとき・スケジュール・外部の出来事で起こす。
 </div>
 
-## What's next?
+## 次は
 
-This script is a minimal working example, but there's a few more steps that can be useful in a real-world use case:
+このスクリプトは動く最小の例ですが、実際の用途ではさらにいくつかの段階が役に立ちます。
 
-- Pass [variables and secrets](../../../core_concepts/2_variables_and_secrets/index.mdx)
-  to a script.
-- Connect to [resources](../../../core_concepts/3_resources_and_types/index.mdx).
-- Mount a [volume](../../../core_concepts/67_volumes/index.mdx) with a `// volume:` annotation below the `<?php` opener to persist files across runs ([Enterprise Edition](/pricing)).
-- [Trigger that script](../../../triggers/index.mdx) in many ways.
-- Compose scripts in [Flows](../../../flows/1_flow_editor.mdx), [low-code apps](../../../apps/0_app_editor/index.mdx) or [full-code apps](../../../full_code_apps/index.mdx).
-- You can [share your scripts](../../../misc/1_share_on_hub/index.md) with the community on [Windmill Hub](https://hub.windmill.dev). Once
-  submitted, they will be verified by moderators before becoming available to
-  everyone right within Windmill.
+- スクリプトに[変数と秘密](../../../core_concepts/2_variables_and_secrets/index.mdx)を渡す。
+- [リソース](../../../core_concepts/3_resources_and_types/index.mdx)につなぐ。
+- `<?php` の開始タグの下に `// volume:` の註記を書いて[ボリューム](../../../core_concepts/67_volumes/index.mdx)をマウントすると、実行をまたいでファイルを残せます（[Enterprise Edition](/pricing)）。
+- [スクリプトを起こす](../../../triggers/index.mdx)方法はいくつもあります。
+- スクリプトを[フロー](../../../flows/1_flow_editor.mdx)・[ローコードのアプリ](../../../apps/0_app_editor/index.mdx)・[フルコードのアプリ](../../../full_code_apps/index.mdx)に組み合わせる。
+- [Windmill Hub](https://hub.windmill.dev) でスクリプトを[共有](../../../misc/1_share_on_hub/index.md)できます。投稿されたものは、Windmill の中で誰でも使えるようになる前に、管理者が確認します。
 
-Scripts are immutable and there is an hash for each deployment of a given script. Scripts are never overwritten and referring to a script by path is referring to the latest deployed hash at that path.
+スクリプトは不変で、配備するたびにハッシュが付きます。上書きされることはなく、パスでスクリプトを指すことは、そのパスに最後に配備されたハッシュを指すことを意味します。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Versioning](https://www.windmill.dev/docs/core_concepts/versioning#script-versioning) —— Scripts, when deployed, can have a parent script identified by its hash.
+	- [版管理](https://www.windmill.dev/docs/core_concepts/versioning#script-versioning) —— 配備されたスクリプトは、ハッシュで指される親のスクリプトを持ちうる。
 </div>
 
-For each script, a UI is autogenerated from the JSON schema inferred from the script signature, and can be customized further as standalone or embedded into rich UIs using the [App builder](../../7_apps_quickstart/index.mdx).
+各スクリプトには、署名から推論された JSON schema をもとに UI が自動生成されます。それは単体でも調整できますし、[アプリビルダー](../../7_apps_quickstart/index.mdx)で作り込んだ UI に埋め込むこともできます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Auto-generated UIs](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill creates auto-generated user interfaces for scripts and flows based on their parameters.
-	- [Generated UI](../../../script_editor/customize_ui.mdx) —— main function's arguments can be given advanced settings that will affect the inputs' auto-generated UI and JSON Schema.
+	- [自動生成される UI](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill はスクリプトとフローの引数から、UI を自動で作る。
+	- [生成される UI](../../../script_editor/customize_ui.mdx) —— main 関数の引数には詳細な設定を与えられ、入力の自動生成 UI と JSON Schema に反映される。
 </div>
 
-In addition to the UI, sync and async [webhooks](../../../core_concepts/4_webhooks/index.mdx) are generated for each deployment.
+UI に加えて、配備のたびに同期・非同期の [webhook](../../../core_concepts/4_webhooks/index.mdx) も作られます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Webhooks](https://www.windmill.dev/docs/core_concepts/webhooks) —— Trigger scripts and flows from webhooks.
+	- [webhook](https://www.windmill.dev/docs/core_concepts/webhooks) —— webhook からスクリプトとフローを起こす。
 </div>

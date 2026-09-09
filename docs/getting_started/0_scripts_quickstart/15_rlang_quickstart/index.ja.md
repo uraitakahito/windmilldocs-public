@@ -1,16 +1,14 @@
 ---
-title: 'R quickstart'
-description: 'How do I write R scripts in Windmill? Create, test and deploy R scripts with CRAN package dependency management.'
+title: 'R クイックスタート'
+description: 'Windmill で R のスクリプトを書くには。CRAN のパッケージ依存の管理とあわせて、作り、テストし、配備する。'
 slug: '/getting_started/scripts_quickstart/r'
 ---
 > **[原文](./index.mdx)の日本語訳。** 相違があれば原文が正。
 > 原典 © Windmill Labs, Inc. — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。この訳も同じライセンスで提供します。
->
-> **未訳。** 以下は原文のままです。
 
-# R quickstart
+# R クイックスタート
 
-In this quick start guide, we will write our first script in [R](https://www.r-project.org/).
+この手引きでは、最初のスクリプトを [R](https://www.r-project.org/) で書きます。
 
 {/* Placeholder: Add demo video for R scripts when available */}
 {/* <div className="mb-4">
@@ -26,30 +24,30 @@ In this quick start guide, we will write our first script in [R](https://www.r-p
 </div> */}
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Local development](https://www.windmill.dev/docs/advanced/local_development) —— Develop from various environments such as your terminal, VS Code, and JetBrains IDEs.
-	- [Dependencies in R](https://www.windmill.dev/docs/getting_started/scripts_quickstart/r#dependencies-management) —— How to manage dependencies in R scripts.
+	- [手元での開発](https://www.windmill.dev/docs/advanced/local_development) —— 端末・VS Code・JetBrains の IDE など、さまざまな環境から開発する。
+	- [R の依存関係](https://www.windmill.dev/docs/getting_started/scripts_quickstart/r#dependencies-management) —— R のスクリプトで依存関係を管理する方法。
 </div>
 
-Scripts are the basic building blocks in Windmill. They can be [run and scheduled](../../../triggers/index.mdx) as standalone, chained together to create [Flows](../../../flows/1_flow_editor.mdx) or displayed with a personalized User Interface as [Apps](../../7_apps_quickstart/index.mdx).
+スクリプトは Windmill の基本の部品です。単体で[実行・スケジュール](../../../triggers/index.mdx)できますし、つなげて[フロー](../../../flows/1_flow_editor.mdx)にすることも、専用の UI を付けて[アプリ](../../7_apps_quickstart/index.mdx)として見せることもできます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Script editor](../../../script_editor/index.mdx) —— All the details on scripts.
-	- [Triggers](../../../triggers/index.mdx) —— Trigger scripts and flows on-demand, by schedule or on external events.
+	- [スクリプトエディタ](../../../script_editor/index.mdx) —— スクリプトのすべて。
+	- [トリガー](../../../triggers/index.mdx) —— スクリプトとフローを、必要なとき・スケジュール・外部の出来事で起こす。
 </div>
 
-Scripts consist of 2 parts:
+スクリプトは 2 つの部分でできています。
 
-- [Code](#code): for R scripts, they must have a `main` function defined as `main <- function(...)`.
-- [Settings](#settings): settings & metadata about the Script such as its path, summary, description, [jsonschema](../../../core_concepts/13_json_schema_and_parsing/index.mdx) of its inputs (inferred from its signature).
+- [コード](#コード): R のスクリプトでは、`main <- function(...)` の形で定義した `main` 関数が要ります。
+- [設定](#設定): パス・要約・説明・入力の [JSON Schema](../../../core_concepts/13_json_schema_and_parsing/index.mdx)（署名から推論されます）といった、スクリプトの設定とメタデータ。
 
-When stored in a code repository, these 2 parts are stored separately at `<path>.r` and `<path>.script.yaml`
+コードリポジトリに保存すると、この 2 つは `<path>.r` と `<path>.script.yaml` に分かれて置かれます。
 
-Windmill automatically manages [dependencies](/docs/getting_started/scripts_quickstart/r#dependencies-management) for you.
-When you use packages in your R script through `library()` or `require()` calls,
-Windmill parses these dependencies upon saving the script and automatically resolves versions from CRAN,
-ensuring that the same version of the script is always executed with the same versions of its dependencies.
+依存関係は Windmill が[自動で管理](/docs/getting_started/scripts_quickstart/r#dependencies-management)します。
+R のスクリプトで `library()` や `require()` を使ってパッケージを読み込むと、
+保存した時点で Windmill がその依存関係を読み取り、CRAN から版を自動で解決します。
+これにより、同じ版のスクリプトは、つねに同じ版の依存関係で実行されます。
 
-This is a simple example of a script built in R with Windmill:
+Windmill で R で組んだスクリプトの簡単な例を挙げます。
 
 ```r
 library(httr)
@@ -66,51 +64,42 @@ main <- function(url = "https://httpbin.org/get", message = "Hello from Windmill
 }
 ```
 
-In this quick start guide, we'll create a script that greets the operator running it.
+この手引きでは、実行した人に挨拶するスクリプトを作ります。
 
-From the Home page, click **New** and select **Script**. This will take you to the first step of script creation: Metadata.
+ホーム画面で **新規（New）** をクリックし、**スクリプト（Script）** を選びます。スクリプト作成の最初の段階、メタデータに進みます。
 
-## Settings
+## 設定
 
 ![R Settings](./r-settings.png "R Settings")
 
-As part of the [settings](../../../script_editor/settings.mdx) menu, each script has metadata associated with it, enabling it to be defined and configured in depth.
+[設定](../../../script_editor/settings.mdx)メニューの一部として、各スクリプトにはメタデータが付いており、細かく定義・設定できます。
 
-- **Path** is the Script's unique identifier that consists of the
-  [script's owner](../../../core_concepts/16_roles_and_permissions/index.mdx), and the script's name.
-  The owner can be either a user, or a group ([folder](../../../core_concepts/8_groups_and_folders/index.mdx#folders)).
-- **Summary** (optional) is a short, human-readable summary of the Script. It
-  will be displayed as a title across Windmill. If omitted, the UI will use the `path` by
-  default.
-- **Language** of the script.
-- **Description** is where you can give instructions through the [auto-generated UI](../../../core_concepts/6_auto_generated_uis/index.mdx)
-  to users on how to run your Script. It supports markdown.
-- **Script kind**: Action (by default), [Trigger](../../../flows/10_flow_trigger.mdx), [Approval](../../../flows/11_flow_approval.mdx) or [Error handler](../../../flows/7_flow_error_handler.md). This acts as a tag to filter appropriate scripts from the [flow editor](../../6_flows_quickstart/index.mdx).
+- **パス（Path）**はスクリプトを一意に指す識別子で、[スクリプトの所有者](../../../core_concepts/16_roles_and_permissions/index.mdx)と名前からなります。所有者はユーザーか、グループ（[フォルダ](../../../core_concepts/8_groups_and_folders/index.mdx#folders)）です。
+- **要約（Summary）**（任意）はスクリプトの短い説明で、人が読むためのものです。Windmill 全体で見出しとして表示されます。省略すると、既定で `path` が使われます。
+- スクリプトの**言語**。
+- **説明（Description）**では、[自動生成される UI](../../../core_concepts/6_auto_generated_uis/index.mdx) を通じて、使う人に実行のしかたを伝えられます。markdown が使えます。
+- **スクリプトの種類**: アクション（既定）、[トリガー](../../../flows/10_flow_trigger.mdx)、[承認](../../../flows/11_flow_approval.mdx)、[エラーハンドラ](../../../flows/7_flow_error_handler.md)。[フローエディタ](../../6_flows_quickstart/index.mdx)で適切なスクリプトを絞り込むための札として働きます。
 
-This menu also has additional settings on [Runtime](../../../script_editor/settings.mdx#runtime), [Generated UI](#generated-ui) and [Triggers](../../../script_editor/settings.mdx#triggers).
+このメニューには [ランタイム](../../../script_editor/settings.mdx#runtime)・[生成される UI](#生成される-ui)・[トリガー](../../../script_editor/settings.mdx#triggers)の設定もあります。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Settings](../../../script_editor/settings.mdx) —— Each script has metadata & settings associated with it, enabling it to be defined and configured in depth.
+	- [設定](../../../script_editor/settings.mdx) —— 各スクリプトにはメタデータと設定が付いており、細かく定義・設定できる。
 </div>
 
-Now click on the code editor on the left side, and let's build our Hello World!
+では左側のコードエディタをクリックして、Hello World を作りましょう。
 
-## Code
+## コード
 
-Windmill provides an online editor to work on your Scripts. The left-side is
-the editor itself. The right-side [previews the UI](../../../core_concepts/6_auto_generated_uis/index.mdx) that Windmill will
-generate from the Script's signature - this will be visible to the users of the
-Script. You can preview that UI, provide input values, and [test your script](#instant-preview--testing) there.
+Windmill にはスクリプトを書くためのオンラインエディタがあります。左側がエディタ本体です。右側は、スクリプトの署名から Windmill が[生成する UI の下見](../../../core_concepts/6_auto_generated_uis/index.mdx)で、これがスクリプトを使う人に見えるものです。その UI を確かめ、値を入れて、[その場でテスト](#その場での確認とテスト)できます。
 
 ![R Editor](./r-editor.png "R Editor")
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Code editor](../../../code_editor/index.mdx) —— The code editor is Windmill's integrated development environment.
-	- [Auto-generated UIs](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill creates auto-generated user interfaces for scripts and flows based on their parameters.
+	- [コードエディタ](../../../code_editor/index.mdx) —— コードエディタは Windmill に統合された開発環境。
+	- [自動生成される UI](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill はスクリプトとフローの引数から、UI を自動で作る。
 </div>
 
-As we picked `R` for this example, Windmill provided some R
-boilerplate. Let's take a look:
+この例では `R` を選んだので、Windmill が R の雛形を用意してくれています。見てみましょう。
 
 ```r
 library(crayon)
@@ -136,22 +125,19 @@ main <- function(
 }
 ```
 
-In Windmill, R scripts must have a `main` function defined as `main <- function(...)` that will be the script's
-entrypoint. There are a few important things to note about the `main` function:
+Windmill の R スクリプトには、`main <- function(...)` の形で定義した `main` 関数が要ります。これがスクリプトの入口です。`main` について押さえておくべき点がいくつかあります。
 
-- The main arguments are used for generating
-  1.  the [input spec](../../../core_concepts/13_json_schema_and_parsing/index.mdx) of the Script
-  2.  the [frontend](../../../core_concepts/6_auto_generated_uis/index.mdx) that you see when running the Script as a standalone app.
-- Default values are used to infer argument types and generate the UI form. String defaults create string inputs, numeric defaults create number inputs, list/vector defaults create appropriate JSON inputs, etc.
-- You can customize the UI in later steps (but not change the input type!).
+- `main` の引数は次の 2 つを作るのに使われます。
+  1.  スクリプトの[入力仕様](../../../core_concepts/13_json_schema_and_parsing/index.mdx)
+  2.  スクリプトを単体のアプリとして実行したときに見える[画面](../../../core_concepts/6_auto_generated_uis/index.mdx)
+- 既定値は引数の型を推論し、UI の入力欄を作るのに使われます。文字列の既定値なら文字列の入力欄、数値の既定値なら数値の入力欄、リストやベクトルの既定値ならそれに合った JSON の入力欄、というように決まります。
+- UI は後の段階で調整できます（ただし入力の型は変えられません）。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [JSON schema and parsing](https://www.windmill.dev/docs/core_concepts/json_schema_and_parsing) —— JSON Schemas are used for defining the input specification for scripts and flows, and specifying resource types.
+	- [JSON schema と解釈](https://www.windmill.dev/docs/core_concepts/json_schema_and_parsing) —— JSON Schema は、スクリプトとフローの入力仕様を定め、リソースの型を指定するために使われる。
 </div>
 
-Back to our Hello World. We can clean up the boilerplate, change the
-main to take in the user's name. Let's also return the `name`, maybe we can use
-this later if we use this Script within a [flow](../../../flows/1_flow_editor.mdx) or [app](../../../full_code_apps/index.mdx) and need to pass its result on.
+Hello World に戻ります。雛形を整理して、`main` が利用者の名前を受け取るようにします。`name` を返しておきましょう —— このスクリプトを[フロー](../../../flows/1_flow_editor.mdx)や[アプリ](../../../full_code_apps/index.mdx)の中で使い、結果を次へ渡したくなるかもしれません。
 
 ```r
 main <- function(name = "World") {
@@ -160,9 +146,9 @@ main <- function(name = "World") {
 }
 ```
 
-## Accessing variables and resources
+## 変数とリソースを使う
 
-R scripts can access Windmill [variables](../../../core_concepts/2_variables_and_secrets/index.mdx) and [resources](../../../core_concepts/3_resources_and_types/index.mdx) using built-in helper functions:
+R のスクリプトからは、組み込みの補助関数を使って Windmill の[変数](../../../core_concepts/2_variables_and_secrets/index.mdx)と[リソース](../../../core_concepts/3_resources_and_types/index.mdx)を利用できます。
 
 ```r
 library(httr)
@@ -188,59 +174,52 @@ main <- function() {
 }
 ```
 
-## Instant preview & testing
+## その場での確認とテスト
 
-Look at the UI preview on the right: it was updated to match the input
-signature. Run a test (`Ctrl` + `Enter`) to verify everything works.
+右側の UI の下見を見てください。入力の署名に合わせて更新されています。テストを実行して（`Ctrl` + `Enter`）、動くことを確かめましょう。
 
-You can change how the UI behaves by changing the main signature. For example,
-if you remove the default for the `name` argument, the UI will consider this field
-as required.
+`main` の署名を変えれば、UI のふるまいも変えられます。たとえば `name` 引数の既定値を消すと、UI はこの欄を必須として扱います。
 
 ```r
 main <- function(name)
 ```
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Instant preview & testing](https://www.windmill.dev/docs/core_concepts/instant_preview) —— On top of its integrated editors, Windmill allows users to see and test what they are building directly from the editor, even before deployment.
+	- [その場での確認とテスト](https://www.windmill.dev/docs/core_concepts/instant_preview) —— Windmill は統合されたエディタに加えて、配備の前でも、作っているものをその場で見て試せるようにしている。
 </div>
 
-Now let's go to the last step: the "Generated UI" settings.
+では最後の段階、「生成される UI」の設定に進みます。
 
-## Generated UI
+## 生成される UI
 
-From the Settings menu, the "Generated UI" tab lets you customize the script's arguments.
+設定メニューの「生成される UI（Generated UI）」タブでは、スクリプトの引数を調整できます。
 
-The UI is generated from the Script's main function signature, but you can add additional constraints here. For example, we could use the `Customize property`: add a regex by clicking on `Pattern` to make sure users are providing a name with only alphanumeric characters: `^[A-Za-z0-9]+$`. Let's still allow numbers in case you are some tech billionaire's kid.
+UI はスクリプトの `main` 関数の署名から作られますが、ここで制約を足せます。たとえば `プロパティを調整（Customize property）` から `パターン（Pattern）` をクリックして正規表現を書き、英数字だけの名前を求められます: `^[A-Za-z0-9]+$`。数字も許しておきましょう —— どこかの技術系の富豪の子かもしれませんから。
 
 ![Generated UI](../14_ruby_quickstart/customize-ui.png "Generated UI")
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Script kind](../../../script_editor/script_kinds.mdx) —— You can attach additional functionalities to Scripts by specializing them into specific Script kinds.
-	- [Generated UI](../../../script_editor/customize_ui.mdx) —— main function's arguments can be given advanced settings that will affect the inputs' auto-generated UI and JSON Schema.
+	- [スクリプトの種類](../../../script_editor/script_kinds.mdx) —— スクリプトを特定の種類に絞ることで、追加の働きを持たせられる。
+	- [生成される UI](../../../script_editor/customize_ui.mdx) —— main 関数の引数には詳細な設定を与えられ、入力の自動生成 UI と JSON Schema に反映される。
 </div>
 
-## Run!
+## 実行する
 
-We're done! Now let's look at what users of the script will do. Click on the [Deploy](../../../core_concepts/0_draft_and_deploy/index.mdx) button
-to load the script. You'll see the user input form we defined earlier.
+これで完成です。次は、このスクリプトを使う人の側を見てみましょう。[配備（Deploy）](../../../core_concepts/0_draft_and_deploy/index.mdx)ボタンを押して読み込みます。さきほど定義した入力欄が出ます。
 
-Note that Scripts are [versioned](../../../core_concepts/34_versioning/index.mdx#script-versioning) in Windmill, and
-each script version is uniquely identified by a hash.
+Windmill のスクリプトは[版管理されて](../../../core_concepts/34_versioning/index.mdx#script-versioning)おり、各版はハッシュで一意に識別されます。
 
-Fill in the input field, then hit "Run". You should see a run view, as well as
-your logs. All script runs are also available in the [Runs](../../../core_concepts/5_monitor_past_and_future_runs/index.mdx) menu on
-the left.
+入力欄を埋めて「実行（Run）」を押します。実行の様子とログが出ます。すべての実行は左側の[実行履歴](../../../core_concepts/5_monitor_past_and_future_runs/index.mdx)メニューからも見られます。
 
-You can also choose to [run the script from the CLI](../../../advanced/3_cli/index.mdx) with the pre-made Command-line interface call.
+用意されたコマンドを使って、[CLI からスクリプトを実行する](../../../advanced/3_cli/index.mdx)こともできます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Triggers](../../../triggers/index.mdx) —— Trigger scripts and flows on-demand, by schedule or on external events.
+	- [トリガー](../../../triggers/index.mdx) —— スクリプトとフローを、必要なとき・スケジュール・外部の出来事で起こす。
 </div>
 
-## Dependencies management
+## 依存の管理
 
-R dependencies are automatically detected from `library()` and `require()` calls in your script. Windmill resolves package versions from CRAN:
+R の依存関係は、スクリプト中の `library()` と `require()` の呼び出しから自動で検出されます。Windmill はパッケージの版を CRAN から解決します。
 
 ```r
 library(httr)
@@ -264,15 +243,15 @@ main <- function(data_url = "https://example.com/data.csv") {
 }
 ```
 
-Windmill will automatically:
-- Parse your `library()` and `require()` calls when you save the script
-- Resolve versions from CRAN (with 3-day TTL caching for lockfiles)
-- Install packages to a shared cache directory
-- Cache dependencies for faster execution
+Windmill が自動で行うことは次のとおりです。
+- スクリプトを保存したときに `library()` と `require()` の呼び出しを読み取る
+- CRAN から版を解決する（lockfile は 3 日の TTL でキャッシュされます）
+- 共有のキャッシュディレクトリにパッケージを導入する
+- 実行を速くするために依存関係をキャッシュする
 
-### Verbose mode
+### 詳しい出力
 
-By default, renv output is suppressed during package installation. To enable verbose output for debugging, add a `#verbose` annotation at the top of your script:
+既定では、パッケージの導入中に renv の出力は伏せられています。不具合を調べるために詳しい出力を有効にするには、スクリプトの先頭に `#verbose` の註記を足します。
 
 ```r
 #verbose
@@ -285,38 +264,35 @@ main <- function() {
 }
 ```
 
-## Caching
+## キャッシュ
 
-Every R package dependency is cached on disk by default. Furthermore if you use the [Distributed cache storage](../../../core_concepts/38_object_storage_in_windmill/index.mdx#instance-object-storage-distributed-cache-for-python-rust-go), it will be available to every other worker, allowing fast startup for every worker.
+R のパッケージ依存は既定でディスクにキャッシュされます。さらに[分散キャッシュの保管](../../../core_concepts/38_object_storage_in_windmill/index.mdx#instance-object-storage-distributed-cache-for-python-rust-go)を使えば、他のすべての worker からも使えるようになり、どの worker でも起動が速くなります。
 
-## What's next?
+## 次は
 
-This script is a minimal working example, but there's a few more steps that can be useful in a real-world use case:
+このスクリプトは動く最小の例ですが、実際の用途ではさらにいくつかの段階が役に立ちます。
 
-- Pass [variables and secrets](../../../core_concepts/2_variables_and_secrets/index.mdx)
-  to a script.
-- Connect to [resources](../../../core_concepts/3_resources_and_types/index.mdx).
-- [Trigger that script](../../../triggers/index.mdx) in many ways.
-- Compose scripts in [Flows](../../../flows/1_flow_editor.mdx), [low-code apps](../../../apps/0_app_editor/index.mdx) or [full-code apps](../../../full_code_apps/index.mdx).
-- You can [share your scripts](../../../misc/1_share_on_hub/index.md) with the community on [Windmill Hub](https://hub.windmill.dev). Once
-  submitted, they will be verified by moderators before becoming available to
-  everyone right within Windmill.
+- スクリプトに[変数と秘密](../../../core_concepts/2_variables_and_secrets/index.mdx)を渡す。
+- [リソース](../../../core_concepts/3_resources_and_types/index.mdx)につなぐ。
+- [スクリプトを起こす](../../../triggers/index.mdx)方法はいくつもあります。
+- スクリプトを[フロー](../../../flows/1_flow_editor.mdx)・[ローコードのアプリ](../../../apps/0_app_editor/index.mdx)・[フルコードのアプリ](../../../full_code_apps/index.mdx)に組み合わせる。
+- [Windmill Hub](https://hub.windmill.dev) でスクリプトを[共有](../../../misc/1_share_on_hub/index.md)できます。投稿されたものは、Windmill の中で誰でも使えるようになる前に、管理者が確認します。
 
-Scripts are immutable and there is a hash for each deployment of a given script. Scripts are never overwritten and referring to a script by path is referring to the latest deployed hash at that path.
+スクリプトは不変で、配備するたびにハッシュが付きます。上書きされることはなく、パスでスクリプトを指すことは、そのパスに最後に配備されたハッシュを指すことを意味します。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Versioning](https://www.windmill.dev/docs/core_concepts/versioning#script-versioning) —— Scripts, when deployed, can have a parent script identified by its hash.
+	- [版管理](https://www.windmill.dev/docs/core_concepts/versioning#script-versioning) —— 配備されたスクリプトは、ハッシュで指される親のスクリプトを持ちうる。
 </div>
 
-For each script, a UI is autogenerated from the jsonschema inferred from the script signature, and can be customized further as standalone or embedded into rich UIs using the [App builder](../../7_apps_quickstart/index.mdx).
+各スクリプトには、署名から推論された JSON schema をもとに UI が自動生成されます。それは単体でも調整できますし、[アプリビルダー](../../7_apps_quickstart/index.mdx)で作り込んだ UI に埋め込むこともできます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Auto-generated UIs](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill creates auto-generated user interfaces for scripts and flows based on their parameters.
-	- [Generated UI](../../../script_editor/customize_ui.mdx) —— main function's arguments can be given advanced settings that will affect the inputs' auto-generated UI and JSON Schema.
+	- [自動生成される UI](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill はスクリプトとフローの引数から、UI を自動で作る。
+	- [生成される UI](../../../script_editor/customize_ui.mdx) —— main 関数の引数には詳細な設定を与えられ、入力の自動生成 UI と JSON Schema に反映される。
 </div>
 
-In addition to the UI, sync and async [webhooks](../../../core_concepts/4_webhooks/index.mdx) are generated for each deployment.
+UI に加えて、配備のたびに同期・非同期の [webhook](../../../core_concepts/4_webhooks/index.mdx) も作られます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Webhooks](https://www.windmill.dev/docs/core_concepts/webhooks) —— Trigger scripts and flows from webhooks.
+	- [webhook](https://www.windmill.dev/docs/core_concepts/webhooks) —— webhook からスクリプトとフローを起こす。
 </div>

@@ -1,16 +1,14 @@
 ---
 title: 'Ansible quickstart'
-description: 'How do I run Ansible playbooks in Windmill? Create and execute Ansible scripts with Windmill.'
+description: 'Windmill で Ansible の playbook を動かすには。Ansible のスクリプトを作って実行する。'
 slug: '/getting_started/scripts_quickstart/ansible'
 ---
 > **[原文](./index.mdx)の日本語訳。** 相違があれば原文が正。
 > 原典 © Windmill Labs, Inc. — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。この訳も同じライセンスで提供します。
->
-> **未訳。** 以下は原文のままです。
 
-# Ansible quickstart
+# Ansible クイックスタート
 
-In this quickstart guide, we will write our first script/playbook with [Ansible](https://www.ansible.com/).
+このクイックスタートでは、[Ansible](https://www.ansible.com/) で最初のスクリプト（playbook）を書きます。
 
 <video
 	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
@@ -22,51 +20,51 @@ In this quickstart guide, we will write our first script/playbook with [Ansible]
 
 <br />
 
-This tutorial covers how to create a simple Ansible script through Windmill web IDE. See the dedicated page to [develop scripts locally](../../../advanced/4_local_development/index.mdx).
+ここでは Windmill の web IDE で簡単な Ansible のスクリプトを作ります。手元で書きたい場合は[手元での開発](../../../advanced/4_local_development/index.mdx)のページを参照してください。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Local development](https://www.windmill.dev/docs/advanced/local_development) —— Develop from various environments such as your terminal, VS Code, and JetBrains IDEs.
+	- [手元での開発](https://www.windmill.dev/docs/advanced/local_development) —— 端末、VS Code、JetBrains の IDE など、好きな場所で書く。
 </div>
 
-Scripts are the basic building blocks in Windmill. They can be [run and scheduled](../../../triggers/index.mdx) as standalone, chained together to create [Flows](../../../flows/1_flow_editor.mdx) or displayed with a personalized user interface as [Apps](../../7_apps_quickstart/index.mdx).
+スクリプトは Windmill の基本の部品です。単体で[実行・スケジュール](../../../triggers/index.mdx)できますし、つなげて[フロー](../../../flows/1_flow_editor.mdx)にすることも、専用の画面を付けて[アプリ](../../7_apps_quickstart/index.mdx)にすることもできます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Script editor](../../../script_editor/index.mdx) —— All the details on scripts.
-	- [Triggers](../../../triggers/index.mdx) —— Trigger scripts and flows on-demand, by schedule or on external events.
+	- [スクリプトのエディタ](../../../script_editor/index.mdx) —— スクリプトの詳細すべて。
+	- [トリガー](../../../triggers/index.mdx) —— スクリプトとフローを、手動・スケジュール・外部の出来事で起こす。
 </div>
 
-Scripts consist of 2 parts:
+スクリプトは 2 つの部分でできています。
 
-- [Code](#code-playbook): for Ansible this is a playbook file written in yaml.
-- [Settings](#settings): settings & metadata about the Script such as its path, summary, description, [JSON Schema](../../../core_concepts/13_json_schema_and_parsing/index.mdx) of its inputs (inferred from its signature).
+- [コード](#コード-playbook): Ansible では yaml で書いた playbook のファイルです。
+- [設定](#設定): パス、要約、説明、（署名から推測した）入力の [JSON Schema](../../../core_concepts/13_json_schema_and_parsing/index.mdx) など、スクリプトについての設定とメタデータです。
 
-When stored in a code repository, these 2 parts are stored separately at `<path>.playbook.yml` and `<path>.script.yaml`
+コードのリポジトリに保存するときは、この 2 つは `<path>.playbook.yml` と `<path>.script.yaml` に分けて置かれます。
 
 ![Ansible in Windmill](./create_ansible_script.png)
 
-## Settings
+## 設定
 
 ![New script](../../../../static/images/script_languages.png "New script")
 
-As part of the [settings](../../../script_editor/settings.mdx) menu, each script has metadata associated with it, enabling it to be defined and configured in depth.
+[設定](../../../script_editor/settings.mdx)のメニューには、スクリプトごとのメタデータがあり、細かく決められます。
 
-- **Summary** (optional) is a short, human-readable summary of the Script. It will be displayed as a title across Windmill. If omitted, the UI will use the `path` by default.
-- **Path** is the Script's unique identifier that consists of the [script's owner](../../../core_concepts/16_roles_and_permissions/index.mdx), and the script's name. The owner can be either a user, or a group ([folder](../../../core_concepts/8_groups_and_folders/index.mdx#folders)).
-- **Description** is where you can give instructions through the [auto-generated UI](../../../core_concepts/6_auto_generated_uis/index.mdx) to users on how to run your Script. It supports markdown.
-- **Language** of the script.
-- **Script kind**: Action (by default), [Trigger](../../../flows/10_flow_trigger.mdx), [Approval](../../../flows/11_flow_approval.mdx), [Error handler](../../../flows/7_flow_error_handler.md) or [Preprocessor](../../../core_concepts/43_preprocessors/index.mdx). This acts as a tag to filter appropriate scripts from the [flow editor](../../6_flows_quickstart/index.mdx).
+- **要約（Summary）**（任意）はスクリプトの短い説明です。Windmill の各所で見出しとして表示されます。省くと、UI は既定で `path` を使います。
+- **パス（Path）** はスクリプトを一意に指す名前で、[持ち主](../../../core_concepts/16_roles_and_permissions/index.mdx)とスクリプト名からなります。持ち主は利用者か、グループ（[フォルダ](../../../core_concepts/8_groups_and_folders/index.mdx#folders)）です。
+- **説明（Description）** は、[自動生成される UI](../../../core_concepts/6_auto_generated_uis/index.mdx) を通して、使う人にスクリプトの動かし方を伝える場所です。markdown が使えます。
+- スクリプトの**言語（Language）**。
+- **スクリプトの種類（Script kind）**: アクション（既定）、[トリガー](../../../flows/10_flow_trigger.mdx)、[承認](../../../flows/11_flow_approval.mdx)、[エラーハンドラ](../../../flows/7_flow_error_handler.md)、[前処理](../../../core_concepts/43_preprocessors/index.mdx)。[フローのエディタ](../../6_flows_quickstart/index.mdx)で目的に合うスクリプトを絞り込むための札として働きます。
 
-This menu also has additional settings on [Runtime](../../../script_editor/settings.mdx#runtime), [Generated UI](#generated-ui) and [Triggers](../../../script_editor/settings.mdx#triggers).
+このメニューには [Runtime](../../../script_editor/settings.mdx#runtime)、[生成される UI](#生成される-ui)、[トリガー](../../../script_editor/settings.mdx#triggers)の設定もあります。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Settings](../../../script_editor/settings.mdx) —— Each script has metadata & settings associated with it, enabling it to be defined and configured in depth.
+	- [設定](../../../script_editor/settings.mdx) —— スクリプトごとにメタデータと設定があり、細かく決められる。
 </div>
 
-Now click on the code editor on the left side.
+では左側のコードエディタをクリックしてください。
 
-## Code (Playbook)
+## コード (Playbook)
 
-In order to make Ansible playbooks compatible with the Windmill environment and script model, there is some extra information preceding the start of the playbook that can be entered. Because of this, an Ansible playbook in Windmill will typically look like this:
+Ansible の playbook を Windmill の環境とスクリプトの形に合わせるため、playbook の前にいくつか情報を書き足せるようになっています。そのため Windmill の Ansible の playbook は、たいていこういう形になります。
 
 ![Ansible in Windmill](./ansible_script_ide.png)
 
@@ -120,13 +118,13 @@ dependencies:
       dest: result.json
 ```
 
-There are two YAML documents in series, the second being the Ansible playbook. The first one is only used by Windmill, and will not be visible to Ansible when executing the playbook. It contains different sections that declare some metadata about the script.
+YAML の文書が 2 つ続いていて、2 つ目が Ansible の playbook です。1 つ目は Windmill だけが使うもので、playbook を実行するとき Ansible からは見えません。ここにスクリプトについてのメタデータをいくつかの節に分けて書きます。
 
-We will now go through each of these sections.
+以下、それぞれの節を順に見ていきます。
 
-### Arguments (extra-args)
+### 引数 (extra-args)
 
-Windmill scripts can take [arguments](../../../core_concepts/13_json_schema_and_parsing/index.mdx), and in order to define the names and types of the arguments you can use this section. These definitions will be parsed allowing the frontend to interactively display dynamic inputs for the script.
+Windmill のスクリプトは[引数](../../../core_concepts/13_json_schema_and_parsing/index.mdx)を取れます。その名前と型をこの節で決めます。ここに書いた定義が読み取られ、画面側がスクリプトの入力欄をその場で組み立てます。
 
 
 ```yaml
@@ -148,10 +146,10 @@ extra_vars:
 
 ![Parsing Yaml and generating UI](./extra_vars_ui.png)
 
-The type definition is inspired and tries to follow the [OpenAPI Data Types standard](https://swagger.io/docs/specification/data-models/data-types/). Note that not all features / types are supported, the best way to know what is supported is to test it out in the Web IDE.
+型の書き方は [OpenAPI のデータ型](https://swagger.io/docs/specification/data-models/data-types/)を手本にしています。ただしすべての機能・型に対応しているわけではないので、何が使えるかは web IDE で試してみるのが早いです。
 
 :::tip Argument defaults
-You can set a default value for your arguments by using a `default:` field, for example:
+`default:` を使えば引数に既定値を与えられます。例えば、
 ```yml
 extra_vars:
   my_string:
@@ -160,7 +158,7 @@ extra_vars:
 ```
 :::
 
-To use Windmill [resources](../../../core_concepts/3_resources_and_types/index.mdx) as types you can use the following type definition:
+Windmill の[リソース](../../../core_concepts/3_resources_and_types/index.mdx)を型として使うには、こう書きます。
 
 ```yaml
 extra_vars:
@@ -171,13 +169,13 @@ extra_vars:
 
 ![Postgres Resource UI](./postgres_ui.png)
 
-Under the hood, Windmill will pass these variables using the `--extra-vars` flag to Ansible, so you can expect the according behavior.
+裏では、Windmill はこれらの変数を `--extra-vars` フラグで Ansible に渡します。挙動もそのとおりです。
 
-### Static resources and variables
+### 固定のリソースと変数
 
-Resources and [variables](../../../core_concepts/2_variables_and_secrets/index.mdx) that are hardcoded to a particular script can also be defined in the `extra-vars` section. This is because they are similarly passed through the `--extra-vars` flag in the Ansible playbook.
+特定のスクリプトに固定したリソースと[変数](../../../core_concepts/2_variables_and_secrets/index.mdx)も、`extra-vars` の節で定義できます。playbook では同じく `--extra-vars` フラグで渡されるからです。
 
-This is what the syntax looks like:
+書き方はこうです。
 ```yml
 extra_vars:
   my_variable:
@@ -188,15 +186,15 @@ extra_vars:
     resource: u/user/my_resource
 ```
 
-Under `resource` or `variable` you can statically link the path to the resource/variable. As you do, you will notice the UI update and hide the resource input as it is now static.
+`resource` や `variable` の下に、リソースや変数へのパスを固定で書けます。そうすると UI が変わり、固定になったぶんの入力欄が消えるのが分かります。
 
 :::tip About static and non-static variables
-Note that Variables defined this way can only be static. If you want to use non-static Variables, define a normal argument with `type: string` and from the UI fill it with one of your Variables or Secrets.
+この書き方で定義した変数は固定のものに限られます。固定でない変数を使いたいときは、`type: string` の普通の引数を定義し、UI からその欄に変数か秘密を入れてください。
 :::
 
-### Return values
+### 返り値
 
-In Windmill scripts usually have a return value, which allows scripts to be chained in flows and run conditionally on the result of a previous operation. For Ansible playbooks you can achieve the same result by having one of the tasks (preferably the last one for coherence of results/errors) write a file named `result.json` with the JSON object you want to return:
+Windmill のスクリプトはたいてい返り値を持ちます。これにより、フローの中でつなげたり、前の処理の結果を見て条件を分けたりできます。Ansible の playbook でも同じことができます。タスクのどれか（結果と誤りの筋を通すなら最後のものがよいでしょう）に、返したい JSON の値を `result.json` という名前のファイルへ書かせるのです。
 
 ```yaml
 ---
@@ -212,34 +210,34 @@ tasks:
 
 ```
 
-Note that valid json must be written to the file or else the job will fail. Also, this should be done by the control node i.e. your worker, so it's important to use the `delegate_to: localhost` directive.
+正しい json を書かないと job は失敗します。またこれは制御ノード、つまり worker が行う必要があるので、`delegate_to: localhost` を付けることが大切です。
 
 
-### Inventories
+### インベントリ
 
-When using ansbile playbooks, you would usually run a command such as `ansible-playbook playbook.yml -i inventory.ini`. The ways to pass inventories to Ansible in Windmill is by filling the following section:
+Ansible の playbook を使うときは、たいてい `ansible-playbook playbook.yml -i inventory.ini` のように実行します。Windmill で Ansible にインベントリを渡すには、次の節を書きます。
 
 ```yaml
 inventory:
   - resource_type: ansible_inventory
 ```
 
-To create similar resource type, refer to [creating plain text resources](../../../core_concepts/3_resources_and_types/index.mdx#plain-text-file-resources). Otherwise `ansible_inventory` should be available after syncing resource types from the hub.
+同じようなリソース型を作るには、[平文ファイルのリソースを作る](../../../core_concepts/3_resources_and_types/index.mdx#plain-text-file-resources)を参照してください。そうでなければ、Hub からリソース型を取り込めば `ansible_inventory` が使えるはずです。
 
-After adding this in the Web IDE, you will see a new `inventory.ini` argument pop up. You can then select or create a new ansible_inventory resource.
+web IDE でこれを書き足すと、新しく `inventory.ini` という引数が現れます。そこで ansible_inventory のリソースを選ぶか、新しく作れます。
 
 ![inventory ui](./inventory_ui.png)
 
-If you don't want one of the inputs of the script be the inventory, you can pin a specific resource to the script by specifying its path. In this case you don't need to specify the resource_type anymore:
+インベントリをスクリプトの入力にしたくない場合は、パスを書いて特定のリソースを固定できます。このときは resource_type を書く必要はありません。
 
 ```yaml
 inventory:
   - resource: u/user/my_ansible_inventory
 ```
 
-Then the UI will not prompt you for the inventory but will use this resource at every run of the script. If otherwise you wish to not specify any inventory, you can remove the section altogether
+こうすると UI はインベントリを訊かず、実行のたびにこのリソースを使います。逆にインベントリをまったく指定したくなければ、この節ごと消してかまいません。
 
-By default, the inventory will be named `inventory.ini`, but if your inventory needs to have a different extension (e.g. dynamic invetories) you can specify the name of the inventory file like this:
+インベントリの名前は既定で `inventory.ini` になりますが、別の拡張子が要るとき（動的インベントリなど）は、こうして名前を決められます。
 
 ```yaml
 inventory:
@@ -247,7 +245,7 @@ inventory:
     name: hcloud.yml
 ```
 
-Additionally, if you need to pass multiple inventories, you just need to continue the yaml array with your other invetories, they will all be passed to the `ansible-playbook` command.
+複数のインベントリを渡したいときは、yaml の配列を続けるだけです。すべてが `ansible-playbook` のコマンドに渡されます。
 
 ```yaml
 # Declaring three different inventories to be passed to the playbook
@@ -259,9 +257,9 @@ inventory:
     name: hcloud.yml
 ```
 
-### Additional inventories
+### 追加のインベントリ
 
-You can also declare additional inventories that will be made available as script arguments without specifying their source. This allows users to dynamically select inventories when running the script.
+取得元を指定せずに、スクリプトの引数として選べるインベントリを追加で宣言することもできます。こうすると、実行するときにインベントリを選べます。
 
 ```yaml
 additional_inventories:
@@ -272,18 +270,18 @@ additional_inventories:
       - "delegate_git_repository/hosts/inventory3.ini"
 ```
 
-They can also be defined statically to always be passed in for this script:
+このスクリプトでは常に渡す、という固定の書き方もできます。
 
 ```yaml
 additional_inventories:
   - "delegate_git_repository/hosts/permanent_inventory.ini"
 ```
 
-Note that this only declares the inventory, but you still need to make it available by either having it in a git repo or using [file resources](#other-non-inventory-file-resources). Otherwise ansible will fail saying it couldn't find your inventory.
+これは宣言するだけである点に注意してください。実体のほうは、git リポジトリに置くか[ファイルのリソース](#インベントリ以外のファイルリソース)を使うかして、別に用意する必要があります。そうしないと ansible が「インベントリが見つからない」と言って失敗します。
 
-### Other non-inventory file resources
+### インベントリ以外のファイルリソース
 
-It sometimes happens that your Ansible playbook depends on some text file existing at a relative path to the playbook. This can be a configuration file, a template, some other file that you can't inline or otherwise is simpler to keep as a separate file. In this case, Windmill's [plain text file resources](../../../core_concepts/3_resources_and_types/index.mdx#plain-text-file-resources) can be used to create these files at the specified path before running the playbook. The syntax will be the following:
+Ansible の playbook が、playbook から見た相対パスにあるテキストファイルに依存していることがあります。設定ファイルであったり、テンプレートであったり、埋め込めない・別ファイルのままのほうが簡単な何かであったりします。そういうときは、Windmill の[平文ファイルのリソース](../../../core_concepts/3_resources_and_types/index.mdx#plain-text-file-resources)を使って、playbook を動かす前に指定した場所へファイルを作れます。書き方はこうです。
 
 ```yaml
 files:
@@ -291,13 +289,13 @@ files:
     target:  ./config_template.j2
 ```
 
-In the example above, the resource `u/user/faboulous_jinja_template` is a special plain text file resource. The target `./config_template.j2` is the path relative to the playbook where the file will be created and where the playbook can access it.
+上の例で、`u/user/faboulous_jinja_template` は平文ファイルの特別なリソースです。`./config_template.j2` は playbook から見た相対パスで、そこにファイルが作られ、playbook から読めるようになります。
 
-Now you can write your playbook assuming that this file will exist at the time of execution.
+これで、実行時にはこのファイルが在るものとして playbook を書けます。
 
-#### Variable inside files
+#### ファイルの中身に変数を使う
 
-If you want to achieve a similar effect with a variable or a secret, you can use a similar syntax:
+変数や秘密で同じことをしたいときは、似た書き方ができます。
 
 ```yaml
 files:
@@ -305,15 +303,15 @@ files:
     target:  ./id_rsa
 ```
 
-And the content of the variable will be written to the file.
+変数の中身がファイルに書き込まれます。
 
-This is useful when you want to store the data in a secret for example, like you would do for SSH keys.
+SSH の鍵のように、データを秘密として保管したいときに便利です。
 
-#### Ansible and SSH
+#### Ansible と SSH
 
-To successfully have the playbook SSH, you might need to follow these tips:
+playbook から SSH を成功させるには、次の点に気を付けるとよいでしょう。
 
-1) Write the SSH key into a *secret* variable, and **make sure it has an ending newline**, otherwise you might get an error.
+1) SSH の鍵を***秘密*の変数に書き、**末尾に必ず改行を入れてください**。無いと誤りになることがあります。
 
 ```
 -----BEGIN OPENSSH PRIVATE KEY-----
@@ -324,7 +322,7 @@ PQMBB6FEA0IABErMvG2Fa1jjG7DjEQuwRGCEDnVQc1G0ibU/HI1BjkIyf4d+sh
 
 ```
 
-2) Make a file for the script that will contain this SSH key. Make sure to add the `mode: '0600'` or you might get another error.
+2) この SSH の鍵を入れるファイルをスクリプトに作らせます。`mode: '0600'` を忘れると、また別の誤りが出ます。
 
 ```yaml
 files:
@@ -333,7 +331,7 @@ files:
     mode: '0600'
 ```
 
-3) In your inventory file, you'll want to add these :
+3) インベントリのファイルに、次を書き足します。
 ```ini
 ...
 [your_host:vars]
@@ -344,9 +342,9 @@ ansible_ssh_common_args='-o StrictHostKeyChecking=no' # This skips host key veri
 ...
 ```
 
-### Dependencies
+### 依存の管理
 
-Ansible playbooks often depend on Python packages or Ansible Galaxy Collections. In Windmill you can specify these dependencies in the `dependencies` section and Windmill will take care of satisfying them before running the playbook.
+Ansible の playbook は、Python のパッケージや Ansible Galaxy のコレクションに依存することがよくあります。Windmill では `dependencies` の節に書いておけば、playbook を動かす前に Windmill が用意します。
 
 ```yaml
 dependencies:
@@ -360,15 +358,15 @@ dependencies:
     - jmespath
 ```
 
-The syntax is similar to `ansible-builder` and Execution Environments, however all is installed locally using the same technology as for managing [Python dependencies](../../../advanced/15_dependencies_in_python/index.mdx) in Python scripts, meaning no extra container is created.
+書き方は `ansible-builder` や Execution Environments に似ていますが、すべては Python スクリプトの [Python の依存](../../../advanced/15_dependencies_in_python/index.mdx)と同じ仕組みで手元に入れられます。つまりコンテナが余分に作られることはありません。
 
 :::info Ansible vs Ansible-core
-Currently the Windmill image supporting Ansible runs the full `ansible` and not `ansible-core`. You can expect the respective collections to be preinstalled.
+いまのところ、Ansible に対応した Windmill のイメージが動かすのは `ansible-core` ではなく完全な `ansible` です。付属のコレクションはあらかじめ入っているものと考えてかまいません。
 :::
 
-### Git repo dependencies
+### git リポジトリからの依存
 
-Outside of galaxy dependencies, a role or collection can exist on a git repo and be imported as such. The only caveat is that the repo needs to be a valid role or collection at its root. Check the [ansible documentation](https://docs.ansible.com/ansible/latest/collections_guide/collections_installing.html#install-multiple-collections-with-a-requirements-file) for more information.
+galaxy 以外にも、ロールやコレクションが git リポジトリに在って、そこから取り込めることがあります。ただしリポジトリの根がそのままロールかコレクションになっている必要があります。詳しくは [Ansible のドキュメント](https://docs.ansible.com/ansible/latest/collections_guide/collections_installing.html#install-multiple-collections-with-a-requirements-file)を参照してください。
 
 ```yaml
 collections:
@@ -377,7 +375,7 @@ collections:
     version: main
 ```
 
-To enable more flexibility however, it is possible to declare a git repo to be cloned at a specified location before the playbook is run. You can do this as follows:
+もっと自由にやりたいときは、playbook を動かす前に指定した場所へ git リポジトリを clone させることもできます。こう書きます。
 
 ```yaml
 git_repos:
@@ -391,10 +389,10 @@ git_repos:
 ```
 
 :::info Specifying a commit for your repo
-If you do not specify the commit to be used, the latest commit hash will be stored in the script lockfile on deployment, and all subsequent executions will use that commit. This is done to ensure reproducibility. If you need to update this, you can simply redeploy the script
+使う commit を書かなかった場合、配備のときに最新の commit hash がスクリプトの lockfile に記録され、以後の実行はすべてその commit を使います。同じ結果になることを保つためです。更新したくなったら、スクリプトを配備し直せば済みます。
 :::
 
-If you want to clone a private repo, you can add the ssh private key like so:
+非公開のリポジトリを clone したいときは、こうして SSH の秘密鍵を足せます。
 ```yaml
 git_ssh_identity:
   - u/user/ssh_id_priv
@@ -405,13 +403,13 @@ git_repos:
 
 ### Ansible Vault
 
-If you have files that are encrypted by ansible vault, you need to pass a password to decrypt them. This can be easily done by storing the password as a Windmill secret, and specifying the path to the secret in the metadata section of your playbook:
+ansible vault で暗号化したファイルがある場合、復号のためのパスワードを渡す必要があります。パスワードを Windmill の秘密として保管し、playbook のメタデータの節にその秘密へのパスを書けば済みます。
 
 ```yaml
 vault_password: u/user/ansible_vault_password
 ```
 
-If you are using multiple vault password with Vault IDs, the setup is slightly different. You need to define your password files, and also add them as [file resources](#other-non-inventory-file-resources):
+Vault ID を使って複数のパスワードを使い分けている場合は、少し形が変わります。パスワードのファイルを定義したうえで、[ファイルのリソース](#インベントリ以外のファイルリソース)としても足します。
 
 ```yaml
 vault_id:
@@ -427,9 +425,9 @@ files:
     target: ./password_filename3
 ```
 
-### Playbook options
+### playbook の実行の選択肢
 
-Pass `ansible-playbook` flags through the `options` block in the script metadata:
+スクリプトのメタデータの `options` の節から、`ansible-playbook` のフラグを渡せます。
 
 ```yaml
 options:
@@ -441,19 +439,19 @@ options:
   - limit: webservers:!db1.example.com
 ```
 
-Supported entries:
+書けるもの:
 
-| Entry | `ansible-playbook` flag |
+| 書き方 | `ansible-playbook` のフラグ |
 | --- | --- |
-| `vv` / `vvv` / `vvvv` (1 to 6 `v`s) | `-v` (verbosity) |
-| `verbosity: vvv` | same as above |
+| `vv` / `vvv` / `vvvv`（`v` を 1〜6 個） | `-v`（詳しさ） |
+| `verbosity: vvv` | 上と同じ |
 | `forks: <int>` | `--forks` |
 | `timeout: <int>` | `--timeout` |
 | `flush_cache` | `--flush-cache` |
 | `force_handlers` | `--force-handlers` |
-| `limit: <pattern>` | `--limit` (target a subset of hosts) |
+| `limit: <pattern>` | `--limit`（対象のホストを絞る） |
 
-The `limit` value may reference a script argument with `{{ argname }}` so a flow can pick the target host at runtime:
+`limit` の値には `{{ argname }}` でスクリプトの引数を参照できます。フローが実行時に対象のホストを選べるようになります。
 
 ```yaml
 options:
@@ -463,10 +461,10 @@ extra_vars:
     type: string
 ```
 
-### Delegate the environment setup to a git repo (EE)
+### 環境の用意を git リポジトリに任せる（EE）
 
 :::info EE feature
-Parts of this feature depend on instance-wide blob storage, which is only available in [Enterprise Edition](/pricing).
+この機能の一部は、インスタンス全体の blob 保管に依存しています。[Enterprise Edition](/pricing) でのみ使えます。
 :::
 
 
@@ -476,23 +474,23 @@ Parts of this feature depend on instance-wide blob storage, which is only availa
 	src="/videos/ansible_delegate_to_git_repo.mp4"
 />
 
-You can choose to set a git repository that contains all your inventories, custom roles, and playbooks as an alternate way to run your ansible script. When declaring this you will get an additional UI that lets you explore the repository, and some helpers to help you define the inventories.
-You can do this by either declaring this section on the metadata part of the script:
+インベントリ・独自のロール・playbook をすべて収めた git リポジトリを指定し、ansible のスクリプトをそちらで動かすこともできます。これを宣言すると、リポジトリの中を見て回れる画面と、インベントリを決めるための補助が加わります。
+やり方は 2 つあり、1 つはスクリプトのメタデータの側にこの節を書くことです。
 
 ```yaml
 delegate_to_git_repo:
   resource: u/user/git_repo_resource
 ```
 
-Or using the utility button that will help you pick a git repo resource to be used.
+もう 1 つは、使う git リポジトリのリソースを選ばせてくれるボタンを使うことです。
 
-You will need to first create a git_repository resource that points to the repository you're trying to use.
+まず、使いたいリポジトリを指す git_repository のリソースを作る必要があります。
 
-You will then see your editor split in two and a Hovering popup indicating the alternate execution mode is detected. The first time you do this the repo viewer will show a button to load the git repository. This will clone and cache the contents of your repository in blob storage, for you to explore the files from within windmill.
+すると編集画面が 2 つに分かれ、別の実行のしかたを検出したことを知らせる小窓が浮かびます。初めてのときは、リポジトリを読み込むボタンがリポジトリの表示欄に出ます。押すとリポジトリが clone され、中身が blob 保管に取っておかれて、Windmill の中からファイルを見て回れるようになります。
 
-If you click on the top-right floating pop-up, you will access a screen letting you manage the definition of the git repo, and will contain some utils for ease of use. You can for example use the inventories section to define a subfolder containing your inventories and quickly import the filenames into the script.
+右上の浮かんだ小窓をクリックすると、git リポジトリの定義を管理する画面が開きます。ここには便利な道具もあります。例えばインベントリの節で、インベントリを収めた下位フォルダを指定し、ファイル名をまとめてスクリプトに取り込めます。
 
-If you want to set a path to the playbook you want executed, you can do so like so:
+実行させたい playbook のパスを決めたいときは、こう書きます。
 
 ```yaml
 delegate_to_git_repo:
@@ -500,11 +498,11 @@ delegate_to_git_repo:
   playbook: playbooks/your_playbook.yml
 ```
 
-If this is undefined, the worker will default to using the second YAML section like normal.
+書かなければ、worker は普段どおり 2 つ目の YAML の節を使います。
 
-#### Inventory from the cloned repo
+#### clone したリポジトリの中のインベントリ
 
-Point ansible at an inventory file (or directory) that lives inside the cloned repository:
+clone したリポジトリの中にあるインベントリのファイル（かディレクトリ）を、ansible に指させます。
 
 ```yaml
 delegate_to_git_repo:
@@ -513,11 +511,11 @@ delegate_to_git_repo:
   inventories_location: inventories/dev.ini
 ```
 
-The path is relative to the repository root. It is added to the `ansible-playbook` invocation as `-i`, alongside any inventories declared in the script metadata.
+パスはリポジトリの根からの相対です。スクリプトのメタデータで宣言したインベントリと並んで、`ansible-playbook` の呼び出しに `-i` として加えられます。
 
-#### Installing requirements.yml from the cloned repo
+#### clone したリポジトリの requirements.yml を入れる
 
-If your repository ships its own `requirements.yml`, set `install_requirements: true` to have Windmill install the listed roles and collections after cloning, before the playbook runs:
+リポジトリが自前の `requirements.yml` を持っているなら、`install_requirements: true` を書けば、clone のあと playbook を動かす前に、そこに並んだロールとコレクションを Windmill が入れてくれます。
 
 ```yaml
 delegate_to_git_repo:
@@ -526,13 +524,13 @@ delegate_to_git_repo:
   install_requirements: true
 ```
 
-The worker looks for `requirements.yml`, `requirements.yaml`, `collections/requirements.yml`, and `roles/requirements.yml` at the root of the cloned repo and runs `ansible-galaxy role install -r` and `ansible-galaxy collection install -r` on every match. If none are found, the step is skipped.
+worker は clone したリポジトリの根で `requirements.yml`、`requirements.yaml`、`collections/requirements.yml`、`roles/requirements.yml` を探し、見つかったものすべてに `ansible-galaxy role install -r` と `ansible-galaxy collection install -r` を走らせます。1 つも無ければ、この段は飛ばされます。
 
-This is independent of the `dependencies.galaxy` block in the script metadata: use whichever fits your workflow, or both.
+これはスクリプトのメタデータの `dependencies.galaxy` とは別ものです。合うほうを使っても、両方使ってもかまいません。
 
-#### Using the repo's ansible.cfg
+#### リポジトリの ansible.cfg を使う
 
-Ansible loads a single configuration file, the first one found among `ANSIBLE_CONFIG`, the working directory, `~/.ansible.cfg` and `/etc/ansible/ansible.cfg`, without merging. Windmill runs `ansible-playbook` from the job directory, where it writes its own generated `ansible.cfg`, so a config file checked into the repository is normally ignored. Set `ansible_cfg` to a repo-relative path to make it the effective configuration instead:
+Ansible が読む設定ファイルは 1 つだけです。`ANSIBLE_CONFIG`、作業ディレクトリ、`~/.ansible.cfg`、`/etc/ansible/ansible.cfg` の順に最初に見つかったものを読み、混ぜ合わせることはしません。Windmill は job のディレクトリから `ansible-playbook` を動かし、そこに自前の `ansible.cfg` を書き出すので、リポジトリに入れてある設定ファイルは普通は無視されます。`ansible_cfg` にリポジトリからの相対パスを書けば、そちらを実際の設定にできます。
 
 ```yaml
 delegate_to_git_repo:
@@ -541,17 +539,17 @@ delegate_to_git_repo:
   ansible_cfg: ansible.cfg
 ```
 
-When set, Windmill points `ANSIBLE_CONFIG` at that file so the repository's settings (roles paths, inventory plugins, callbacks, `host_key_checking`, ssh arguments, etc.) apply as they would outside Windmill. Only the settings that depend on runtime state are layered back on top, through environment variables:
+これを書くと、Windmill は `ANSIBLE_CONFIG` をそのファイルに向けるので、リポジトリ側の設定（ロールのパス、インベントリのプラグイン、callback、`host_key_checking`、ssh の引数など）が Windmill の外と同じように効きます。実行時の状態に依るものだけが、環境変数を通して上から重ねられます。
 
-- Temp and home directories (`ANSIBLE_HOME`, `ANSIBLE_LOCAL_TEMP`, `ANSIBLE_REMOTE_TEMP`) point to the ephemeral job directory.
-- Vault settings declared in the script metadata ([`vault_password`, `vault_id`](#ansible-vault)) keep taking precedence over the repo config.
-- The directories where Windmill installs galaxy roles and collections are prepended to the `roles_path` and `collections_path` declared in your config, so dependencies installed by Windmill (via `dependencies.galaxy` or `install_requirements`) and those shipped in the repo both resolve.
+- 一時ディレクトリとホームディレクトリ（`ANSIBLE_HOME`、`ANSIBLE_LOCAL_TEMP`、`ANSIBLE_REMOTE_TEMP`）は、使い捨ての job のディレクトリを指します。
+- スクリプトのメタデータで宣言した vault の設定（[`vault_password`、`vault_id`](#ansible-vault)）は、リポジトリの設定より優先されたままです。
+- Windmill が galaxy のロールとコレクションを入れる先のディレクトリが、設定に書かれた `roles_path` と `collections_path` の先頭に足されます。Windmill が入れたもの（`dependencies.galaxy` か `install_requirements` によるもの）と、リポジトリに同梱されたものの両方が解決できるようにするためです。
 
-The job fails if the file does not exist in the cloned repository. Without `ansible_cfg`, Windmill's generated config takes precedence as before. Like git repo delegation in general, this requires workers running with `DISABLE_NSJAIL=true`.
+clone したリポジトリにそのファイルが無ければ job は失敗します。`ansible_cfg` を書かなければ、これまでどおり Windmill が作る設定が優先されます。git リポジトリへの委譲全般と同じく、これには worker が `DISABLE_NSJAIL=true` で動いている必要があります。
 
-#### Dynamic field values
+#### 値を実行時に決める
 
-The `playbook`, `commit`, `inventories_location`, and `ansible_cfg` fields accept `{{ argname }}` placeholders that are substituted from the script's arguments before the repo is cloned and the playbook runs. This lets a flow pick the playbook, branch, or inventory at runtime:
+`playbook`、`commit`、`inventories_location`、`ansible_cfg` の 4 つは `{{ argname }}` の形を受け付け、リポジトリを clone して playbook を動かす前に、スクリプトの引数から埋められます。これによりフローが、playbook・ブランチ・インベントリを実行時に選べます。
 
 ```yaml
 delegate_to_git_repo:
@@ -568,12 +566,11 @@ extra_vars:
     type: string
 ```
 
-Only string, number, and boolean argument values can be substituted. The path fields reject absolute paths and `..` segments to prevent escaping the cloned repo.
+埋められるのは文字列・数・真偽の引数だけです。パスの欄は、clone したリポジトリの外へ出られないよう、絶対パスと `..` を拒みます。
 
-## Instant preview & testing
+## その場での確認とテスト
 
-Look at the UI preview on the right: it was updated to match the input
-signature. Run a test (`Ctrl` + `Enter`) to verify everything works.
+右側の UI の下見を見てください。入力の署名に合わせて更新されています。テストを実行して（`Ctrl` + `Enter`）、思ったとおりに動くか確かめましょう。
 
 <video
 	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
@@ -585,86 +582,79 @@ signature. Run a test (`Ctrl` + `Enter`) to verify everything works.
 
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Instant preview & testing](https://www.windmill.dev/docs/core_concepts/instant_preview) —— On top of its integrated editors, Windmill allows users to see and test what they are building directly from the editor, even before deployment.
+	- [その場での確認とテスト](https://www.windmill.dev/docs/core_concepts/instant_preview) —— 組み込みのエディタに加えて、Windmill では作っているものを配備の前からエディタで見て試せる。
 </div>
 
-Now let's go to the last step: the "Generated UI" settings.
+では最後の段、「生成される UI（Generated UI）」の設定へ進みましょう。
 
-## Generated UI
+## 生成される UI
 
-From the Settings menu, the "Generated UI" tab lets you customize the script's arguments.
+設定のメニューにある「生成される UI（Generated UI）」のタブで、スクリプトの引数を細かく決められます。
 
-The UI is generated from the Script's main function signature, but you can add additional constraints here. For example, we could use the `Customize property`: add a regex by clicking on `Pattern` to make sure users are providing a name with only alphanumeric characters: `^[A-Za-z0-9]+$`. Let's still allow numbers in case you are some tech billionaire's kid.
+UI はスクリプトの main 関数の署名から作られますが、ここで制約を足せます。例えば `プロパティを調整（Customize property）` から `Pattern` をクリックして正規表現を足し、名前に英数字しか使えないようにできます: `^[A-Za-z0-9]+$`。技術系の大富豪の子どものために、数字は許しておきましょう。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Script Kinds](../../../script_editor/script_kinds.mdx) —— You can attach additional functionalities to Scripts by specializing them into specific Script kinds.
-	- [Generated UI](../../../script_editor/customize_ui.mdx) —— main function's arguments can be given advanced settings that will affect the inputs' auto-generated UI and JSON Schema.
+	- [スクリプトの種類](../../../script_editor/script_kinds.mdx) —— スクリプトを特定の種類に特化させて、機能を足せる。
+	- [生成される UI](../../../script_editor/customize_ui.mdx) —— main 関数の引数には、自動生成される UI と JSON Schema に効く詳しい設定を与えられる。
 </div>
 
-## Workflows as code
+## コードとしてのワークフロー
 
-One way to write distributed programs that execute distinct jobs is to use [flows](../../../flows/1_flow_editor.mdx) that chain scripts together.
+別々の job を実行する分散したプログラムを書く方法の 1 つは、スクリプトをつなげる[フロー](../../../flows/1_flow_editor.mdx)を使うことです。
 
-Another approach is to write a program that defines the jobs and their dependencies, and then execute that program directly in your script. This is known as [workflows as code](../../../core_concepts/31_workflows_as_code/index.mdx).
+もう 1 つは、job とその依存関係を定義するプログラムを書き、それをスクリプトの中で直に実行することです。これを[コードとしてのワークフロー](../../../core_concepts/31_workflows_as_code/index.mdx)と呼びます。
 
 ![Flow as code in Python](../../../core_concepts/31_workflows_as_code/wac-editor-1.png "Flow as code in Python")
 
-All details at:
+詳しくは、
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Workflows as code](https://www.windmill.dev/docs/core_concepts/workflows_as_code) —— Automate tasks and their flow with only code.
+	- [コードとしてのワークフロー](https://www.windmill.dev/docs/core_concepts/workflows_as_code) —— タスクとその流れをコードだけで自動化する。
 </div>
 
-## Run!
+## 実行する
 
-We're done! Now let's look at what users of the script will do. Click on the [Deploy](../../../core_concepts/0_draft_and_deploy/index.mdx) button
-to load the script. You'll see the user input form we defined earlier.
+これで完成です。ここからは、このスクリプトを使う人の側を見てみましょう。[配備（Deploy）](../../../core_concepts/0_draft_and_deploy/index.mdx)ボタンを押してスクリプトを読み込みます。先ほど決めた入力フォームが出るはずです。
 
-Note that Scripts are [versioned](../../../core_concepts/34_versioning/index.mdx#script-versioning) in Windmill, and
-each script version is uniquely identified by a hash.
+Windmill のスクリプトには[版](../../../core_concepts/34_versioning/index.mdx#script-versioning)があり、版ごとに hash で一意に定まります。
 
-Fill in the input field, then hit "Run". You should see a run view, as well as
-your logs. All script runs are also available in the [Runs](../../../core_concepts/5_monitor_past_and_future_runs/index.mdx) menu on
-the left.
+入力欄を埋めて「実行（Run）」を押してください。実行の画面と log が見られます。すべての実行は左側の [Runs](../../../core_concepts/5_monitor_past_and_future_runs/index.mdx) のメニューからも見られます。
 
-You can also choose to [run the script from the CLI](../../../advanced/3_cli/index.mdx) with the pre-made Command-Line Interface call.
+用意されたコマンドを使って、[CLI からスクリプトを実行](../../../advanced/3_cli/index.mdx)することもできます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Triggering Scripts](../../../triggers/index.mdx) —— Trigger scripts and flows on-demand, by schedule or on external events.
+	- [スクリプトを起こす](../../../triggers/index.mdx) —— スクリプトとフローを、手動・スケジュール・外部の出来事で起こす。
 </div>
 
-## Caching
+## キャッシュ
 
-Every dependency on Python is cached on disk by default. Furthermore if you use the [Distributed cache storage](../../../core_concepts/38_object_storage_in_windmill/index.mdx#instance-object-storage-distributed-cache-for-python-rust-go), it will be available to every other worker, allowing fast startup for every worker.
+Python の依存は既定ですべてディスクに取っておかれます。さらに[分散キャッシュ](../../../core_concepts/38_object_storage_in_windmill/index.mdx#instance-object-storage-distributed-cache-for-python-rust-go)を使えば、他のすべての worker からも使えるようになり、どの worker も素早く立ち上がります。
 
-## What's next?
+## 次は
 
-This script is a minimal working example, but there's a few more steps that can be useful in a real-world use case:
+このスクリプトは動く最小の例ですが、実際に使うにはもう少し段が要ります。
 
-- Pass [variables and secrets](../../../core_concepts/2_variables_and_secrets/index.mdx)
-  to a script.
-- Connect to [resources](../../../core_concepts/3_resources_and_types/index.mdx).
-- [Trigger that script](../../../triggers/index.mdx) in many ways.
-- Compose scripts in [Flows](../../../flows/1_flow_editor.mdx), [low-code apps](../../../apps/0_app_editor/index.mdx) or [full-code apps](../../../full_code_apps/index.mdx).
-- You can [share your scripts](../../../misc/1_share_on_hub/index.md) with the community on [Windmill Hub](https://hub.windmill.dev). Once
-  submitted, they will be verified by moderators before becoming available to
-  everyone right within Windmill.
+- スクリプトに[変数と秘密](../../../core_concepts/2_variables_and_secrets/index.mdx)を渡す。
+- [リソース](../../../core_concepts/3_resources_and_types/index.mdx)につなぐ。
+- いろいろなやり方で[そのスクリプトを起こす](../../../triggers/index.mdx)。
+- [フロー](../../../flows/1_flow_editor.mdx)、[ローコードのアプリ](../../../apps/0_app_editor/index.mdx)、[フルコードのアプリ](../../../full_code_apps/index.mdx)にスクリプトを組み合わせる。
+- [Windmill Hub](https://hub.windmill.dev) で、みんなに[スクリプトを公開](../../../misc/1_share_on_hub/index.md)できます。出すと、まず取りまとめ役が確かめ、そのあと Windmill の中から誰でも使えるようになります。
 
-Scripts are immutable and there is an hash for each deployment of a given script. Scripts are never overwritten and referring to a script by path is referring to the latest deployed hash at that path.
+スクリプトは書き換えられないもので、配備のたびに hash が付きます。上書きされることはなく、パスで指すというのは、そのパスに最後に配備された hash を指すという意味です。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Versioning](https://www.windmill.dev/docs/core_concepts/versioning#script-versioning) —— Scripts, when deployed, can have a parent script identified by its hash.
+	- [版の管理](https://www.windmill.dev/docs/core_concepts/versioning#script-versioning) —— 配備されたスクリプトは、hash で指される親のスクリプトを持てる。
 </div>
 
-For each script, a UI is autogenerated from the JSON schema inferred from the script signature, and can be customized further as standalone or embedded into rich UIs using the [App builder](../../7_apps_quickstart/index.mdx).
+スクリプトごとに、署名から推測した JSON schema をもとに UI が自動生成されます。単体で細かく調整することも、[アプリの作成画面](../../7_apps_quickstart/index.mdx)で作り込んだ UI に埋め込むこともできます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Auto-generated UIs](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill creates auto-generated user interfaces for scripts and flows based on their parameters.
-	- [Generated UI](../../../script_editor/customize_ui.mdx) —— main function's arguments can be given advanced settings that will affect the inputs' auto-generated UI and JSON Schema.
+	- [自動生成される UI](https://www.windmill.dev/docs/core_concepts/auto_generated_uis) —— Windmill はスクリプトとフローの引数から UI を自動で作る。
+	- [生成される UI](../../../script_editor/customize_ui.mdx) —— main 関数の引数には、自動生成される UI と JSON Schema に効く詳しい設定を与えられる。
 </div>
 
-In addition to the UI, sync and async [webhooks](../../../core_concepts/4_webhooks/index.mdx) are generated for each deployment.
+UI に加えて、配備ごとに同期・非同期の [webhook](../../../core_concepts/4_webhooks/index.mdx) が作られます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Webhooks](https://www.windmill.dev/docs/core_concepts/webhooks) —— Trigger scripts and flows from webhooks.
+	- [webhook](https://www.windmill.dev/docs/core_concepts/webhooks) —— webhook からスクリプトとフローを起こす。
 </div>
