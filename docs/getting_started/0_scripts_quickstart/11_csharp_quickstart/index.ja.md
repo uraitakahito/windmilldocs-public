@@ -82,6 +82,7 @@ using System;
 using System.Linq;
 using Humanizer;
 
+
 class Script
 {
     public static DateTime Main(string[] extraWords, string word = "clue", int highNumberThreshold = 50)
@@ -150,6 +151,7 @@ Note that only the lines at the very top will be taken into account.
 :::
 
 ## Instant preview & testing
+
 
 Look at the UI preview on the right: it was updated to match the input
 signature. Run a test (`Ctrl` + `Enter`) to verify everything works.

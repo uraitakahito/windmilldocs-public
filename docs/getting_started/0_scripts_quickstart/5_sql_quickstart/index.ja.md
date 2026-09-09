@@ -582,6 +582,7 @@ ATTACH '$res:u/demo/amazed_postgresql' AS db (TYPE postgres);
 SELECT * FROM db.public.friends;
 ```
 
+
 Database resource can be specified from the UI or directly within the script with a line `-- database resource_path`.
 
 <video
@@ -632,6 +633,7 @@ SELECT * FROM my_table;
 --
 ```
 
+
 ## Contextual variables
 
 You can use [contextual variables](../../../core_concepts/47_environment_variables/index.mdx#contextual-variables) in your queries. They need to be wrapped in `%%` like this:
@@ -673,13 +675,16 @@ SELECT name, calories FROM %%table_name%% WHERE calories > daily_minimum_calorie
 
 Keep in mind that this means users of this script can try this query against all existent and non-existent tables of the database.
 
+
 ### Unsafe interpolation on a REST script
 
 A more convenient but less secure option is to execute raw queries with a TypeScript, Deno or Python client. You can for instance do string interpolation to make the name of the table a parameter of your script: `SELECT * FROM ${table}`. However this is dangerous since the string is directly interpolated and this open the door for [SQL injections](https://en.wikipedia.org/wiki/SQL_injection). Use with care and only in trusted environment.
 
 #### PostgreSQL
 
+
 #### TypeScript (Bun)
+
 
 ```ts
 import * as wmill from 'windmill-client';
@@ -730,7 +735,9 @@ export async function main(query = 'SELECT * FROM demo', pg_resource: Postgresql
 
 View script on [Windmill Hub](https://hub.windmill.dev/scripts/postgresql/7105/execute-arbitrary-query-and-return-results-postgresql).
 
+
 #### TypeScript (Deno)
+
 
 ```ts
 import {
@@ -770,7 +777,9 @@ export function pgClient(db: any) {
 
 View script on [Windmill Hub](https://hub.windmill.dev/scripts/postgresql/1294/execute-query-and-return-results-postgresql).
 
+
 #### Python
+
 
 ```python
 from typing import TypedDict, Dict, Any
@@ -820,6 +829,7 @@ def main(query: str, db_config: postgresql) -> Dict[str, Any]:
 
 View script on [Windmill Hub](https://hub.windmill.dev/scripts/postgresql/7106/execute-arbitrary-query-postgresql).
 
+
 :::tip
 
 You can find more Script examples related to PostgreSQL on
@@ -831,7 +841,9 @@ You can find more Script examples related to PostgreSQL on
 
 The same logic goes for MySQL.
 
+
 #### TypeScript (Bun)
+
 
 ```ts
 import { createConnection } from 'mysql';
@@ -885,7 +897,9 @@ export async function main(mysqlResource: Mysql, query: string): Promise<any> {
 
 View script on [Windmill Hub](https://hub.windmill.dev/scripts/mysql/7108/execute-arbitrary-query-mysql).
 
+
 #### TypeScript (Deno)
+
 
 ```ts
 import { createPool as createMysqlPool } from "npm:mysql2/promise";
@@ -940,7 +954,9 @@ export async function main(
 
 View script on [Windmill Hub](https://hub.windmill.dev/scripts/mysql/7107/execute-arbitrary-query-mysql).
 
+
 #### Python
+
 
 ```python
 from typing import TypedDict
@@ -984,6 +1000,7 @@ def main(mysql_credentials: mysql, query: str) -> str:
 ```
 
 View script on [Windmill Hub](https://hub.windmill.dev/scripts/mysql/7109/execute-arbitrary-query-mysql).
+
 
 And so on for [MS SQL](#ms-sql), [BigQuery](#bigquery) and [Snowflake](#snowflake).
 

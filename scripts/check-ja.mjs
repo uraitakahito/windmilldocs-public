@@ -37,6 +37,8 @@ const shape = (text) => {
   const links = [];
   const images = [];
   const fences = [];
+  const fenceBodies = [];
+  let body = null;
   const headings = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
   const headingIds = [];
   // **見出し id は文書ごとの状態を持つ。** 同名の見出しが 2 つあれば 2 つ目は
@@ -49,11 +51,20 @@ const shape = (text) => {
   for (const line of text.split("\n")) {
     const fence = /^\s*```(\S*)/.exec(line);
     if (fence) {
-      if (!infence) fences.push(fence[1] ?? "");
+      if (infence) {
+        fenceBodies.push(body.join("\n"));
+        body = null;
+      } else {
+        fences.push(fence[1] ?? "");
+        body = [];
+      }
       infence = !infence;
       continue;
     }
-    if (infence) continue;
+    if (infence) {
+      body.push(line);
+      continue;
+    }
 
     const h = /^(#{1,6})\s/.exec(line);
     if (h) {
@@ -64,7 +75,9 @@ const shape = (text) => {
     for (const m of line.matchAll(/!\[[^\]]*\]\(([^)\s]+)/g)) images.push(m[1]);
     for (const m of line.matchAll(/(?<!!)\[[^\]]*\]\(([^)\s]+)\)/g)) links.push(m[1]);
   }
-  return { links, images, fences, headings, headingIds };
+  // 閉じ忘れたフェンスも、在ったものとして数える。
+  if (body !== null) fenceBodies.push(body.join("\n"));
+  return { links, images, fences, fenceBodies, headings, headingIds };
 };
 
 const collectJa = (dir) => {
@@ -163,8 +176,30 @@ for (const ja of collectJa(DOCS)) {
     }
   }
 
+  // **コードブロックは中身まで一致させる。**
+  //
+  // 訳の決め事として、コードは 1 文字も変えない —— コメントも、画面に出るものと
+  // 食い違わせないために原文のまま残す。であれば機械で押さえられる。数と言語しか
+  // 見ていなかった頃は、写し間違いも空行の増減も緑のまま通った。残り 25,000 語を
+  // 手で写す前に閉じておく。
+  //
+  // これが成り立つのは、生成器がフェンスの中身を素通しするから (原文 401 本・
+  // フェンス 1349 個で確認)。以前は空行を詰める処理がフェンスの中にも効いていて
+  // 18 個が変わっていた。
   if (a.fences.length !== b.fences.length) {
     problems.push(`${rel}: コードブロックの数が違う (原文 ${a.fences.length} / 訳 ${b.fences.length})`);
+  } else {
+    for (let i = 0; i < a.fenceBodies.length; i += 1) {
+      if (a.fenceBodies[i] === b.fenceBodies[i]) continue;
+      const aL = a.fenceBodies[i].split("\n");
+      const bL = b.fenceBodies[i].split("\n");
+      const at = aL.findIndex((l, k) => l !== bL[k]);
+      problems.push(
+        `${rel}: ${i + 1} 個目のコードブロックの中身が原文と違う (${at + 1} 行目)\n` +
+          `      原文: ${JSON.stringify(aL[at])}\n` +
+          `      訳  : ${JSON.stringify(bL[at])}`,
+      );
+    }
   }
   for (const level of [1, 2, 3, 4, 5, 6]) {
     if (a.headings[level] !== b.headings[level]) {

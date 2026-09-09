@@ -128,6 +128,7 @@ We will now go through each of these sections.
 
 Windmill scripts can take [arguments](../../../core_concepts/13_json_schema_and_parsing/index.mdx), and in order to define the names and types of the arguments you can use this section. These definitions will be parsed allowing the frontend to interactively display dynamic inputs for the script.
 
+
 ```yaml
 extra_vars:
   world_qualifier:
@@ -212,6 +213,7 @@ tasks:
 ```
 
 Note that valid json must be written to the file or else the job will fail. Also, this should be done by the control node i.e. your worker, so it's important to use the `delegate_to: localhost` directive.
+
 
 ### Inventories
 
@@ -467,6 +469,7 @@ extra_vars:
 Parts of this feature depend on instance-wide blob storage, which is only available in [Enterprise Edition](/pricing).
 :::
 
+
 <video
 	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
 	controls
@@ -579,6 +582,7 @@ signature. Run a test (`Ctrl` + `Enter`) to verify everything works.
 />
 
 <br />
+
 
 <div className="grid grid-cols-2 gap-6 mb-4">
 	- [Instant preview & testing](https://www.windmill.dev/docs/core_concepts/instant_preview) —— On top of its integrated editors, Windmill allows users to see and test what they are building directly from the editor, even before deployment.

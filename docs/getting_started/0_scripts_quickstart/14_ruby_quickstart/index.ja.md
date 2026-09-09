@@ -24,6 +24,7 @@ In this quick start guide, we will write our first script in [Ruby](https://www.
 	/>
 </div>
 
+
 <div className="grid grid-cols-2 gap-6 mb-4">
 	- [Local development](https://www.windmill.dev/docs/advanced/local_development) —— Develop from various environments such as your terminal, VS Code, and JetBrains IDEs.
 	- [Dependencies in Ruby](https://www.windmill.dev/docs/getting_started/scripts_quickstart/ruby#dependencies-management) —— How to manage dependencies in Ruby scripts.

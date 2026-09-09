@@ -90,6 +90,33 @@ const docCardsToList = (text, fromFile) =>
     return `- ${link}${desc ? ` —— ${desc}` : ""}`;
   });
 
+/** フェンスの外だけ、3 行以上続く空行を 2 行に詰める。 */
+const collapseBlankLinesOutsideFences = (text) => {
+  const out = [];
+  let infence = false;
+  let blanks = 0;
+  for (const line of text.split("\n")) {
+    if (/^\s*```/.test(line)) {
+      infence = !infence;
+      blanks = 0;
+      out.push(line);
+      continue;
+    }
+    if (infence) {
+      out.push(line);
+      continue;
+    }
+    if (line.trim() === "") {
+      blanks += 1;
+      if (blanks <= 2) out.push(line);
+      continue;
+    }
+    blanks = 0;
+    out.push(line);
+  }
+  return out.join("\n");
+};
+
 export const convert = (src) => {
   let s = readFileSync(src, "utf8");
 
@@ -106,8 +133,13 @@ export const convert = (src) => {
   // `@theme/` と `@docusaurus/` も落とす —— 対応する部品は下で見出しや註記に
   // 変えるので、import だけが残ると GitHub に生の JS の行として出る
   // (Bash と apps のページで実際に残っていた)。
+  //
+  // **1 行に収まるものだけを見る。** 以前は `[\s\S]*?` で行を跨げたので、
+  // `import { Client } from 'pg'` のような**例示コードの import から**始まって、
+  // ずっと下の `@theme/…` の行までを丸ごと飲み込みうる形になっていた。
+  // 実際に複数行にまたがる該当 import は本家に 1 つも無い (1 行 388 / 複数行 0)。
   s = s.replace(
-    /^import\s+[\s\S]*?from\s+['"](@site|@theme|@docusaurus|lucide-react|react-icons)[^'"]*['"];?\s*$/gm,
+    /^import\s+[^\n]*?from\s+['"](@site|@theme|@docusaurus|lucide-react|react-icons)[^'"]*['"];?[^\S\n]*$/gm,
     "",
   );
 
@@ -126,7 +158,11 @@ export const convert = (src) => {
   }
 
   // 空行が 3 つ以上続かないように詰める。
-  s = s.replace(/\n{3,}/g, "\n\n").trimStart();
+  //
+  // **コードフェンスの中には手を入れない。** 素朴に全体へかけていたため、原文の
+  // 例示コードにある 2 連続の空行が 1 本に詰まっていた (1346 個中 18 個)。
+  // コードは 1 文字も変えないと決めているので、行の増減も含めて変えない。
+  s = collapseBlankLinesOutsideFences(s).trimStart();
 
   const original = "./" + basename(src);
   const banner =

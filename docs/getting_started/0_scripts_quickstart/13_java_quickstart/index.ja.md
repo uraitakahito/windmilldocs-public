@@ -32,6 +32,7 @@ Scripts consist of 2 parts:
 - [Code](#code): for Java scripts, it must have at least a **public** static main method inside a Main class.
 - [Settings](#settings): settings & metadata about the Script such as its path, summary, description, [JSON Schema](../../../core_concepts/13_json_schema_and_parsing/index.mdx) of its inputs (inferred from its signature).
 
+
 From the Home page, click **New** and select **Script**. This will take you to the first step of script creation: [Metadata](../../../script_editor/settings.mdx#metadata).
 
 ## Settings
@@ -188,6 +189,7 @@ Example `settings.xml` content:
 ```
 
 ## Instant preview & testing
+
 
 Look at the UI preview on the right: it was updated to match the input
 signature. Run a test (`Ctrl` + `Enter`) to verify everything works.
