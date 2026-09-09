@@ -6,13 +6,15 @@ Windmill のドキュメントを個人的に日本語へ訳したものです�
 
 **このファイルは生成物です。** `node scripts/build-ja-index.mjs` で作り直せます。
 
-## 訳済み（1 本）
-
-- [intro.ja.md](./intro.ja.md)
-
-## 骨組みのみ（本文は英語）（21 本）
+## 訳済み（4 本）
 
 - [getting_started/00_how_to_use_windmill/index.ja.md](./getting_started/00_how_to_use_windmill/index.ja.md)
+- [getting_started/0_scripts_quickstart/index.ja.md](./getting_started/0_scripts_quickstart/index.ja.md)
+- [getting_started/6_flows_quickstart/index.ja.md](./getting_started/6_flows_quickstart/index.ja.md)
+- [intro.ja.md](./intro.ja.md)
+
+## 骨組みのみ（本文は英語）（18 本）
+
 - [Ansible quickstart](./getting_started/0_scripts_quickstart/10_ansible_quickstart/index.ja.md)
 - [C# quickstart](./getting_started/0_scripts_quickstart/11_csharp_quickstart/index.ja.md)
 - [Java quickstart](./getting_started/0_scripts_quickstart/13_java_quickstart/index.ja.md)
@@ -28,9 +30,7 @@ Windmill のドキュメントを個人的に日本語へ訳したものです�
 - [Docker quickstart](./getting_started/0_scripts_quickstart/7_docker_quickstart/index.ja.md)
 - [PHP quickstart](./getting_started/0_scripts_quickstart/8_php_quickstart/index.ja.md)
 - [Rust quickstart](./getting_started/0_scripts_quickstart/9_rust_quickstart/index.ja.md)
-- [getting_started/0_scripts_quickstart/index.ja.md](./getting_started/0_scripts_quickstart/index.ja.md)
 - [getting_started/10_pipeline_quickstart/index.ja.md](./getting_started/10_pipeline_quickstart/index.ja.md)
-- [getting_started/6_flows_quickstart/index.ja.md](./getting_started/6_flows_quickstart/index.ja.md)
 - [getting_started/7_apps_quickstart/index.ja.md](./getting_started/7_apps_quickstart/index.ja.md)
 - [getting_started/9_full_code_apps_quickstart/index.ja.md](./getting_started/9_full_code_apps_quickstart/index.ja.md)
 
@@ -38,3 +38,5 @@ Windmill のドキュメントを個人的に日本語へ訳したものです�
 
 原文は同じディレクトリに `.mdx` として置いてあります。訳が古いと思ったら、
 各ページ冒頭の「原文」リンクから戻れます。
+
+訳語は [GLOSSARY.ja.md](./GLOSSARY.ja.md) に固定してあります。

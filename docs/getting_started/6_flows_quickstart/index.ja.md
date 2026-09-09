@@ -1,14 +1,13 @@
 ---
-description: How do I build a workflow in Windmill? Step-by-step guide to create, test and deploy a multi-step flow.
+description: Windmill でワークフローを組むには。複数段のフローを作り、テストし、配備するまでの手引き。
 ---
+
 > **[原文](./index.mdx)の日本語訳。** 相違があれば原文が正。
 > 原典 © Windmill Labs, Inc. — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。この訳も同じライセンスで提供します。
->
-> **未訳。** 以下は原文のままです。
 
-# Flows quickstart
+# フローのクイックスタート
 
-The present document will introduce you to [Flows](../../flows/1_flow_editor.mdx) and how to build your first one.
+この文書では[フロー](../../flows/1_flow_editor.mdx)とは何かを説明し、最初の 1 本を組み立てます。
 
 <iframe
 	style={{ aspectRatio: '16/9' }}
@@ -22,128 +21,128 @@ The present document will introduce you to [Flows](../../flows/1_flow_editor.mdx
 
 <br />
 
-> [Here](https://hub.windmill.dev/flows/43/) is an example of a simple flow built with Windmill.
+> Windmill で組んだ簡単なフローの例が[こちら](https://hub.windmill.dev/flows/43/)にあります。
 
 <br />
 
-Have in mind that in Windmill, Scripts are at the basis of Flows and Apps. To sum up roughly, workflows are state machines [represented as DAGs](../../flows/16_architecture.mdx) (Directed Acyclic Graphs) to compose scripts together. To learn more about scripts, check the [Script quickstart](../0_scripts_quickstart/index.mdx). You will not necessarily have to re-build each script as you can reuse them from your workspace or from the [Hub](https://hub.windmill.dev/).
+Windmill では、**スクリプトがフローとアプリの土台**であることを覚えておいてください。大まかに言えば、ワークフローとはスクリプトを組み合わせるための状態機械で、[DAG（有向非巡回グラフ）として表されます](../../flows/16_architecture.mdx)。スクリプトについては[スクリプトのクイックスタート](../0_scripts_quickstart/index.mdx)を参照してください。毎回スクリプトを作り直す必要はありません —— ワークスペースにあるものや [Hub](https://hub.windmill.dev/) のものを再利用できます。
 
-Those workflows can run for-loops, branches (parallelizable), suspend themselves until a timeout or receiving events such as webhooks or approvals. They can be scheduled very frequently and check for new external items to process (what we call "Trigger" script).
+ワークフローは for ループや分岐（並列化できます）を回せますし、時間切れまで、あるいは webhook や承認といった出来事を受け取るまで、自分を止めておくこともできます。ごく短い間隔でスケジュールして、処理すべき新しいものが外部に無いかを確かめる、という使い方もできます（これを「トリガースクリプト」と呼びます）。
 
-The result of a flow is the result of the last step executed, unless [error](../../flows/8_error_handling.mdx) was returned before or [Early return](../../flows/19_early_return.mdx) is set.
+フローの結果は、**最後に実行された段の結果**です。ただし途中で[エラー](../../flows/8_error_handling.mdx)が返るか、[早期に返す](../../flows/19_early_return.mdx)設定がされている場合は別です。
 
-The overhead and coldstart between each step is about 20ms, which is [faster than any other orchestration engine](/blog/launch-week-1/fastest-workflow-engine), by a large margin.
+段と段のあいだのオーバーヘッドとコールドスタートは約 20ms で、[他のどのオーケストレーションエンジンより速く](/blog/launch-week-1/fastest-workflow-engine)、しかも大きな差があります。
 
-To create your first workflow, you could also pick one from our [Hub](https://hub.windmill.dev/flows) and fork it. Here, we're going to build our own flow from scratch, step by step.
+最初のワークフローは、[Hub](https://hub.windmill.dev/flows) から 1 つ選んで fork してもかまいません。ここでは自分のフローを一から、順を追って組み立てます。
 
-From the [Windmill](../00_how_to_use_windmill/index.mdx) home page, click **New** and select **Flow**, and let's get started!
+[Windmill](../00_how_to_use_windmill/index.mdx) のホーム画面で **新規（New）** をクリックし、**フロー（Flow）** を選んでください。始めましょう。
 
 :::tip
 
-Follow our [detailed section](../../flows/1_flow_editor.mdx) on the Flow editor for more information.
+フローエディタについては、[詳しい節](../../flows/1_flow_editor.mdx)を参照してください。
 
 :::
 
-## Settings
+## 設定
 
-### Metadata
+### メタデータ
 
-The first thing you'll see is the [Settings](../../flows/3_editor_components.mdx#settings) menu. From there, you can set the [permissions](../../core_concepts/16_roles_and_permissions/index.mdx) of the workflow: User (by default, you), and [Folder](../../core_concepts/8_groups_and_folders/index.mdx) (referring to read and/or write groups).
+最初に出るのが[設定（Settings）](../../flows/3_editor_components.mdx#settings)のメニューです。ここでワークフローの[権限](../../core_concepts/16_roles_and_permissions/index.mdx)を決められます —— ユーザー（既定では自分）と、[フォルダ](../../core_concepts/8_groups_and_folders/index.mdx)（読み取り・書き込みのグループを指します）です。
 
-Also, you can give succinctly a Name, a Summary and a Description to your flow. Those are supposed to be explicit, we recommend you to give context and make them as self-explanatory as possible.
+あわせて、フローに名前・要約・説明を簡潔に付けられます。これらは**明示的であるべき**もので、背景を書き、それだけ読んで分かるようにしておくことを勧めます。
 
 ![Flows metadata](./flows_metadata.png.webp)
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Roles and permissions](https://www.windmill.dev/docs/core_concepts/roles_and_permissions) —— Control access and manage permissions within your instance and workspaces.
+	- [ロールと権限](https://www.windmill.dev/docs/core_concepts/roles_and_permissions) —— インスタンスとワークスペースの中で、アクセスを制御し権限を管理する。
 </div>
 
-### Schedule
+### スケジュール
 
-On another tab, you can configure a [Schedule](../../core_concepts/1_scheduling/index.mdx) to trigger your flow. Flows can be [triggered](../../triggers/index.mdx) by any schedules, their [webhooks](../../core_concepts/4_webhooks/index.mdx) or their UI but they only have only one primary schedule with which they share the same path. This menu is where you set the primary schedule with CRON. The default schedule is none.
+別のタブでは、フローを起こす[スケジュール](../../core_concepts/1_scheduling/index.mdx)を設定できます。フローは任意のスケジュール、[webhook](../../core_concepts/4_webhooks/index.mdx)、UI から[起こせます](../../triggers/index.mdx)が、**同じパスを共有する主たるスケジュールは 1 つだけ**です。このメニューで、その主たるスケジュールを CRON で設定します。既定では設定されていません。
 
 ![Flows schedule](./flows_schedule.png.webp)
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Schedules](https://www.windmill.dev/docs/core_concepts/scheduling) —— Scheduling allows you to define schedules for Scripts and Flows, automatically running them at set frequencies.
+	- [スケジュール](https://www.windmill.dev/docs/core_concepts/scheduling) —— スクリプトとフローにスケジュールを定め、決めた頻度で自動的に実行する。
 </div>
 
-### Shared directory
+### 共有ディレクトリ
 
-Last tab of the settings menu is the [Shared Directory](../../core_concepts/11_persistent_storage/states_resources_shared_directory.mdx#shared-directory).
+設定メニューの最後のタブが[共有ディレクトリ](../../core_concepts/11_persistent_storage/states_resources_shared_directory.mdx#shared-directory)です。
 
-By default, flows on Windmill are based on a [result basis](#how-data-is-exchanged-between-steps). A step will take as inputs the results of previous steps. And this works fine for lightweight automation.
+既定では、Windmill のフローは[結果を受け渡す](#各段のあいだでデータをどう受け渡すか)形になっています。ある段は、前の段の結果を入力として受け取ります。軽い自動化ならこれで十分です。
 
-For heavier ETLs and any output that is not suitable for JSON, you might want to use the `Shared Directory` to share data between steps. Steps share a folder at `./shared` in which they can store heavier data and pass them to the next step.
+重い ETL や、JSON に向かない出力を扱うときは、`共有ディレクトリ` を使って段のあいだでデータを渡せます。各段は `./shared` というフォルダを共有していて、そこに大きめのデータを置いて次の段へ渡せます。
 
-Get more details on the [Persistent storage & databases dedicated page](../../core_concepts/11_persistent_storage/index.mdx).
+詳しくは[永続化とデータベースのページ](../../core_concepts/11_persistent_storage/index.mdx)を参照してください。
 
 ![Flows shared directory](./flows_shared_directory.png.webp)
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Persistent storage & databases](https://www.windmill.dev/docs/core_concepts/persistent_storage) —— Ensure that your data is safely stored and easily accessible whenever required.
+	- [永続化とデータベース](https://www.windmill.dev/docs/core_concepts/persistent_storage) —— データを安全に保管し、必要なときに取り出せるようにする。
 </div>
 
-### Worker group
+### worker グループ
 
-When a [worker group](../../core_concepts/9_worker_groups/index.mdx) is defined at the flow level, any steps inside the flow will run on that worker group, regardless of the steps' worker group. If no worker group is defined, the flow controls will be executed by the default worker group 'flow' and the steps will be executed in their respective worker group.
+フローの水準で [worker グループ](../../core_concepts/9_worker_groups/index.mdx)を指定すると、そのフローの中のどの段も、**段ごとの指定に関わらず**その worker グループで走ります。指定しなければ、フローの制御は既定の worker グループ `flow` が実行し、各段はそれぞれの worker グループで実行されます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Workers and worker groups](https://www.windmill.dev/docs/core_concepts/worker_groups) —— Worker Groups allow users to run scripts and flows on different machines with varying specifications.
+	- [worker と worker グループ](https://www.windmill.dev/docs/core_concepts/worker_groups) —— worker グループを使うと、性能の異なる複数の機械でスクリプトとフローを走らせられる。
 </div>
 
-You can always go back to this menu by clicking on `Settings` on the top lef, or on the name of the flow on the [toolbar](../../flows/3_editor_components.mdx#toolbar).
+このメニューには、左上の `設定（Settings）` か、[ツールバー](../../flows/3_editor_components.mdx#toolbar)のフロー名から、いつでも戻れます。
 
-## How data is exchanged between steps
+## 各段のあいだでデータをどう受け渡すか
 
-Flows on Windmill are generic and reusable, they therefore expose inputs. Input and outputs are piped together.
+Windmill のフローは汎用で再利用できるものなので、入力を外に出しています。入力と出力は互いにつながります。
 
-Inputs are either:
+入力は次のいずれかです。
 
-- Static: fixed values set directly in the step input fields (strings, numbers, JSON, etc.). These are constants that do not change between executions.
-- [Flow env variables](../../flows/3_editor_components.mdx#flow-env-variables): flow-level constants accessible from any step using `flow_env.VARIABLE_NAME`. They support strings, JSON and [resources](../../core_concepts/3_resources_and_types/index.mdx).
-- [Dynamically linked to others](../../flows/16_architecture.mdx): with [JSON objects](../../core_concepts/13_json_schema_and_parsing/index.mdx) as result that allow to refer to the output of any step.
-  You can refer to the result of any step:
-  - using the id associated with the step
-  - clicking on the plug logo that will let you pick flow inputs or previous steps' results (after testing flow or step).
+- 静的な値: 段の入力欄に直接書いた固定値（文字列、数値、JSON など）。実行のたびに変わらない定数です。
+- [フローの環境変数](../../flows/3_editor_components.mdx#flow-env-variables): フロー全体の定数で、どの段からも `flow_env.VARIABLE_NAME` で参照できます。文字列・JSON・[リソース](../../core_concepts/3_resources_and_types/index.mdx)を扱えます。
+- [他と動的につながった値](../../flows/16_architecture.mdx): 結果が [JSON オブジェクト](../../core_concepts/13_json_schema_and_parsing/index.mdx)なので、どの段の出力も参照できます。
+  参照のしかたは 2 通りです。
+  - 段に付いている id を使う
+  - プラグの絵をクリックして、フローの入力や前の段の結果から選ぶ（フローか段をテストした後）
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Architecture and data exchange](https://www.windmill.dev/docs/flows/architecture) —— A workflow is a JSON serializable value in the OpenFlow format.
+	- [構造とデータの受け渡し](https://www.windmill.dev/docs/flows/architecture) —— ワークフローは OpenFlow 形式の、JSON にできる値である。
 </div>
 
-## Flow editor
+## フローエディタ
 
-On the left of the editor, you'll find a graphical view of the flow. From there you can architecture your flow and take action at each step.
+エディタの左側には、フローの図が出ます。ここでフローの構造を組み、各段に対して操作します。
 
 ![Flow editor menu](./flow_editor_menu.png.webp)
 
-:::tip Pro tips
-Keep your flows organized and documented with [sticky notes](../../flows/24_sticky_notes.mdx) for free-floating comments and TODOs, and with [flow groups](../../flows/1_flow_editor.mdx#flow-groups) to visually cluster related steps and document complex workflow sections.
+:::tip 使いこなしのコツ
+[付箋](../../flows/24_sticky_notes.mdx)で自由な位置にメモや TODO を置き、[フローグループ](../../flows/1_flow_editor.mdx#flow-groups)で関連する段を視覚的にまとめると、フローを整理して読める状態に保てます。
 :::
 
-There are five kinds of scripts: [Action](../../flows/3_editor_components.mdx#flow-actions), [Trigger](../../flows/10_flow_trigger.mdx), [Approval](../../flows/11_flow_approval.mdx), [Error handler](../../flows/7_flow_error_handler.md) and [Preprocessor](../../core_concepts/43_preprocessors/index.mdx). You can sequence them how you want. Action is the default script type.
+スクリプトには 5 種類あります —— [アクション](../../flows/3_editor_components.mdx#flow-actions)、[トリガー](../../flows/10_flow_trigger.mdx)、[承認](../../flows/11_flow_approval.mdx)、[エラーハンドラ](../../flows/7_flow_error_handler.md)、[前処理](../../core_concepts/43_preprocessors/index.mdx)。好きな順に並べられます。既定はアクションです。
 
-Each script can be called from Workspace or [Hub](https://hub.windmill.dev/), you can also decide to write them inline.
+各スクリプトはワークスペースからも [Hub](https://hub.windmill.dev/) からも呼べますし、その場に直接書くこともできます。
 
 ![Import or write scripts](./import_or_write_scripts.png.webp)
 
 <br />
 
-Your flow can be deepened with [additional features](../../flows/1_flow_editor.mdx), below are some major ones.
+フローは[さまざまな機能](../../flows/1_flow_editor.mdx)で深められます。主なものを以下に挙げます。
 
-### For loops
+### for ループ
 
-[For loops](../../flows/12_flow_loops.md) are a special type of steps that allows you to iterate over a list of items, given by an iterator expression.
+[for ループ](../../flows/12_flow_loops.md)は特別な種類の段で、反復子の式で与えた一覧を順に処理します。
 
 ![Flows For loops](./for_loops.png.webp)
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [For loops](https://www.windmill.dev/docs/flows/flow_loops) —— Iterate a series of tasks.
+	- [for ループ](https://www.windmill.dev/docs/flows/flow_loops) —— 一連の処理を繰り返す。
 </div>
 
-### While loops
+### while ループ
 
-While loops execute a sequence of code indefinitely until the user cancels or a step set to [Early stop](../../flows/2_early_stop.md) stops.
+while ループは、利用者が止めるか、[早期停止](../../flows/2_early_stop.md)を設定した段が止めるまで、処理を繰り返し続けます。
 
 <video
 	className="border-2 rounded-xl object-cover w-full h-full dark:border-gray-800"
@@ -154,61 +153,61 @@ While loops execute a sequence of code indefinitely until the user cancels or a 
 <br />
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [While loops](https://www.windmill.dev/docs/flows/while_loops) —— While loops execute a sequence of code indefinitely until the user cancels or a step set to Early stop stops.
+	- [while ループ](https://www.windmill.dev/docs/flows/while_loops) —— 利用者が止めるか、早期停止を設定した段が止めるまで、処理を繰り返し続ける。
 </div>
 
-### Branching
+### 分岐
 
-[Branches](../../flows/13_flow_branches.md) build branching logic to create and manage complex workflows based on conditions. There are two of them:
+[分岐](../../flows/13_flow_branches.md)は条件に応じて処理を分け、込み入ったワークフローを組み立てるためのものです。2 種類あります。
 
-- [Branch one](../../flows/13_flow_branches.md#branch-one): allows you to execute a branch if a condition is true.
-- [Branch all](../../flows/13_flow_branches.md#branch-all): allows you to execute all the branches in parallel, as if each branch is a flow.
+- [Branch one](../../flows/13_flow_branches.md#branch-one): 条件が真のときに、その枝を実行します。
+- [Branch all](../../flows/13_flow_branches.md#branch-all): すべての枝を並列に実行します。各枝がそれぞれフローであるかのように扱われます。
 
 ![Flow branching](flow_branches.png.webp)
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Branches](https://www.windmill.dev/docs/flows/flow_branches) —— Split the execution of the flow based on a condition.
+	- [分岐](https://www.windmill.dev/docs/flows/flow_branches) —— 条件に応じてフローの実行を分ける。
 </div>
 
-### Retries
+### 再試行
 
-At each step, Windmill allows you to [customize the number of retries](../../flows/14_retries.md) by going on the `Advanced` tabs of the individual script. If defined, upon error this step will be retried with a delay and a maximum number of attempts.
+各段では、個々のスクリプトの `詳細（Advanced）` タブから[再試行の回数を決められます](../../flows/14_retries.md)。設定しておくと、エラーのときにその段が、指定した間隔と上限回数のもとで再試行されます。
 
 ![Flows retries](./flows_retries.png.webp)
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Retries](https://www.windmill.dev/docs/flows/retries) —— Re-try a step in case of error.
+	- [再試行](https://www.windmill.dev/docs/flows/retries) —— エラーのときに段を試し直す。
 </div>
 
-### Suspend/Approval Step
+### 中断と承認の段
 
-At each step you can add [Approval scripts](../../flows/11_flow_approval.mdx) to manage security and control over your flows.
+各段には[承認スクリプト](../../flows/11_flow_approval.mdx)を足せます。フローに対する安全性と統制を保つためのものです。
 
-Request approvals can be sent by email, Slack, anything. Then you can automatically resume workflows with secret webhooks after the approval steps.
+承認の依頼はメールでも Slack でも、何でも送れます。承認の段の後は、秘密の webhook でワークフローを自動的に再開できます。
 
-![Approval step diagram](../../assets/flows/approval_diagram.png 'Approval step diagram')
+![Approval step diagram](../../assets/flows/approval_diagram.png '承認の段の図')
 
 <br />
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Suspend & Approval / Prompts](https://www.windmill.dev/docs/flows/flow_approval) —— Suspend a flow until specific event(s) are received, such as approvals or cancellations.
+	- [中断と承認・確認](https://www.windmill.dev/docs/flows/flow_approval) —— 承認や取り消しといった出来事を受け取るまで、フローを止めておく。
 </div>
 
-You can find all the flows' features in their [dedicated section](../../flows/1_flow_editor.mdx).
+フローの機能は[専用の節](../../flows/1_flow_editor.mdx)にすべてまとまっています。
 
-## Triggers
+## 起こしかた
 
-There are several ways to trigger a flow with Windmill.
+Windmill でフローを起こす方法はいくつもあります。
 
-1. The most direct one is from the [autogenerated UI provided by Windmill](../../core_concepts/6_auto_generated_uis/index.mdx). It is the one you will see from the flow editor.
-2. A similar but more customized way is to use Windmill Apps using the [App editor](../7_apps_quickstart/index.mdx).
-3. We saw above that you can trigger flows using [schedules](../../core_concepts/1_scheduling/index.mdx) that you can check from the [Runs](../../core_concepts/5_monitor_past_and_future_runs/index.mdx) page. One special way to use scheduling is to combine it with [trigger scripts](../../flows/10_flow_trigger.mdx).
-4. [Execute flows from the CLI](../../advanced/3_cli/index.mdx) to trigger your flows from your terminal.
-5. [Trigger the flow from another flow](../../triggers/index.mdx#trigger-from-flows).
-6. Using [trigger scripts](../../flows/10_flow_trigger.mdx) to trigger only if a condition has been met.
-7. [Webhooks](../../core_concepts/4_webhooks/index.mdx). Each Flow created in the app gets autogenerated webhooks. You can see them once you flow is saved. You can even [trigger flows without leaving Slack](/blog/handler-slack-commands)!
+1. いちばん直接なのは、[Windmill が自動生成する UI](../../core_concepts/6_auto_generated_uis/index.mdx) からです。フローエディタで見えるのがそれです。
+2. 似ていてより作り込めるのが、[アプリエディタ](../7_apps_quickstart/index.mdx)で作る Windmill のアプリからです。
+3. 上で見たとおり、[スケジュール](../../core_concepts/1_scheduling/index.mdx)でも起こせます。実行の様子は[実行履歴](../../core_concepts/5_monitor_past_and_future_runs/index.mdx)のページで確認できます。スケジュールの特別な使い方として、[トリガースクリプト](../../flows/10_flow_trigger.mdx)と組み合わせる手があります。
+4. [CLI からフローを実行して](../../advanced/3_cli/index.mdx)、端末から起こす。
+5. [別のフローから起こす](../../triggers/index.mdx#trigger-from-flows)。
+6. [トリガースクリプト](../../flows/10_flow_trigger.mdx)を使い、条件が満たされたときだけ起こす。
+7. [webhook](../../core_concepts/4_webhooks/index.mdx)。アプリで作った各フローには webhook が自動生成されます。フローを保存すると見られます。[Slack から離れずにフローを起こす](/blog/handler-slack-commands)こともできます。
 
-You can test your triggers in test mode:
+起こし方はテストモードで試せます。
 
 <iframe
 	style={{ aspectRatio: '16/9' }}
@@ -223,12 +222,12 @@ You can test your triggers in test mode:
 <br />
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Triggering flows](../../triggers/index.mdx) —— Trigger scripts and flows on-demand, by schedule or on external events.
+	- [フローの起こしかた](https://www.windmill.dev/docs/triggers) —— スクリプトとフローを、必要なとき・スケジュール・外部の出来事で起こす。
 </div>
 
-## Test your flow
+## フローをテストする
 
-You don't have to explore all Flow editor possibilities at once. At each step, test what you're building to keep control on your wonder. You can also test up to a certain step by clicking on an action (x) and then on `Test up to x`.
+フローエディタの機能を一度に全部知る必要はありません。各段で、作っているものをその都度テストして、手綱を握ったまま進めてください。ある操作（x）をクリックして `x までテスト` を選べば、そこまでを試すこともできます。
 
 <video
 	className="border-2 rounded-lg object-cover w-full h-full dark:border-gray-800"
@@ -240,19 +239,19 @@ You don't have to explore all Flow editor possibilities at once. At each step, t
 <br />
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Testing flows](https://www.windmill.dev/docs/flows/test_flows) —— Iterate quickly and get control on your flow testing.
+	- [フローのテスト](https://www.windmill.dev/docs/flows/test_flows) —— 手早く回して、フローのテストを掌握する。
 </div>
 
-When you're done, [deploy](../../core_concepts/0_draft_and_deploy/index.mdx) your flow, schedule it, [create and app from it](../../core_concepts/6_auto_generated_uis/index.mdx), or even [publish it to Hub](../../misc/1_share_on_hub/index.md).
+出来上がったらフローを[配備](../../core_concepts/0_draft_and_deploy/index.mdx)し、スケジュールを付け、[そこからアプリを作り](../../core_concepts/6_auto_generated_uis/index.mdx)、あるいは [Hub に公開](../../misc/1_share_on_hub/index.md)することもできます。
 
-Follow our [detailed section](../../flows/1_flow_editor.mdx) on the Flow editor for more information.
+フローエディタについては[詳しい節](../../flows/1_flow_editor.mdx)を参照してください。
 
-## Flow as Code
+## コードとしてのフロー
 
-Flows are not the only way to write distributed programs that execute distinct jobs. Another approach is to write a program that defines the jobs and their dependencies, and then execute that program within a [Python](../0_scripts_quickstart/2_python_quickstart/index.mdx) or [TypeScript](../0_scripts_quickstart/1_typescript_quickstart/index.mdx) script. This is known as workflows as code.
+分散して動くプログラムを書く方法は、フローだけではありません。もう 1 つのやり方は、仕事とその依存関係を定義するプログラムを書き、それを [Python](../0_scripts_quickstart/2_python_quickstart/index.mdx) か [TypeScript](../0_scripts_quickstart/1_typescript_quickstart/index.mdx) のスクリプトとして実行することです。これを workflows as code と呼びます。
 
 ![Flow as code](../../core_concepts/31_workflows_as_code/wac-editor-1.png)
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Workflows as code](https://www.windmill.dev/docs/core_concepts/workflows_as_code) —— Automate tasks and their flow with only code.
+	- [コードとしてのワークフロー](https://www.windmill.dev/docs/core_concepts/workflows_as_code) —— コードだけで、処理とその流れを自動化する。
 </div>

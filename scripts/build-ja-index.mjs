@@ -18,13 +18,15 @@ const ROOT = process.cwd();
 const DOCS = join(ROOT, "docs");
 /** 生成直後の骨組みに入っている印。訳し始めたら消してもらう。 */
 const UNTRANSLATED = "> **未訳。** 以下は原文のままです。";
+/** こちらで書いた文書。訳ではないので目次に並べない (check-ja.mjs と揃える)。 */
+const OURS = new Set(["INDEX.ja.md", "GLOSSARY.ja.md"]);
 
 const pages = [];
 const walk = (dir) => {
   for (const e of readdirSync(dir).sort()) {
     const p = join(dir, e);
     if (statSync(p).isDirectory()) walk(p);
-    else if (e.endsWith(".ja.md") && e !== "INDEX.ja.md") pages.push(p);
+    else if (e.endsWith(".ja.md") && !OURS.has(e)) pages.push(p);
   }
 };
 walk(DOCS);
@@ -63,6 +65,8 @@ Windmill のドキュメントを個人的に日本語へ訳したものです�
 
 原文は同じディレクトリに \`.mdx\` として置いてあります。訳が古いと思ったら、
 各ページ冒頭の「原文」リンクから戻れます。
+
+訳語は [GLOSSARY.ja.md](./GLOSSARY.ja.md) に固定してあります。
 `,
 );
 console.log(`  目次: 訳済み ${done.length} 本 / 骨組み ${todo.length} 本`);
