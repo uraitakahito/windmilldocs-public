@@ -1,0 +1,89 @@
+/**
+ * この fork のためだけの CSS。
+ *
+ * ## Tailwind を入れていない
+ *
+ * 本家の docs は JSX の中に Tailwind のユーティリティを直接書いている。本家の
+ * サイトは Tailwind を積んでいるが、この mirror には設定が入っていない。
+ *
+ * ただし **実際に使われているのは 28 種類だけ** (docs/ 401 本を走査した結果) なので、
+ * ビルドに Tailwind を足すより、その 28 個を手で書くほうが軽い。足りない見た目は
+ * 出るが、目的は読めること。
+ */
+
+/* ── docs が使う Tailwind 相当（28 種類）────────────────────────── */
+.grid { display: grid; }
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.gap-2 { gap: 0.5rem; }
+.gap-6 { gap: 1.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.my-4 { margin-block: 1rem; }
+.my-6 { margin-block: 1.5rem; }
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.object-cover { object-fit: cover; }
+.border-2 { border: 2px solid var(--ifm-color-emphasis-300); }
+.rounded-lg { border-radius: 0.5rem; }
+.rounded-xl { border-radius: 0.75rem; }
+.inline-flex { display: inline-flex; }
+.text-center { text-align: center; }
+.text-sm { font-size: 0.875rem; }
+.container { width: 100%; }
+
+/* 画面が狭いときは 1 列へ。本家の md: 接頭辞と同じ意図。 */
+@media (max-width: 768px) {
+  .grid-cols-2,
+  .md\:grid-cols-2 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+}
+@media (min-width: 769px) {
+  .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+[data-theme="dark"] .dark\:border-gray-800 { border-color: var(--ifm-color-emphasis-300); }
+
+/* 対話的な部品（この fork には無い）が使っていた入れ物。素通しでよい。 */
+.buttons,
+.input-section,
+.results,
+.result-card,
+.result-value,
+.primary,
+.subtitle,
+.unique-tabs { display: block; }
+
+/* ── 自前の DocCard ───────────────────────────────────────────── */
+.wm-doccard {
+  display: block;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-left: 4px solid var(--ifm-color-primary);
+  border-radius: 0.5rem;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.wm-doccard:hover {
+  text-decoration: none;
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+}
+.wm-doccard__head { display: flex; align-items: center; gap: 0.5rem; }
+.wm-doccard__icon { flex: none; opacity: 0.75; }
+.wm-doccard__title { font-weight: 600; }
+.wm-doccard__desc {
+  margin: 0.4rem 0 0;
+  font-size: 0.9rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+/* ── 本家にしか無い部品の代わり ───────────────────────────────── */
+.wm-not-in-mirror {
+  margin: 1.25rem 0;
+  padding: 0.9rem 1.1rem;
+  border: 1px dashed var(--ifm-color-emphasis-400);
+  border-radius: 0.5rem;
+  background: var(--ifm-color-emphasis-100);
+  font-size: 0.92rem;
+}
+.wm-not-in-mirror a { margin-left: 0.25rem; }

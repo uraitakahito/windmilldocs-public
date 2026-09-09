@@ -1,0 +1,21 @@
+# pnpm 11 は依存の lifecycle script を既定で実行しない。ここに挙がっているのは
+# 「実行してよいか」を pnpm に聞かれたパッケージ。
+#
+#   core-js — Docusaurus (babel preset-env) 経由。postinstall は資金提供の案内を
+#             stderr に書くだけで、ファイルを 1 つも作らない。false でよい。
+#
+# **明示しないと build が動かない。** pnpm は run の前に依存を検査し直し、未承認が
+# 残っていると install が非 0 で終わるので、build まで到達しない (実測)。
+allowBuilds:
+  core-js: false
+
+# **node_modules を平坦にする。**
+#
+# docs/ の 1 本 (`getting_started/7_apps_quickstart/index.mdx`) が
+# `@docusaurus/theme-common` の `useColorMode` を import しており、pnpm の既定の
+# 厳格な配置では「Module not found」で落ちる。
+#
+# 直接依存に足す形と webpack alias も試したが、どちらも二重の実体を作るか
+# subpath (`theme-common/internal`) を奪うかで別の形に壊れた。平坦にするのが
+# いちばん素直。
+nodeLinker: hoisted

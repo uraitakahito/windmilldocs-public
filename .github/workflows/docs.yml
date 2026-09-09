@@ -1,0 +1,55 @@
+name: docs
+
+# develop (訳とビルド設定が載っているブランチ) を GitHub Pages へ配信する。
+#
+#   /windmilldocs-public/      → 英語 (本家のまま)
+#   /windmilldocs-public/ja/   → 日本語訳 (訳したページだけ。残りは英語に落ちる)
+#
+# Security:
+#   - 引き金は develop への push と手動のみ。**pull_request では走らせない** ——
+#     fork のコードを Pages の権限付きでビルドすることになる。
+#   - 権限は job ごとに分ける: build は contents:read、deploy は pages:write と
+#     id-token:write (deploy-pages の OIDC に要る)。
+#   - secret を 1 つも参照しない。
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+# 配信は 1 度に 1 つ。cancel-in-progress にしないのは、公開されているものの
+# 中途半端な配信は待つより悪いから。
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          # **版は .nvmrc 1 か所。** Docusaurus 3.10 は Node 24 でビルドできない
+          # (SSR が require.resolveWeak で落ちる)。詳しくは NODE-VERSION.md。
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: build
+
+  deploy:
+    needs: [build]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+    steps:
+      - uses: actions/deploy-pages@v5
