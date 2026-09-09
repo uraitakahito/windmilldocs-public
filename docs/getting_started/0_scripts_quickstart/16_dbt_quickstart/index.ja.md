@@ -1,38 +1,36 @@
 ---
 title: 'dbt quickstart'
-description: 'How do I run dbt projects in Windmill? Author or import an unmodified dbt project as a script, run it on your own workers and refresh its model graph from the editor.'
+description: 'Windmill で dbt のプロジェクトを動かすには。手を入れていない dbt のプロジェクトをそのままスクリプトとして書く・取り込む、自分の worker で走らせる、エディタからモデルのグラフを取り直す。'
 slug: '/getting_started/scripts_quickstart/dbt'
 ---
 > **[原文](./index.mdx)の日本語訳。** 相違があれば原文が正。
 > 原典 © Windmill Labs, Inc. — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。この訳も同じライセンスで提供します。
->
-> **未訳。** 以下は原文のままです。
 
-# dbt quickstart
+# dbt クイックスタート
 
-Windmill runs [dbt](https://www.getdbt.com/) projects as a script language of its own. One dbt project is one Windmill script: the project's own files ride with the script as its module bundle, and the worker materializes them into the job directory before invoking dbt. Nothing is cloned at run time, and the project itself is unmodified - the same directory a developer runs `dbt build` against locally.
+Windmill は [dbt](https://www.getdbt.com/) のプロジェクトを、1 つの言語として動かします。dbt のプロジェクト 1 つが Windmill のスクリプト 1 つです。プロジェクトのファイルはスクリプトの module bundle として一緒に運ばれ、worker が dbt を呼ぶ前に job のディレクトリへ書き出します。実行時に clone は起きませんし、プロジェクト自体には手が入りません —— 手元で `dbt build` を走らせるのとまったく同じディレクトリです。
 
-What you get on top of `dbt build` is the rest of Windmill: [scheduling and triggers](../../../triggers/index.mdx), [permissions](../../../core_concepts/16_roles_and_permissions/index.mdx), run history, live per-model progress, and the project's models as first-class [assets](../../../core_concepts/52_assets/index.mdx), so a Python or DuckDB script reading one of its marts appears on the same lineage graph.
+`dbt build` に加えて手に入るのは、Windmill の残り全部です —— [スケジュールとトリガー](../../../triggers/index.mdx)、[権限](../../../core_concepts/16_roles_and_permissions/index.mdx)、実行の履歴、モデルごとの進み具合の実況、そしてプロジェクトのモデルが一級の[アセット](../../../core_concepts/52_assets/index.mdx)になること。おかげで、その mart を読む Python や DuckDB のスクリプトが同じ系譜のグラフに現れます。
 
-The runtime, the model graph and the UI are all in the Community Edition. Only the `mssql` and `oracle` adapters require an [Enterprise Edition](/pricing) license, mirroring the boundary the native SQL languages already draw.
+実行の仕組みも、モデルのグラフも、画面も、すべて Community Edition に入っています。[Enterprise Edition](/pricing) のライセンスが要るのは `mssql` と `oracle` のアダプタだけで、これは SQL の言語がすでに引いている線と同じです。
 
-dbt is in the browser's new-script language picker, and a dbt script opens in [an editor of its own](#the-dbt-editor) rather than the generic one. Projects can equally be imported and edited with the [CLI](../../../advanced/3_cli/index.mdx).
+dbt はブラウザの「新しいスクリプト」の言語の選択肢に入っていて、dbt のスクリプトは共通のエディタではなく[専用のエディタ](#dbt-のエディタ)で開きます。[CLI](../../../advanced/3_cli/index.mdx) から取り込んで編集することもできます。
 
-dbt is not offered as an inline language, though: a [flow](../../6_flows_quickstart/index.mdx) step and an [app](../../7_apps_quickstart/index.mdx) runnable are a raw body with nowhere to carry a project, so a flow reaches a dbt project the way it reaches any other script - by path, to a deployed one.
+ただし、その場で書く言語としては使えません。[フロー](../../6_flows_quickstart/index.mdx)の段や[アプリ](../../7_apps_quickstart/index.mdx)の実行対象はコードの本体だけを持つもので、プロジェクトを運ぶ場所がないからです。フローから dbt のプロジェクトへは、他のスクリプトと同じように届きます —— 配備済みのものへ、パスで。
 
-## Configure a warehouse
+## warehouse を設定する
 
-A dbt project on Windmill carries no connection of its own. Warehouses are configured once per workspace, under `Workspace settings` -> `dbt`: each entry is a name, a [resource](../../../core_concepts/3_resources_and_types/index.mdx) and an optional dbt target. A project reaches one by name, and takes `main` when it names none.
+Windmill 上の dbt のプロジェクトは、自分では接続を持ちません。warehouse はワークスペースごとに一度だけ、`ワークスペースの設定（Workspace settings）` -> `dbt` で設定します。1 件は名前・[リソース](../../../core_concepts/3_resources_and_types/index.mdx)・（任意で）dbt の target からなります。プロジェクトは名前で warehouse を指し、何も指さなければ `main` になります。
 
-The name is also the warehouse's identity in the asset graph - every model becomes `dbt://<warehouse>/<schema>/<name>` - so two projects pointing at the same warehouse share their nodes instead of drawing two disconnected islands.
+この名前は、アセットのグラフにおける warehouse の身元でもあります —— どのモデルも `dbt://<warehouse>/<schema>/<name>` になります —— なので、同じ warehouse を指す 2 つのプロジェクトは、離れた 2 つの島を描くのではなく、節点を共有します。
 
 ![Workspace settings, dbt tab: a warehouses table with Name, Resource and Target columns - `main` on a Postgres resource with target `prod`, and `lake` on a dbt_profile resource](./warehouse_settings.png 'Warehouses configured under Workspace settings -> dbt')
 
-A warehouse points at one of two kinds of resource.
+warehouse が指すリソースには 2 種類あります。
 
-**A Windmill connection resource**, when one exists for your warehouse: `postgresql`, `redshift`, `mysql`, `snowflake`, `bigquery` (or `gcp_service_account`) and `databricks`. Windmill translates the fields it carries into the keys dbt reads, so there is nothing dbt-specific to fill in - the resource you already use elsewhere works. The adapter comes from the resource's type.
+**Windmill の接続のリソース**。その warehouse 向けのものがあるなら —— `postgresql`、`redshift`、`mysql`、`snowflake`、`bigquery`（か `gcp_service_account`）、`databricks`。Windmill がその欄を dbt の読む鍵に読み替えるので、dbt のために埋めるものは何もありません。他所ですでに使っているリソースがそのまま使えます。アダプタはリソースの型から決まります。
 
-**A `dbt_profile` resource**, for everything else - and for anything the translation above does not cover. It is one entry of a `profiles.yml` `outputs` map, as a resource. Given this file on a developer's machine:
+**`dbt_profile` のリソース**。それ以外すべてと、上の読み替えで足りないものに使います。これは `profiles.yml` の `outputs` の 1 項目を、そのままリソースにしたものです。手元にこういうファイルがあるとして、
 
 ```yaml
 # ~/.dbt/profiles.yml
@@ -49,7 +47,7 @@ my_project:
       secure: true
 ```
 
-the resource *is* the `prod` block - paste it in as it stands, `type` and all:
+リソースは `prod` のかたまり*そのもの*です —— `type` も含め、そのまま貼り付けます。
 
 ```json
 {
@@ -63,25 +61,25 @@ the resource *is* the `prod` block - paste it in as it stands, `type` and all:
 }
 ```
 
-Nothing is renamed or lifted out, so the block you run locally is the block Windmill runs. The resource type declares no fields, so you get a JSON editor. `$var:` and `$res:` references resolve, including inside nested keys, so credentials stay Windmill secrets.
+名前を変えたり外に出したりはしないので、手元で動かしているかたまりがそのまま Windmill で動きます。このリソース型は欄を宣言していないので、JSON のエディタが出ます。`$var:` と `$res:` の参照は入れ子の鍵の中でも解決されるので、資格情報は Windmill の秘密のままにしておけます。
 
-The layers *above* the block are not in the resource, because Windmill already has them: the profile name comes from the project's own `dbt_project.yml`, and which output to use is the warehouse's `Target` (or the descriptor's `profile.target`). A project with a `dev` and a `prod` output becomes two warehouses, one resource each.
+そのかたまりより*上*の層はリソースに入りません。Windmill がすでに持っているからです —— profile の名前はプロジェクト自身の `dbt_project.yml` から来ますし、どの output を使うかは warehouse の `Target`（か記述子の `profile.target`）が決めます。`dev` と `prod` の output を持つプロジェクトは、リソース 1 つずつの warehouse 2 つになります。
 
-Every key is handed to dbt unchanged - so **any adapter dbt supports works**, including ones Windmill has never heard of (`trino`, `athena`, `spark`, `fabric`, whatever ships next). Copy the keys from your adapter's own dbt documentation; numbers and booleans keep their type.
+鍵はどれも手を加えずに dbt へ渡されます。つまり **dbt が対応しているアダプタなら何でも動きます** —— Windmill が名前も知らないもの（`trino`、`athena`、`spark`、`fabric`、この先出るもの）も含めて。鍵はそのアダプタの dbt のドキュメントから写してください。数と真偽は型を保ちます。
 
-With the `dbt-core-1x` engine the adapter is installed from PyPI as `dbt-<type>`, and that install is not sandboxed - so it is limited to adapters Windmill ships a list of, plus whatever an instance admin adds to `DBT_EXTRA_ADAPTERS`. `dbt-core-2x` and `fusion` carry their adapters in the binary and install nothing, so they take any `type` at all.
+`dbt-core-1x` のエンジンでは、アダプタは `dbt-<type>` として PyPI から入れられます。この導入は隔離されていないので、Windmill が持っている一覧にあるアダプタと、インスタンスの管理者が `DBT_EXTRA_ADAPTERS` に足したものに限られます。`dbt-core-2x` と `fusion` はアダプタを実行ファイルの中に持っていて何も入れないので、どんな `type` でも受け付けます。
 
-Two conveniences on top of a literal target: `root_certificate_pem` is written next to `profiles.yml` and pointed at by `sslrootcert` rather than being sent as a value, and the descriptor's `profile.schema` and `threads` override their keys in the block.
+そのまま渡すのに加えて、2 つの便宜があります。`root_certificate_pem` は値として送られるのではなく `profiles.yml` の隣に書き出され、`sslrootcert` がそれを指します。また記述子の `profile.schema` と `threads` は、かたまりの中の同じ鍵より優先されます。
 
-The `mssql` and `oracle` adapters need an [enterprise](/pricing) license, whichever kind of resource reaches them - the same boundary the native `ms_sql_server` and `oracledb` script languages draw. Every other adapter is CE.
+`mssql` と `oracle` のアダプタには [Enterprise](/pricing) のライセンスが要ります。どちらの種類のリソースから届いても同じです —— `ms_sql_server` と `oracledb` の言語が引いているのと同じ線です。他のアダプタはすべて CE で使えます。
 
-A project that would rather keep its own `profiles.yml` file still can: see [Bring your own profiles.yml](#bring-your-own-profilesyml).
+自前の `profiles.yml` を持ち続けたいプロジェクトも、そのままにできます。[自前の profiles.yml を使う](#自前の-profilesyml-を使う)を参照してください。
 
-Configuring a warehouse is what makes it available: the resource is read on the runner without a per-user permission check, exactly as `s3://` reaches the workspace bucket. Anyone who may run a dbt script may build with the warehouses it names.
+warehouse は、設定した時点で使えるようになります。リソースは実行側で、利用者ごとの権限の検査なしに読まれます —— `s3://` がワークスペースのバケットに届くのとまったく同じです。dbt のスクリプトを実行できる人は誰でも、そこに書かれた warehouse で build できます。
 
-## Import a project
+## プロジェクトを取り込む
 
-The project is copied in as-is, into a `<script>__dbt/` folder next to where the script will live. There is no transformation step and no Windmill-specific file to add:
+プロジェクトはそのまま、スクリプトが置かれる場所の隣の `<script>__dbt/` というフォルダに写します。変換の手順も、Windmill のために足すファイルもありません。
 
 ```bash
 mkdir -p f/analytics/analytics__dbt
@@ -89,7 +87,7 @@ cp -r my-dbt-project/. f/analytics/analytics__dbt/
 wmill sync push
 ```
 
-That deploys the script `f/analytics/analytics`. A `wmill sync pull` writes the bundle back verbatim, so the tree stays a canonical dbt project that dbt itself can run with `--project-dir analytics__dbt`:
+これで `f/analytics/analytics` というスクリプトが配備されます。`wmill sync pull` は bundle をそのまま書き戻すので、この木は dbt 自身が `--project-dir analytics__dbt` で動かせる、正しい dbt のプロジェクトのままです。
 
 ```text
 f/analytics/
@@ -105,88 +103,88 @@ f/analytics/
     └── snapshots/orders_snapshot.sql
 ```
 
-`dbt_project.yml` is what identifies a project - the worker refuses a bundle without it. A team whose repository must stay canonical keeps it and lets [git sync](../../../advanced/11_git_sync/index.mdx) push the project into the workspace; a team with no repository pushes straight from a working copy. Either way the version of the project is the version of the script: a deploy is atomic, a rollback is a redeploy, and the graph the deploy parsed is exactly what a run builds.
+プロジェクトであることを示すのが `dbt_project.yml` です —— これが無い bundle を worker は受け付けません。リポジトリを正しい形に保ちたいチームはそれを保ち、[git sync](../../../advanced/11_git_sync/index.mdx) にワークスペースへ押し込ませます。リポジトリを持たないチームは作業中の写しから直に押し込みます。どちらにせよ、プロジェクトの版はスクリプトの版です。配備は不可分で、巻き戻しは配備し直すことで、配備のときに読んだグラフが、実行が build するものと寸分違いません。
 
-Two paths deploying to the same script path is an error rather than a silent overwrite, so `f/analytics/analytics.py` and `f/analytics/analytics__dbt/` cannot coexist.
+2 つのパスが同じスクリプトのパスへ配備しようとすると、黙って上書きされるのではなく誤りになります。つまり `f/analytics/analytics.py` と `f/analytics/analytics__dbt/` は同居できません。
 
-## The dbt editor
+## dbt のエディタ
 
-A dbt script is a project rather than a body of code, so it opens in an editor shaped like one: a file tree, the descriptor, the run arguments and the model graph. Picking dbt in the new-script language picker seeds a minimal project - `wm_dbt.yaml`, `dbt_project.yml` and one model - and an imported project opens the same way.
+dbt のスクリプトはコードの本体ではなくプロジェクトなので、それに合った形のエディタで開きます —— ファイルの木、記述子、実行の引数、モデルのグラフ。「新しいスクリプト」の言語の選択肢で dbt を選ぶと、最小のプロジェクト（`wm_dbt.yaml`、`dbt_project.yml`、モデル 1 つ）が用意されます。取り込んだプロジェクトも同じ形で開きます。
 
 ![The dbt editor: project file tree, the open model, and the Models pane showing a graph parsed from the editor](./dbt_editor.png 'The dbt editor, with a graph parsed from the buffer')
 
-The header names the project folder, its [engine](#engines) and the warehouse its assets are keyed on, and flags a descriptor that does not parse. The tree adds and removes files - `.sql`, `.py`, `.yml`, `.yaml`, `.csv` and `.md` - all but `dbt_project.yml`, which cannot be deleted since it is what makes the bundle a project. Selecting a file opens it with the grammar its extension implies, and the descriptor sits at the root of the tree.
+見出しにはプロジェクトのフォルダ、[エンジン](#エンジン)、アセットの鍵になる warehouse が出ます。記述子が読めないときはそれも知らせます。木からファイルを足したり消したりできます —— `.sql`、`.py`、`.yml`、`.yaml`、`.csv`、`.md`。ただし `dbt_project.yml` だけは消せません。それが bundle をプロジェクトたらしめているからです。ファイルを選ぶと拡張子に応じた文法で開き、記述子は木の根にあります。
 
-The run button reads `Build <model>` when a model file is open and `Build project` otherwise. The whole bundle travels with the job either way, since dbt resolves `ref()` project-wide and cannot run a subset of the files; `Build <model>` only adds dbt's own `--select` for that model, with its tests along for the ride. A `.sql` file that is not a model - a macro, an analysis, a singular test - is not selectable by name, so those build the project.
+実行のボタンは、モデルのファイルを開いていれば `Build <model>`、そうでなければ `Build project` になります。どちらでも bundle 全体が job と一緒に運ばれます —— dbt は `ref()` をプロジェクト全体で解決するので、ファイルの一部だけを動かすことはできないからです。`Build <model>` は、そのモデル向けに dbt 自身の `--select` を足すだけで、そのテストも一緒に付いてきます。モデルでない `.sql`（マクロ、分析、単発のテスト）は名前で選べないので、プロジェクト全体の build になります。
 
-The right pane has two tabs: `Models`, the graph covered below, and `Run`, the run form over the job log. That form is derived from the descriptor server-side, which is why a dbt script has no `Generated UI` settings tab: anything refined there would be overwritten by the next deploy.
+右の枠にはタブが 2 つあります。`Models` は下で説明するグラフ、`Run` は job の log の上に出る実行のフォームです。このフォームはサーバ側で記述子から作られます。dbt のスクリプトに `生成される UI（Generated UI）` の設定タブが無いのはそのためです —— そこで整えたものは次の配備で上書きされてしまいます。
 
-### Refreshing the model graph
+### モデルのグラフを取り直す
 
-The `Models` pane draws the project's graph, and it says where the graph came from: `as of last deploy` for a deployed project, `never parsed` for one that has never been deployed or refreshed.
+`Models` の枠はプロジェクトのグラフを描き、そのグラフがどこから来たのかも示します —— 配備済みのプロジェクトなら `as of last deploy`、一度も配備も取り直しもしていないなら `never parsed`。
 
-`Refresh models` redraws it from the project as it is in the editor. It runs a real `dbt parse` job over the files - `dbt deps`, then `dbt parse`, no build and no warehouse writes - and the label becomes `parsed from the editor at 01:18 PM`. The buffer's graph and the deploy's are drawn identically, so the label is how you tell them apart. The graph is always dbt's own: it comes from the manifest dbt produced, not from a scan of the `ref()` calls, so it agrees with dbt about `enabled`, macro-built refs, loops and package models.
+`Refresh models` を押すと、いまエディタにあるプロジェクトから描き直します。ファイルに対して本物の `dbt parse` の job を走らせ（`dbt deps` のあと `dbt parse`。build も warehouse への書き込みもありません）、札が `parsed from the editor at 01:18 PM` に変わります。編集中のグラフと配備のグラフはまったく同じように描かれるので、見分けるのはこの札です。グラフは常に dbt 自身のものです —— `ref()` の呼び出しを走査したものではなく、dbt が出した manifest から来るので、`enabled`、マクロが組み立てた ref、繰り返し、パッケージのモデルについて dbt と食い違いません。
 
-The parse runs on your workers under the script's [worker tag](../../../core_concepts/9_worker_groups/index.mdx) and timeout, so a project reaching a private network parses on a worker that can reach it. It carries whatever run arguments have been filled in, since `vars` steer `enabled`, schemas, aliases and relation identity - a parse without them would describe a different project than a build with them.
+parse は、そのスクリプトの [worker のタグ](../../../core_concepts/9_worker_groups/index.mdx)と制限時間のもとで、自分の worker で走ります。閉じたネットワークにつなぐプロジェクトなら、そこへ届く worker で parse されます。埋めてある実行の引数も一緒に運ばれます —— `vars` は `enabled`、schema、別名、関係の身元を左右するので、それ抜きの parse は、それ付きの build とは別のプロジェクトを描いてしまうからです。
 
-It renders `profiles.yml` before dbt runs, so the warehouse the descriptor names has to be one configured on the workspace: a project that names an unknown one fails a refresh the way it would fail a run, and the pane shows dbt's own message with a link to the parse job.
+dbt を動かす前に `profiles.yml` を書き出すので、記述子が指す warehouse はワークスペースに設定されているものである必要があります。知らない名前を指すプロジェクトは、実行が失敗するのと同じように取り直しにも失敗し、枠には dbt 自身の言い分と parse の job へのリンクが出ます。
 
-Selecting a node shows that model's SQL and the file it lives in, with `Edit` to open it in the tree.
+節点を選ぶと、そのモデルの SQL とそれが在るファイルが出ます。`Edit` を押せば木の中で開けます。
 
-A refresh's graph belongs to the editing session rather than to the script: it carries no deployed version, is readable only through the parse job that produced it, and publishes no asset ownership, so refreshing a project you are writing never changes what the workspace [asset graph](#models-in-the-asset-graph) says about the deployed one. Only the last few parses of a script are kept per user, dropped as newer ones land.
+取り直したグラフは、スクリプトではなく編集中のひとときに属します。配備の版を持たず、それを作った parse の job を通してしか読めず、アセットの持ち主も公表しません。ですから、書いている途中のプロジェクトを取り直しても、ワークスペースの[アセットのグラフ](#アセットのグラフに載るモデル)が配備済みのものについて言うことは変わりません。スクリプトごと・利用者ごとに直近の数回の parse だけが残り、新しいものが来ると古いものから消えます。
 
-## Run it
+## 実行する
 
-Deploying parses the project (`dbt deps` + `dbt parse`, no warehouse touched) and stores its graph. Running it invokes one `dbt build` per job - dbt's own threading provides the parallelism, Windmill provides the observability.
+配備するとプロジェクトが parse され（`dbt deps` と `dbt parse`。warehouse には触れません）、そのグラフが保管されます。実行すると job ごとに `dbt build` が 1 回呼ばれます —— 並行して動かすのは dbt 自身のスレッド、様子を見せるのが Windmill です。
 
-A run takes a single `command` argument whose variant is the dbt command, so it carries exactly the overrides that command accepts:
+実行が取る引数は `command` 1 つで、その種別が dbt のコマンドにあたります。ですから、そのコマンドが受け付ける上書きだけを運びます。
 
-| Command | What it does | Arguments |
+| コマンド | すること | 引数 |
 | --- | --- | --- |
-| `build` | Builds the project (models, seeds, snapshots and tests interleaved) | `select`, `exclude`, `vars`, `full_refresh`, `defer`, each defaulting to the descriptor's own value |
-| `retry` | Resumes a failed run from its failure point, rebuilding only what it left failed or skipped | `dbt_retry_job`, the id of the run to resume |
-| `show` | Previews a model's rows without writing anything | `model`, `vars`, `limit` (100 by default, 1000 max) |
-| `parse` | Parses the project and ingests its model graph, building nothing | `vars` |
+| `build` | プロジェクトを build する（モデル・seed・snapshot・テストを織り交ぜて） | `select`、`exclude`、`vars`、`full_refresh`、`defer`。いずれも既定は記述子の値 |
+| `retry` | 失敗した実行を、失敗した所から再開する。失敗したものと飛ばされたものだけを build し直す | `dbt_retry_job`。再開する実行の id |
+| `show` | 何も書かずに、モデルの行を下見する | `model`、`vars`、`limit`（既定 100、最大 1000） |
+| `parse` | プロジェクトを parse してモデルのグラフを取り込む。build はしない | `vars` |
 
-Each `{{ placeholder }}` the descriptor interpolates in `vars` becomes one more required run argument, so a date-parameterized project gets a proper run form, webhook payload and schedule argument.
+記述子が `vars` に埋め込む `{{ placeholder }}` は、1 つにつき必須の実行の引数が 1 つ増えます。日付を引数にしたプロジェクトなら、実行のフォーム・webhook の中身・スケジュールの引数がきちんと用意されます。
 
-`show` and `parse` are not run-form variants - each is a thing you do to the project in front of you, and the graph and the [editor](#the-dbt-editor) are where they live - but both are accepted from a [flow](../../6_flows_quickstart/index.mdx), the CLI and the API, which is what makes the editor's refresh scriptable. A `parse` of a deployed version records that run's own snapshot of the graph and changes nothing about what the script owns.
+`show` と `parse` は実行のフォームの選択肢ではありません —— どちらも目の前のプロジェクトに対してすることで、居場所はグラフと[エディタ](#dbt-のエディタ)です。ただし[フロー](../../6_flows_quickstart/index.mdx)・CLI・API からは受け付けます。エディタの取り直しをスクリプトから起こせるのはそのためです。配備済みの版に対する `parse` は、その実行なりのグラフの写しを記録するだけで、スクリプトが持つものは何も変えません。
 
-While a run is in flight, the run page shows each model's state on the project graph: green as nodes finish, spinners on the ones still building, and failures with the nodes dbt skipped behind them. When it ends, every node carries its status, timing, row count and dbt's own message, so a partial failure is legible without reading the log. Live per-model progress is `dbt-core-1x` only; the other two engines settle every node from `run_results.json` when the invocation ends (see [Engines](#engines)).
+実行の最中、実行のページはプロジェクトのグラフの上にモデルごとの状態を映します —— 終わった節点は緑に、まだ build 中のものは回る印に、失敗したものはその後ろに dbt が飛ばした節点を伴って。終わると、どの節点にも状態・所要時間・行数・dbt 自身の言い分が付くので、一部だけ失敗した実行も log を読まずに読み取れます。モデルごとの進み具合の実況は `dbt-core-1x` だけです。他の 2 つのエンジンは、呼び出しが終わってから `run_results.json` を見てすべての節点を確定させます（[エンジン](#エンジン)を参照）。
 
 ![A dbt run page: the project graph with each model's status, and a result summary reading 4 passed, 1 failed, 1 skipped of 6 nodes, with the failing model's database error](./dbt_run_live.png 'A run page: per-model status on the graph, and the failure that skipped its downstream')
 
-Test failures honor dbt's own `severity`: an `error` test fails the job and names the failing node, a `warn` test surfaces without failing it. Selecting a model on the run page shows its SQL and fully-qualified relation, and `Preview rows` dispatches a `dbt show` for exactly that node.
+テストの失敗は dbt 自身の `severity` に従います。`error` のテストは job を失敗させ、失敗した節点の名前を出します。`warn` のテストは、job を失敗させずに知らせます。実行のページでモデルを選ぶと、その SQL と完全修飾の関係名が出ます。`Preview rows` を押すと、その節点だけに対して `dbt show` が飛びます。
 
-`Resume this run` on a failed run page fills in the `retry` command for you. Retry state is kept per worker and in the database, so a retry works from any worker with a database connection, and it is refused rather than misapplied when the project, warehouse or engine has changed since. Retries do not take a lock: a project that must not run twice at once sets the script's [concurrency limit](../../../core_concepts/21_concurrency_limits/index.md), which covers its retries with it.
+失敗した実行のページにある `Resume this run` は、`retry` のコマンドを埋めてくれます。再開のための状態は worker ごとにも、データベースにも保たれるので、データベースにつながるどの worker からでも再開できます。プロジェクト・warehouse・エンジンが変わっていた場合は、取り違えて適用されるのではなく拒まれます。再開は錠を取りません。同時に 2 本走ってはいけないプロジェクトは、スクリプトの[同時実行の上限](../../../core_concepts/21_concurrency_limits/index.md)を設定してください。再開もその上限に含まれます。
 
-## Deferring to a previous run
+## 前の実行に委ねる
 
-`defer` resolves a `ref()` a run does not build to the relation the last successful run of the same environment produced, instead of to the schema this run writes into.
-Rebuilding one model into a scratch schema then costs that model rather than everything above it.
+`defer` は、その実行が build しない `ref()` を、この実行が書き込む schema ではなく、同じ環境で最後に成功した実行が作った関係に解決します。
+そうすると、モデルを 1 つ作業用の schema へ build し直すのに、その上流すべてではなくそのモデルの分だけで済みます。
 
-It is a toggle on the `build` command, defaulting to the descriptor's own `defer:`, and a `show` takes the descriptor's value.
-Per run rather than descriptor-only, because the run that publishes an environment's state and the run that defers to it are two invocations of the same script.
-A deferring run names the run it read, in the job log and in its result as `deferred_to`.
+これは `build` のコマンドの切り替えで、既定は記述子の `defer:` です。`show` は記述子の値を取ります。
+記述子だけでなく実行ごとに決められるのは、環境の状態を公表する実行と、それに委ねる実行とが、同じスクリプトの 2 回の呼び出しだからです。
+委ねた実行は、読んだ実行の名前を job の log と、結果の `deferred_to` に記します。
 
-The state is `manifest.json` and `run_results.json`, published by a successful `build` that added nothing of its own, kept per script and environment - the warehouse, the target dbt actually runs, and the database and schema they resolve to.
-So a run overriding `select`, `exclude` or `vars` publishes nothing, and neither does a dynamic descriptor, a `retry`, a preview, or a deferring run itself.
-It lives in the database rather than on the worker that produced it, so the next run reads it wherever it lands, and it goes with the script rather than expiring.
-A manifest past `DBT_STATE_INLINE_MAX_BYTES` (8 MiB, an [environment variable](../../../core_concepts/47_environment_variables/index.mdx) on the worker) goes to the instance's object storage instead, which is an [enterprise](/pricing) feature, so on CE that ceiling is the limit.
+その状態とは `manifest.json` と `run_results.json` で、自前の上書きを何もしなかった `build` が成功したときに公表されます。スクリプトごと・環境ごとに保たれます —— ここでいう環境とは、warehouse、dbt が実際に使う target、そしてそれらが解決する database と schema のことです。
+ですから `select`・`exclude`・`vars` を上書きした実行は何も公表しませんし、動的な記述子、`retry`、下見、委ねた実行そのものも同じです。
+状態は、それを作った worker の上ではなくデータベースに置かれるので、次の実行がどの worker に落ちても読めます。期限切れにはならず、スクリプトと一緒に付いていきます。
+`DBT_STATE_INLINE_MAX_BYTES`（8 MiB。worker の[環境変数](../../../core_concepts/47_environment_variables/index.mdx)）を超える manifest は、代わりにインスタンスのオブジェクト保管へ行きます。これは [Enterprise](/pricing) の機能なので、CE ではこの上限がそのまま限界です。
 
-Deferring is refused rather than run without a state: where the environment has none published, where the profile selects its schema or database with a Jinja template (dbt renders those and Windmill does not, so two renderings would resolve to one environment), and on an [agent worker](../../../core_concepts/28_agent_workers/index.mdx), which reaches the database only through the API.
-A repointed warehouse or a moved schema is a different environment, so it reads as one nothing has published yet rather than as a manifest whose relation names no longer fit.
+状態が無いまま走るのではなく、委ねること自体が拒まれる場合があります。環境が何も公表していないとき、profile が schema や database を Jinja のテンプレートで選んでいるとき（dbt はそれを展開しますが Windmill はしないので、2 とおりの展開が 1 つの環境に解決されてしまいます）、そしてデータベースへ API 越しにしか届かない[エージェントの worker](../../../core_concepts/28_agent_workers/index.mdx) の上です。
+warehouse の指し先を変えたり schema を移したりすると別の環境になるので、関係の名前がもう合わない manifest としてではなく、まだ何も公表されていない環境として読まれます。
 
-dbt's own state selectors compare against the same artifacts, so `state:modified+`, `state:new` and `result:error+` in `select` or `exclude` need `defer` on and are refused without it: `dbt-core-2x` and `fusion` read a missing state as an empty one and exit 0, building nothing or everything while reporting success.
-The descriptor may not carry them at all, since its selection also decides which nodes the script owns and the deploy resolves it before any run exists.
-`source_status:` is refused throughout, and so is a `result:` selector against a state published without `run_results.json`, which is what a build recovered by `retry_failed_nodes` stores.
+dbt 自身の状態の絞り込みも同じ成果物を見比べるので、`select` や `exclude` の中の `state:modified+`・`state:new`・`result:error+` には `defer` が要り、無ければ拒まれます。`dbt-core-2x` と `fusion` は、状態が無いのを空の状態と読んで 0 で終わり、何も build しないか全部 build したうえで成功したと言うからです。
+記述子のほうには、そもそもこれらを書けません。記述子の絞り込みはスクリプトが持つ節点も決めるもので、実行が 1 つも無いうちに配備がそれを解決するからです。
+`source_status:` はどこでも拒まれます。`run_results.json` を伴わずに公表された状態に対する `result:` の絞り込みも同じで、`retry_failed_nodes` で立ち直った build が保管するのがそれにあたります。
 
-`dbt retry` reads the run it resumes from `--state`, the flag a deferral reads its manifest from, and only `dbt-core-1x` separates the two (`--defer-state`).
-So a run that deferred cannot be resumed on `dbt-core-2x` or `fusion`, and its `retry_failed_nodes` is dropped there too.
+`dbt retry` は再開する実行を `--state` から読みますが、これは委ねるときに manifest を読むのと同じフラグです。この 2 つを分けているのは `dbt-core-1x` だけです（`--defer-state`）。
+ですから、委ねた実行は `dbt-core-2x` と `fusion` では再開できませんし、そこでは `retry_failed_nodes` も落とされます。
 
-## The descriptor
+## 記述子
 
-`wm_dbt.yaml`, inside the project folder, holds the run configuration. It is optional - an unmodified dbt project is already a complete Windmill script, running the whole project against the workspace's default warehouse - and appears only when the project wants something Windmill-specific.
+プロジェクトのフォルダの中にある `wm_dbt.yaml` が、実行の設定を持ちます。これは任意です —— 手を入れていない dbt のプロジェクトは、それだけで完全な Windmill のスクリプトであり、ワークスペースの既定の warehouse に対してプロジェクト全体を動かします —— Windmill ならではの何かが要るときにだけ現れます。
 
 ```yaml
 # dbt-core-1x (default) | dbt-core-2x | fusion
@@ -221,41 +219,41 @@ env:
   DBT_PASSWORD: $var:u/alice/warehouse_password
 ```
 
-| Field | Default | Purpose |
+| 欄 | 既定 | 用途 |
 | --- | --- | --- |
-| `engine` | `dbt-core-1x` | Which dbt to run, see [Engines](#engines) |
-| `profile.warehouse` | `main` | A warehouse configured on the workspace, by name |
-| `profile.target` | the warehouse's, else `default` | dbt target name within the profile |
-| `profile.schema` | the resource's | Target schema. Required for BigQuery, whose resource is a service-account JSON with no dataset in it |
-| `profile.type` | the resource's, else inferred | dbt adapter, spelled as dbt's own `type:`. Pins it when the inference is wrong or the resource is a custom type. A `dbt_profile` resource states its own, and a descriptor disagreeing with it is an error rather than a silent override |
-| `profile.profiles_yml` | - | Path (relative to the project) of the project's own `profiles.yml`, used instead of rendering one |
-| `select` / `exclude` / `selector` | - | Passed to dbt verbatim. They also scope what the script owns in the graph |
-| `test_behavior` | `build` | `build` interleaves tests with models (dbt's own default); `after_all` runs them as a second phase; `none` skips them |
-| `vars` | - | `--vars`. Values keep their YAML type; string leaves may carry `{{ arg }}` placeholders substituted from job arguments |
-| `threads` | dbt's own | dbt's `--threads` |
-| `full_refresh` | `false` | dbt's `--full-refresh` |
-| `defer` | `false` | Default for the `build` command's own `defer`, see [Deferring to a previous run](#deferring-to-a-previous-run) |
-| `column_lineage` | `false` | Run the static-analysis pass that produces [column-level lineage](#column-level-lineage), on the engines that write it |
-| `retry_failed_nodes` | - | `{attempts, delay_seconds}`: in-job retry of a build's failed and skipped nodes, up to 10 attempts. Not available on [agent workers](../../../core_concepts/28_agent_workers/index.mdx) |
-| `env` | - | Environment for the dbt process, for the project's own `{{ env_var() }}` lookups and for engine flags. A `$var:<path>` value resolves to that Windmill [variable](../../../core_concepts/2_variables_and_secrets/index.mdx) |
+| `engine` | `dbt-core-1x` | どの dbt を動かすか。[エンジン](#エンジン)を参照 |
+| `profile.warehouse` | `main` | ワークスペースに設定した warehouse を名前で指す |
+| `profile.target` | warehouse のもの、無ければ `default` | その profile の中の dbt の target の名前 |
+| `profile.schema` | リソースのもの | 書き込み先の schema。BigQuery では必須（リソースがサービスアカウントの JSON で、dataset を含まないため） |
+| `profile.type` | リソースのもの、無ければ推測 | dbt のアダプタ。dbt 自身の `type:` と同じ綴りで書く。推測が誤るときや、リソースが独自の型のときに固定する。`dbt_profile` のリソースは自分の型を名乗るので、記述子がそれと食い違うと、黙って上書きされるのではなく誤りになる |
+| `profile.profiles_yml` | - | プロジェクト自身の `profiles.yml` の（プロジェクトからの相対の）パス。書き出す代わりにこれを使う |
+| `select` / `exclude` / `selector` | - | そのまま dbt へ渡される。グラフの中でスクリプトが持つ範囲も、これが決める |
+| `test_behavior` | `build` | `build` はテストをモデルと織り交ぜる（dbt 自身の既定）。`after_all` は 2 段目としてまとめて走らせる。`none` は飛ばす |
+| `vars` | - | `--vars`。値は YAML の型を保つ。文字列の末端には `{{ arg }}` を書け、job の引数から埋められる |
+| `threads` | dbt 自身のもの | dbt の `--threads` |
+| `full_refresh` | `false` | dbt の `--full-refresh` |
+| `defer` | `false` | `build` のコマンドの `defer` の既定値。[前の実行に委ねる](#前の実行に委ねる)を参照 |
+| `column_lineage` | `false` | [列ごとの系譜](#列ごとの系譜)を作る静的解析の段を走らせる。書き出せるエンジンでのみ |
+| `retry_failed_nodes` | - | `{attempts, delay_seconds}`: build が失敗・飛ばした節点を、同じ job の中でやり直す。最大 10 回。[エージェントの worker](../../../core_concepts/28_agent_workers/index.mdx) では使えない |
+| `env` | - | dbt のプロセスの環境。プロジェクト自身の `{{ env_var() }}` の参照と、エンジンのフラグのために使う。`$var:<path>` の値は、その Windmill の[変数](../../../core_concepts/2_variables_and_secrets/index.mdx)に解決される |
 
-`select`, `exclude` and `vars` are overridable per run. Overriding `select` changes what a run builds without changing what the graph says the script owns; when the graph itself should differ, split the project across several scripts, each with its own selection. Unknown fields are refused at parse time rather than silently ignored.
+`select`・`exclude`・`vars` は実行ごとに上書きできます。`select` を上書きすると、その実行が build するものは変わりますが、グラフが言う「このスクリプトが持つもの」は変わりません。グラフ自体を分けたいなら、プロジェクトを複数のスクリプトに分け、それぞれに絞り込みを持たせてください。知らない欄は、黙って無視されるのではなく parse のときに拒まれます。
 
-Prefer the descriptor's `env` over the script's own environment variables for anything the graph depends on (an `env_var()` feeding a schema, alias or `enabled`): the descriptor's map applies to the deploy-time parse as well as the run, so the stored graph and the build agree.
+グラフが依存するもの（schema・別名・`enabled` に効く `env_var()`）については、スクリプト自身の環境変数ではなく記述子の `env` を使ってください。記述子の対応表は実行だけでなく配備のときの parse にも効くので、保管されたグラフと build とが食い違いません。
 
-### Bring your own profiles.yml
+### 自前の profiles.yml を使う
 
-A project that keeps its own `profiles.yml` runs unchanged - point `profile.profiles_yml` at it and inject any credentials as Windmill variables through the descriptor's `env` map, which `{{ env_var() }}` then reads. Such a project still names a warehouse, but only to say where its assets belong: the name grants nothing, and without it the project's models land on a node nothing else reaches.
+自前の `profiles.yml` を持ち続けるプロジェクトは、そのままで動きます —— `profile.profiles_yml` をそれに向け、資格情報は記述子の `env` を通して Windmill の変数として渡します。`{{ env_var() }}` がそれを読みます。そういうプロジェクトも warehouse の名前は書きますが、それはアセットの居場所を言うためだけです。名前は何の権限も与えませんし、書かなければプロジェクトのモデルは他のどこからも届かない節点に落ちます。
 
-## Models in the asset graph
+## アセットのグラフに載るモデル
 
-Every model, seed, snapshot and source the project declares becomes an [asset](../../../core_concepts/52_assets/index.mdx) named `dbt://<warehouse>/<schema>/<name>`, with the project's `ref()` lineage as edges between them. Models, seeds and snapshots are writes; sources are reads. Each node carries its materialization (`view`, `table`, `incremental`, `snapshot`, `seed`), its tags, its column metadata (the descriptions the project declares, or the [analyzed column schema](#column-level-lineage) when it asks for one) and its data tests, and the script node is badged with the number of models it materializes.
+プロジェクトが宣言するモデル・seed・snapshot・source は、どれも `dbt://<warehouse>/<schema>/<name>` という名前の[アセット](../../../core_concepts/52_assets/index.mdx)になり、プロジェクトの `ref()` の系譜がその間の辺になります。モデル・seed・snapshot は書き込み、source は読み取りです。各節点は、実体化のしかた（`view`、`table`、`incremental`、`snapshot`、`seed`）、タグ、列のメタデータ（プロジェクトが宣言した説明か、頼んだ場合は[解析された列の schema](#列ごとの系譜)）、データのテストを持ち、スクリプトの節点には実体化するモデルの数が付きます。
 
 ![The asset graph of a folder holding two dbt projects: source nodes, model nodes badged view or table, and ref() lineage running between the two projects through a shared table](./dbt_asset_graph.png 'Two dbt projects in one folder, meeting on the table one writes and the other reads')
 
-The workspace graph is written at deploy time, so redeploying is what refreshes it. A descriptor that is dynamic by construction (a `{{ }}` placeholder in `vars`, or a `$var:` value in `env`) can select a different model set per run, so those runs re-parse and each run page shows the models that run actually built. The editor's own [Refresh models](#refreshing-the-model-graph) draws from a parse of the buffer instead, which is why it can show a project that has never been deployed and why its graph stays inside that editing session.
+ワークスペースのグラフは配備のときに書かれるので、取り直すには配備し直します。作りからして動的な記述子（`vars` の中の `{{ }}`、`env` の中の `$var:` の値）は、実行ごとに違うモデルの集合を選びうるので、そういう実行は parse をやり直し、各実行のページにはその実行が実際に build したモデルが出ます。エディタの [Refresh models](#モデルのグラフを取り直す) のほうは、編集中の中身を parse して描きます。一度も配備していないプロジェクトを見せられるのも、そのグラフが編集中のひとときの中に留まるのも、そのためです。
 
-A native script joins the same lineage by naming a relation in its own code: a `dbt://` URI written as a string literal in a Python, TypeScript, DuckDB or Ansible script is [detected as an asset](../../../core_concepts/52_assets/index.mdx#static-code-analysis) there, and marking it a read in the editor's asset panel renders the script as a consumer of the very node the dbt model writes.
+通常のスクリプトも、自分のコードの中で関係の名前を書けば同じ系譜に加われます。Python・TypeScript・DuckDB・Ansible のスクリプトに文字列として書かれた `dbt://` の URI は、そこで[アセットとして見つけられ](../../../core_concepts/52_assets/index.mdx#static-code-analysis)ます。エディタのアセットの枠でそれを読み取りとして印を付ければ、そのスクリプトは dbt のモデルが書くまさにその節点の読み手として描かれます。
 
 ```python
 # The URI literal is what puts this script on the graph, beside the model.
@@ -265,12 +263,12 @@ def main():
     ...
 ```
 
-One limit worth knowing: two workspace warehouses pointing at one physical warehouse do not unify, so point both projects at one warehouse to link them.
+1 つ知っておくべき限界があります。ワークスペースの warehouse を 2 つ作って同じ物理的な warehouse を指しても、それらは 1 つになりません。つなげたいなら、両方のプロジェクトを 1 つの warehouse に向けてください。
 
-### Declaring a write from a native script
+### 通常のスクリプトから書き込みを宣言する
 
-The reverse edge is an annotation.
-A script in any language but dbt's own can declare that it *writes* a warehouse relation with `// materialize manual dbt://<warehouse>/<schema>/<name>`, so an ingestion step and the dbt project consuming its output are one lineage rather than two disconnected pictures:
+逆向きの辺は註記で書きます。
+dbt 以外のどの言語のスクリプトも、`// materialize manual dbt://<warehouse>/<schema>/<name>` と書けば warehouse の関係へ*書き込む*ことを宣言できます。取り込みの段と、その出力を使う dbt のプロジェクトとが、離れた 2 枚の絵ではなく 1 つの系譜になります。
 
 ```python
 # pipeline
@@ -280,25 +278,25 @@ def main():
     ...  # your own write against the warehouse
 ```
 
-The script and the dbt model that reads `analytics.raw_orders` as a `source` land on the same node, because identity is the physical relation rather than the tool that produced it.
-`manual` is the only mode the target has: Windmill generates no warehouse DDL, so the script issues its own write and Windmill records the outcome.
-A dbt script may not declare one - what a project builds is read from its `manifest.json`.
-See [declaring a warehouse relation write](../../../core_concepts/63_pipelines/materialization.mdx#declaring-a-warehouse-relation-write) for the rest of the deploy-time rules and for what a run records.
+このスクリプトと、`analytics.raw_orders` を `source` として読む dbt のモデルは、同じ節点に落ちます。身元を決めるのは、作った道具ではなく物理的な関係のほうだからです。
+この宛先が取れるやり方は `manual` だけです。Windmill は warehouse の DDL を作らないので、書き込みはスクリプト自身が出し、Windmill はその結果を記録します。
+dbt のスクリプトはこれを宣言できません —— プロジェクトが build するものは `manifest.json` から読むからです。
+配備のときの決まりの残りと、実行が何を記録するかは、[warehouse の関係への書き込みを宣言する](../../../core_concepts/63_pipelines/materialization.mdx#declaring-a-warehouse-relation-write)を参照してください。
 
-### Which subscriptions fire
+### どの購読が起きるか
 
-A dbt run does not trigger downstream runs.
-dbt already orders its own DAG, and a run's `select` can build any subset of the project, so the deploy-time write set is not what ran.
-A native producer does trigger them: a script that declares the write above wakes `# on dbt://<relation>` subscribers when it completes, like any other asset write.
-So `# on dbt://...` is refused at deploy only for a relation dbt projects alone build, which would draw a cascade arrow that can never fire; schedule the consumer of such a mart, or run it from the graph.
-A dbt script may not subscribe at all: a project runs on its own schedule rather than being woken by an asset cascade.
-For the same reason it is not a member of its folder's [pipeline](../../../core_concepts/63_pipelines/index.mdx) - its models are on the shared asset graph regardless, which is what puts a native reader beside them.
+dbt の実行は、下流の実行を起こしません。
+dbt はすでに自分の DAG の順序を決めていますし、実行の `select` はプロジェクトのどの部分集合でも build できるので、配備のときの書き込みの集合は、実際に走ったものとは違うからです。
+通常の作り手のほうは起こします。上の書き込みを宣言したスクリプトは、終わったときに `# on dbt://<relation>` の購読者を起こします。他のアセットへの書き込みと同じです。
+ですから `# on dbt://...` が配備のときに拒まれるのは、dbt のプロジェクトだけが build する関係についてだけです。それは決して起きない連鎖の矢印を描くことになるからです。そういう mart を使う側は、スケジュールで動かすか、グラフから実行してください。
+dbt のスクリプトはそもそも購読できません。プロジェクトはアセットの連鎖に起こされるのではなく、自分のスケジュールで走るものだからです。
+同じ理由で、フォルダの[パイプライン](../../../core_concepts/63_pipelines/index.mdx)の一員でもありません —— それでもモデルは共有のアセットのグラフに載るので、通常の読み手はその隣に並びます。
 
-## Column-level lineage
+## 列ごとの系譜
 
-On top of the `ref()` graph, a project can publish column-level lineage: the real column list of every relation, typed and in the order the model emits it, and the column-to-column edges between them.
-Neither comes from `manifest.json`, whose `columns` are the ones an author wrote down in a `schema.yml` and which carries no column-to-column edges at all.
-Both come from the static-analysis index the engine writes, which is a `dbt compile` of its own, so it is opt-in per project:
+`ref()` のグラフに加えて、プロジェクトは列ごとの系譜を公表できます —— 関係ごとの本当の列の一覧（型付きで、モデルが出す順のまま）と、列と列を結ぶ辺です。
+どちらも `manifest.json` から来るものではありません。あちらの `columns` は書き手が `schema.yml` に書き留めたものですし、列と列を結ぶ辺はそもそも持っていません。
+どちらも、エンジンが書き出す静的解析の索引から来ます。これはそれ自体が 1 回の `dbt compile` なので、プロジェクトごとに明示して有効にします。
 
 ```yaml
 # wm_dbt.yaml
@@ -306,36 +304,36 @@ engine: fusion
 column_lineage: true
 ```
 
-Strict static analysis is a stricter dialect than a build: `select no_such_column from ref(...)` compiles under dbt's default and is an error under it.
-That is why it is a separate compile rather than a flag on the build - nothing it decides can change what a build does, and a project it cannot analyze keeps exactly the graph it had.
-The pass runs wherever the graph is ingested: at deploy, on [Refresh models](#refreshing-the-model-graph), and on a run that re-parses.
-It gets half the job's remaining time, so the build behind it is not starved.
+厳密な静的解析は、build より厳しい方言です。`select no_such_column from ref(...)` は dbt の既定では通りますが、この解析では誤りになります。
+build のフラグではなく別の compile になっているのはそのためです —— この解析が何を決めても build の動きは変わりませんし、解析できなかったプロジェクトは、それまで持っていたグラフをそのまま保ちます。
+この段は、グラフを取り込むところならどこでも走ります —— 配備のとき、[Refresh models](#モデルのグラフを取り直す) のとき、そして parse をやり直す実行のときです。
+job の残り時間の半分が割り当てられるので、その後ろの build が痩せることはありません。
 
-It also needs an engine that does the analysis.
-`dbt-core-1x` has no such option, and `dbt-core-2x` accepts the flag today without writing the index, so [`fusion`](#engines) is the engine that produces lineage - and only for the warehouses it analyzes natively, since an adapter it still treats as experimental turns static analysis off on its own.
-None of that can fail a build: a wrong engine, a rejected analysis, a missing or unreadable index and a pass that outran its budget all end in partial lineage or none, plus a line in the job log naming which.
+解析をするエンジンも要ります。
+`dbt-core-1x` にはその選択肢がありませんし、`dbt-core-2x` はいまのところフラグを受け付けるものの索引を書きません。ですから系譜を作るエンジンは [`fusion`](#エンジン) です —— しかも、それが自前で解析する warehouse についてだけです。まだ試験扱いのアダプタでは、静的解析が自動的に切られるからです。
+これらが build を失敗させることはありません。エンジンが違う、解析が拒まれた、索引が無いか読めない、段が持ち時間を使い切った —— どれも、系譜が部分的になるか無くなるかで終わり、job の log にどれだったかが 1 行残ります。
 
-### Where it shows
+### どこに出るか
 
-Selecting a model in the [dbt editor's](#the-dbt-editor) `Models` pane, or a `dbt://` relation on a folder's [pipeline page](../../../core_concepts/63_pipelines/index.mdx), opens two things above the model's SQL:
+[dbt のエディタ](#dbt-のエディタ)の `Models` の枠でモデルを選ぶか、フォルダの[パイプラインのページ](../../../core_concepts/63_pipelines/index.mdx)で `dbt://` の関係を選ぶと、モデルの SQL の上に 2 つが開きます。
 
-- `columns` - every column the model produces, with its type and whatever description the project documented for it. Without the analysis pass the list is the declared metadata only, and says so.
-- The column trace - the columns feeding the selected relation's columns, and the ones derived from them.
+- `columns` —— そのモデルが作る列すべてと、その型、そしてプロジェクトが書き残した説明。解析の段を通していなければ、一覧は宣言されたメタデータだけになり、そうと表示されます。
+- 列の追跡 —— 選んだ関係の列に流れ込む列と、そこから導かれる列。
 
-Only direct edges are drawn: `copy`, where the value passes through, and `mod`, where it is transformed.
-dbt also records the columns a model reads to pick its rows - a join key, a `where` predicate, a `group by` - and those are stored but not drawn, since such a column reaches every output column of its model and would draw the diagram as a solid block of edges.
+描かれるのは直接の辺だけです —— 値がそのまま通る `copy` と、変換される `mod`。
+dbt は、モデルが行を選ぶために読む列（join の鍵、`where` の条件、`group by`）も記録します。それらは保管されますが描かれません。そういう列はそのモデルの出力の列すべてに届くので、図が辺で真っ黒になってしまうからです。
 
 ![The dbt editor's details pane for a selected model: its typed column list, then a column-lineage diagram running from the staging models' columns through the model's own to the mart derived from them, above the model's SQL](./dbt_column_trace.webp "A model's columns and its column trace, above its SQL")
 
-### Across projects, and into pipelines
+### プロジェクトを跨ぎ、パイプラインへ
 
-A trace is not one project's.
-A relation one project produces is another's source, so a trace follows the columns into whichever project owns the relation it just reached, and repeats from there.
-That is what the pipeline page draws: the workspace's live graph, expanded until the columns run out.
-The dbt editor is the exception - it draws one project as of one parse, its deployed version or the parse behind `Refresh models`, and its trace stays inside that project, since another project's live graph is not the one on screen.
+追跡は 1 つのプロジェクトのものではありません。
+あるプロジェクトが作る関係は、別のプロジェクトの source です。ですから追跡は、いま辿り着いた関係を持つプロジェクトへ列を追っていき、そこからまた繰り返します。
+パイプラインのページが描くのはこれです —— ワークスペースの生きたグラフを、列が尽きるまで広げたもの。
+dbt のエディタだけは例外です。あちらは 1 回の parse の時点の 1 つのプロジェクトを描きます（配備済みの版か、`Refresh models` の裏で走った parse）。追跡もそのプロジェクトの中に留まります。画面に出ているのは、他のプロジェクトの生きたグラフではないからです。
 
-A trace crosses the boundary into [pipelines](../../../core_concepts/63_pipelines/index.mdx) the same way.
-A DuckDB pipeline script that names a dbt model's column as the source of one of its own:
+追跡は同じように[パイプライン](../../../core_concepts/63_pipelines/index.mdx)の側へも越えていきます。
+dbt のモデルの列を、自分の列の元として名指しする DuckDB のパイプラインのスクリプトは、
 
 ```sql
 -- pipeline
@@ -343,24 +341,24 @@ A DuckDB pipeline script that names a dbt model's column as the source of one of
 -- column amount <- dbt://main/analytics/orders.amount
 ```
 
-puts that model's column on the pipeline's [column-level lineage](../../../core_concepts/63_pipelines/materialization.mdx#column-level-lineage) graph under the same identity dbt's own lineage gives it, so the two are one graph.
-Selecting a DuckLake table traces back through the script that wrote it into the dbt models that fed it, and selecting a dbt model traces forward into what a pipeline derived from it.
+そのモデルの列を、dbt 自身の系譜が与えるのと同じ身元で、パイプラインの[列ごとの系譜](../../../core_concepts/63_pipelines/materialization.mdx#column-level-lineage)のグラフに載せます。2 つは 1 つのグラフになります。
+DuckLake の表を選べば、それを書いたスクリプトを通って、元になった dbt のモデルまで遡れますし、dbt のモデルを選べば、そこからパイプラインが何を導いたかを辿れます。
 
-### Who sees a trace, and where it stops
+### 誰が辿れて、どこで止まるか
 
-Column-level lineage is gated on being able to read the project that produces the relation, exactly like the model's SQL: it is the shape of what an author wrote, one level finer than the `ref()` graph, which is ungated only because it draws relations the caller already sees.
-Someone entitled to a dbt run but not to the project therefore gets the run's relations and `ref()` edges, and neither the SQL nor the columns.
-Because a trace crosses projects, that check is re-decided for every project it reaches rather than once for the one selected - reaching a relation says nothing about who may read the project on the far side of it - so both the project's own visibility and a token's [`scripts:read` scope](../../../core_concepts/59_user_tokens/index.mdx#token-scopes) apply per project, and a trace ends where the caller's access does.
+列ごとの系譜は、その関係を作るプロジェクトを読めるかどうかで守られています。モデルの SQL とまったく同じ扱いです —— これは書き手が書いたものの形であり、`ref()` のグラフより 1 段細かいものだからです。`ref()` のグラフに制限が無いのは、呼び出した人がすでに見られる関係を描いているからにすぎません。
+ですから、dbt の実行を見る権限はあるがプロジェクトを読む権限は無い人には、その実行の関係と `ref()` の辺までは見えて、SQL も列も見えません。
+追跡はプロジェクトを跨ぐので、この検査は選んだ 1 つについて一度きりではなく、辿り着くプロジェクトごとに決め直されます —— ある関係に届いたことは、その向こう側のプロジェクトを誰が読んでよいかについて何も語らないからです。プロジェクト自身の見え方と、トークンの [`scripts:read` の範囲](../../../core_concepts/59_user_tokens/index.mdx#token-scopes)の両方がプロジェクトごとに効き、追跡は呼び出した人の届く先で終わります。
 
-A trace also stops at 5000 edges.
-It is walked outwards from the selected relation, so a bounded answer holds the part nearest the selection, and the pane says the lineage reaches further than it can draw rather than letting a cut trace look like one that ended.
+追跡は 5000 本の辺でも止まります。
+選んだ関係から外へ向かって辿るので、打ち切られた答えには選んだ場所に近いところが残ります。枠には「系譜は描ける範囲より先まで続いている」と出ます —— 打ち切られた追跡が、そこで終わった追跡のように見えてしまわないためです。
 
-### From the API
+### API から
 
-`GET /api/w/<workspace>/assets/column_lineage` returns the trace around one or more relations.
-`asset_path` is repeated once per relation - the `dbt://` URI without its scheme - and the relations are answered as one union, since one selection can reach several.
-At least one and at most 1000: a request naming none, or more than that, is refused rather than answered with an empty component.
-`dbt_script_hash` pins the answer to one deployed version of one project; without it the answer crosses projects as above.
+`GET /api/w/<workspace>/assets/column_lineage` は、1 つ以上の関係のまわりの追跡を返します。
+`asset_path` は関係の数だけ繰り返します（`dbt://` の URI から scheme を除いたもの）。1 回の選択が複数に届きうるので、それらは 1 つにまとめて返されます。
+最低 1 つ、最大 1000 個までです。1 つも書かない要求と、それを超える要求は、空の答えではなく拒否が返ります。
+`dbt_script_hash` を付けると、答えは 1 つのプロジェクトの 1 つの配備済みの版に固定されます。付けなければ、上に書いたとおりプロジェクトを跨ぎます。
 
 ```bash
 curl -H "Authorization: Bearer $WM_TOKEN" \
@@ -382,53 +380,53 @@ curl -H "Authorization: Bearer $WM_TOKEN" \
 }
 ```
 
-`truncated` is how a cut trace is told apart from a complete one.
-`GET /api/w/<workspace>/jobs/dbt_column_lineage/<job_id>` takes the same repeated `asset_path` and answers for the project version one job ran, authorized through the job - which is the only way to reach a graph that names no deployed version, such as the editor's parse of its own buffer.
+打ち切られた追跡と、完全な追跡とを見分けるのが `truncated` です。
+`GET /api/w/<workspace>/jobs/dbt_column_lineage/<job_id>` も同じように `asset_path` を繰り返し取り、ある job が走らせたプロジェクトの版について答えます。認可は job を通して行われます —— これは、配備の版を持たないグラフ（エディタが編集中の中身を parse したものなど）に届く唯一の方法です。
 
-## Engines
+## エンジン
 
-`engine` picks which dbt runs the project. None is baked into the images - each is fetched or built on first use and cached on the worker.
+`engine` は、どの dbt がプロジェクトを動かすかを選びます。どれもイメージには焼き込まれていません —— 最初に使うときに取得か構築が行われ、worker に取っておかれます。
 
-| Engine | What it is | Cold start | Live per-model progress |
+| エンジン | 何か | 初回の立ち上がり | モデルごとの実況 |
 | --- | --- | --- | --- |
-| `dbt-core-1x` (default) | dbt Core 1.x, a uv virtualenv resolved per adapter | One venv build per (core range, adapter) | Yes |
-| `dbt-core-2x` | dbt Core 2.x, one adapter-agnostic binary fetched from GitHub releases | One download | No, settled at the end of the run |
-| `fusion` | The dbt Fusion engine, fetched from dbt Labs and subject to their license agreement | One ~290 MB download | No, settled at the end of the run |
+| `dbt-core-1x`（既定） | dbt Core 1.x。アダプタごとに解決される uv の仮想環境 | (core の範囲, アダプタ) の組ごとに venv を 1 回構築 | あり |
+| `dbt-core-2x` | dbt Core 2.x。GitHub のリリースから取る、アダプタに依らない実行ファイル 1 つ | ダウンロード 1 回 | なし。実行の終わりにまとめて確定 |
+| `fusion` | dbt Fusion のエンジン。dbt Labs から取得し、あちらのライセンス条項に従う | 約 290 MB のダウンロード 1 回 | なし。実行の終わりにまとめて確定 |
 
-The shipped default is `dbt-core-1x` because it runs today's projects untouched. dbt Core 2.x and Fusion are v2 semantics and drop all deprecated functionality, so a valid 1.x project may fail to parse on them until its deprecations are resolved.
+既定が `dbt-core-1x` なのは、いまあるプロジェクトを手を入れずに動かせるからです。dbt Core 2.x と Fusion は v2 の意味づけで、非推奨だった機能をすべて落としています。ですから正しい 1.x のプロジェクトでも、非推奨の箇所を直すまでは parse に失敗することがあります。
 
-Engine provisioning is tunable with [environment variables](../../../core_concepts/47_environment_variables/index.mdx) on the worker: `DBT_CORE_1X_FLOOR` / `DBT_CORE_1X_CEILING` bound the resolved 1.x range, `DBT_CORE_2X_VERSION` pins 2.x, and `DBT_BUNDLED_DIR` (default `/usr/local/dbt`) lets an operator pre-stage an engine in a derived image for an air-gapped instance - the worker prefers it over its own cache. dbt jobs run on the `dbt` [worker tag](../../../core_concepts/9_worker_groups/index.mdx), which is in the default set.
+エンジンの用意は、worker の[環境変数](../../../core_concepts/47_environment_variables/index.mdx)で調整できます。`DBT_CORE_1X_FLOOR` と `DBT_CORE_1X_CEILING` が解決される 1.x の範囲を挟み、`DBT_CORE_2X_VERSION` が 2.x を固定します。`DBT_BUNDLED_DIR`（既定は `/usr/local/dbt`）を使えば、外とつながらないインスタンス向けに、派生させたイメージへエンジンをあらかじめ仕込んでおけます —— worker は自分のキャッシュよりそちらを優先します。dbt の job は `dbt` の [worker のタグ](../../../core_concepts/9_worker_groups/index.mdx)で走ります。これは既定の集合に入っています。
 
-### Which adapters an instance installs
+### インスタンスが入れるアダプタ
 
-`dbt-core-1x` builds a virtualenv per adapter and fetches the adapter itself from PyPI as `dbt-<adapter>`, so which packages it may install is an operator's decision rather than a script author's. Windmill vouches for the published `dbt-*` adapters (postgres, snowflake, bigquery, databricks, redshift, trino, athena, clickhouse, duckdb, spark and the rest of the list it ships); `DBT_EXTRA_ADAPTERS` on the worker adds to it, as comma-separated adapter names spelled the way dbt's own `type:` spells them. An adapter on neither list fails the job naming itself, rather than being fetched.
+`dbt-core-1x` はアダプタごとに仮想環境を作り、アダプタ自体は `dbt-<adapter>` として PyPI から取ります。ですからどのパッケージを入れてよいかは、スクリプトを書く人ではなく運用する人が決めることです。Windmill は公開されている `dbt-*` のアダプタを保証します（postgres、snowflake、bigquery、databricks、redshift、trino、athena、clickhouse、duckdb、spark と、同梱の一覧の残り）。worker の `DBT_EXTRA_ADAPTERS` でそこに足せます。dbt 自身の `type:` と同じ綴りのアダプタ名を、コンマ区切りで書きます。どちらの一覧にも無いアダプタは、取りに行かれるのではなく、自分の名前を挙げて job を失敗させます。
 
-`dbt-core-2x` and `fusion` carry their adapters in the binary and install nothing, so they take any adapter, with no list to extend.
+`dbt-core-2x` と `fusion` はアダプタを実行ファイルの中に持っていて何も入れないので、どのアダプタでも受け付けますし、足すべき一覧もありません。
 
-## What the bundle carries
+## bundle に入るもの
 
-The bundle is the project's authored files, and nothing else:
+bundle に入るのは、人が書いたプロジェクトのファイルだけです。
 
-- Directories dbt generates are excluded: `target`, `dbt_packages`, `logs`, `.git`, `.venv`, `__pycache__`, plus whatever `dbt_project.yml` configures as `target-path`, `packages-install-path` or `clean-targets`.
-- Only text is carried. A binary file - an image under `docs/`, a `.DS_Store`, a parquet seed - is skipped with the reason.
-- `.env`, `.env.*` and `.envrc` are skipped. What a `.gitignore` was keeping out of the repository must not become a script version instead; dbt reads `env_var()` from the process environment, which the descriptor's `env` map fills.
-- Files over 5 MB are an error, not a skip: dbt would have read the file, so deploying without it ships a project that fails at run time with a missing relation. A committed dataset belongs in the warehouse.
+- dbt が作るディレクトリは除かれます: `target`、`dbt_packages`、`logs`、`.git`、`.venv`、`__pycache__`。加えて `dbt_project.yml` が `target-path`・`packages-install-path`・`clean-targets` に指定したものも。
+- 運ばれるのはテキストだけです。バイナリのファイル（`docs/` の下の画像、`.DS_Store`、parquet の seed）は、理由を添えて飛ばされます。
+- `.env`、`.env.*`、`.envrc` は飛ばされます。`.gitignore` がリポジトリから締め出していたものが、代わりにスクリプトの版になってはいけないからです。dbt は `env_var()` をプロセスの環境から読み、そこを埋めるのは記述子の `env` です。
+- 5 MB を超えるファイルは、飛ばされるのではなく誤りになります。dbt はそのファイルを読んだはずなので、それ抜きで配備すると、実行時に「関係が無い」と失敗するプロジェクトを出荷することになるからです。commit されたデータの集まりは、warehouse に置くべきものです。
 
-The [dbt editor](#the-dbt-editor) edits the bundle in place, but a browser is still not where a dbt project is developed: that is a local `dbt run` / `dbt test` loop against a warehouse you can iterate on. Windmill is the runner, the viewer and the place a project is corrected. A module-only edit still pushes its parent script, so `wmill sync push` after editing a model deploys the project once.
+[dbt のエディタ](#dbt-のエディタ)は bundle をその場で編集しますが、それでも dbt のプロジェクトを開発する場所はブラウザではありません。開発は、何度も試せる warehouse に対して手元で `dbt run` と `dbt test` を回すことです。Windmill は実行する場所、見る場所、そしてプロジェクトを直す場所です。module だけを編集した場合も、親のスクリプトごと押し込まれます。ですからモデルを編集したあとの `wmill sync push` は、プロジェクトを 1 回配備します。
 
-## Dependencies
+## 依存
 
-A project declaring `packages.yml` ranges asks dbt to resolve them, and dbt re-resolves on every `dbt deps`. Windmill resolves once, at deploy, and pins the result in the script's lockfile alongside the engine and adapter versions - the same contract every other language gets here. A run restores the package tree from a worker-local cache keyed on that resolution; a worker that resolves anything else is refused rather than run.
+`packages.yml` に範囲を書いたプロジェクトは、dbt にその解決を頼むことになり、dbt は `dbt deps` のたびに解決し直します。Windmill は配備のときに一度だけ解決し、その結果をエンジンとアダプタの版と並べてスクリプトの lockfile に固定します —— ここでの他のすべての言語と同じ約束です。実行のときは、その解決を鍵にした worker の中のキャッシュからパッケージの木を戻します。別のものを解決してしまった worker は、走るのではなく拒まれます。
 
-Two consequences: to pick up a newer version of a ranged dependency you have to deploy a change, since only a deploy re-resolves; and committing `package-lock.yml` lets a deploy hit the cache instead of paying a real `dbt deps`, which is dbt's own recommendation for the same reason.
+ここから 2 つのことが言えます。1 つは、範囲で書いた依存の新しい版を取り込むには何か変更を配備する必要があること —— 解決し直すのは配備だけだからです。もう 1 つは、`package-lock.yml` を commit しておけば、配備が本物の `dbt deps` を払わずにキャッシュに当たること。これは同じ理由から dbt 自身も勧めていることです。
 
-Worker-local caches - package trees, engine installs and retry state - live under `$WINDMILL_DIR/cache_nomount/` and are not reclaimed by `cache_clear`. Engine installs dominate the space, at roughly 270-290 MB each.
+worker の中のキャッシュ（パッケージの木、エンジンの導入、再開のための状態）は `$WINDMILL_DIR/cache_nomount/` の下に置かれ、`cache_clear` では回収されません。場所を食うのは主にエンジンの導入で、1 つおよそ 270〜290 MB です。
 
-## Related
+## 関連
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Assets](https://www.windmill.dev/docs/core_concepts/assets) —— How Windmill detects and tracks the datasets your scripts read and write, and how lineage is drawn.
-	- [Pipelines](https://www.windmill.dev/docs/core_concepts/pipelines) —— Windmill's native asset-based orchestration: DuckDB transformations materialized into managed DuckLake tables.
-	- [Command-line interface](https://www.windmill.dev/docs/advanced/cli) —— Sync a workspace to a local folder, push and pull scripts, and develop locally.
-	- [Triggers](../../../triggers/index.mdx) —— Trigger scripts and flows on-demand, by schedule or on external events.
+	- [アセット](https://www.windmill.dev/docs/core_concepts/assets) —— スクリプトが読み書きするデータの集まりを Windmill がどう見つけて追うのか、系譜がどう描かれるのか。
+	- [パイプライン](https://www.windmill.dev/docs/core_concepts/pipelines) —— アセットを軸にした Windmill 本来の組み立て。DuckDB の変換を、管理された DuckLake の表として実体化する。
+	- [コマンドライン](https://www.windmill.dev/docs/advanced/cli) —— ワークスペースを手元のフォルダと同期し、スクリプトを push / pull し、手元で開発する。
+	- [トリガー](../../../triggers/index.mdx) —— スクリプトとフローを、手動・スケジュール・外部の出来事で起こす。
 </div>

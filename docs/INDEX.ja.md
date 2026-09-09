@@ -6,7 +6,7 @@ Windmill のドキュメントを個人的に日本語へ訳したものです�
 
 **このファイルは生成物です。** `node scripts/build-ja-index.mjs` で作り直せます。
 
-## 訳済み（21 本）
+## 訳済み（22 本）
 
 - [Windmill をはじめる](./getting_started/00_how_to_use_windmill/index.ja.md)
 - [Ansible quickstart](./getting_started/0_scripts_quickstart/10_ansible_quickstart/index.ja.md)
@@ -14,6 +14,7 @@ Windmill のドキュメントを個人的に日本語へ訳したものです�
 - [Java クイックスタート](./getting_started/0_scripts_quickstart/13_java_quickstart/index.ja.md)
 - [Ruby クイックスタート](./getting_started/0_scripts_quickstart/14_ruby_quickstart/index.ja.md)
 - [R クイックスタート](./getting_started/0_scripts_quickstart/15_rlang_quickstart/index.ja.md)
+- [dbt quickstart](./getting_started/0_scripts_quickstart/16_dbt_quickstart/index.ja.md)
 - [TypeScript クイックスタート](./getting_started/0_scripts_quickstart/1_typescript_quickstart/index.ja.md)
 - [Python クイックスタート](./getting_started/0_scripts_quickstart/2_python_quickstart/index.ja.md)
 - [Go クイックスタート](./getting_started/0_scripts_quickstart/3_go_quickstart/index.ja.md)
@@ -29,10 +30,6 @@ Windmill のドキュメントを個人的に日本語へ訳したものです�
 - [アプリのクイックスタート（ローコード、旧来のもの）](./getting_started/7_apps_quickstart/index.ja.md)
 - [フルコードのアプリのクイックスタート](./getting_started/9_full_code_apps_quickstart/index.ja.md)
 - [Windmill とは](./intro.ja.md)
-
-## 骨組みのみ（本文は英語）（1 本）
-
-- [dbt quickstart](./getting_started/0_scripts_quickstart/16_dbt_quickstart/index.ja.md)
 
 ---
 
