@@ -16,6 +16,7 @@
  * 通る。質のほうは目で読むしかない。そのつもりで使うこと。
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
+import GithubSlugger from "github-slugger";
 import { join, relative, basename } from "node:path";
 import { convert } from "./mdx-to-ja.mjs";
 
@@ -37,6 +38,12 @@ const shape = (text) => {
   const images = [];
   const fences = [];
   const headings = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+  const headingIds = [];
+  // **見出し id は文書ごとの状態を持つ。** 同名の見出しが 2 つあれば 2 つ目は
+  // `bash-1` になる (実際 Bash のページに 3 組ある)。自前の正規表現で書いていたが、
+  // 全角の約物 (（ 、 ・) を落とし損ね、この重複の連番も無かった —— 本物と
+  // 突き合わせて 133 本中 12 本が食い違った。GitHub の規則は写さず、借りる。
+  const slugger = new GithubSlugger();
   let infence = false;
 
   for (const line of text.split("\n")) {
@@ -49,12 +56,15 @@ const shape = (text) => {
     if (infence) continue;
 
     const h = /^(#{1,6})\s/.exec(line);
-    if (h) headings[h[1].length] += 1;
+    if (h) {
+      headings[h[1].length] += 1;
+      headingIds.push(slugger.slug(line.slice(h[1].length).trim()));
+    }
 
     for (const m of line.matchAll(/!\[[^\]]*\]\(([^)\s]+)/g)) images.push(m[1]);
     for (const m of line.matchAll(/(?<!!)\[[^\]]*\]\(([^)\s]+)\)/g)) links.push(m[1]);
   }
-  return { links, images, fences, headings };
+  return { links, images, fences, headings, headingIds };
 };
 
 const collectJa = (dir) => {
@@ -115,11 +125,21 @@ for (const ja of collectJa(DOCS)) {
     for (const x of xs) m.set(x, (m.get(x) ?? 0) + 1);
     return m;
   };
-  // **同一ページ内のアンカー (`#…`) は値を比べない。**
+  // **同一ページ内のアンカー (`#…`) は原文と値を比べない。**
   //
   // 見出しを訳せば、GitHub が作るアンカーも変わる —— これは正しい変化で、
   // 止めるべきではない。ただし**数**は見る (節への導線が落ちれば分かる)。
+  //
+  // 値のほうは、原文の代わりに**訳自身の見出し**と突き合わせる。訳した見出しに
+  // 合わせてアンカーを直し忘れると、数は合ったまま飛び先だけが消える —— 数える
+  // だけではそこが見えない。GitHub 上では黙って何も起きないので、目でも気づけない。
   const anchors = (xs) => xs.filter((v) => v.startsWith("#"));
+  const ids = new Set(b.headingIds);
+  for (const anchor of anchors(b.links)) {
+    if (!ids.has(anchor.slice(1))) {
+      problems.push(`${rel}: ページ内リンク ${anchor} の飛び先が、この訳の見出しに無い`);
+    }
+  }
   const outward = (xs) => xs.filter((v) => !v.startsWith("#"));
   if (anchors(a.links).length !== anchors(b.links).length) {
     problems.push(

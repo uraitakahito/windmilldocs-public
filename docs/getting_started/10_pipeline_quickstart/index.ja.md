@@ -1,45 +1,44 @@
 ---
-description: How do I build my first pipeline in Windmill? A step-by-step guide to DuckDB scripts that materialize DuckLake tables, wired automatically by asset lineage.
+description: Windmill で最初のパイプラインを組むには。DuckLake のテーブルを書き出す DuckDB のスクリプトを、資産の系譜で自動的につなぐ手引き。
 ---
+
 > **[原文](./index.mdx)の日本語訳。** 相違があれば原文が正。
 > 原典 © Windmill Labs, Inc. — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。この訳も同じライセンスで提供します。
->
-> **未訳。** 以下は原文のままです。
 
-# Pipelines quickstart
+# パイプラインのクイックスタート
 
 :::caution Alpha
-Pipelines are in alpha. The entry point is deliberately tucked away while we develop the feature, and the annotation syntax and behavior described in this guide are still evolving and may change in future releases. We would love your feedback - share it on [Discord](https://discord.com/invite/V7PM2YHsPB) or [GitHub](https://github.com/windmill-labs/windmill).
+パイプラインは alpha です。開発中のため入口はあえて目立たない場所に置いてあり、この手引きで説明する注釈の書き方と挙動も、まだ変わりうるものです。感想を [Discord](https://discord.com/invite/V7PM2YHsPB) か [GitHub](https://github.com/windmill-labs/windmill) でぜひ聞かせてください。
 :::
 
-This guide builds your first [pipeline](../../core_concepts/63_pipelines/index.mdx): a set of scripts in a folder wired together automatically by the data they read and write, no manual orchestration. It uses the recommended [DuckDB](../../integrations/duckdb.md) + [DuckLake](../../core_concepts/11_persistent_storage/ducklake.mdx) path, where each step materializes a table (this is what makes the writes idempotent, versioned and testable). It takes about five minutes.
+この手引きでは、最初の[パイプライン](../../core_concepts/63_pipelines/index.mdx)を組みます。フォルダに入れたスクリプトの束が、読み書きするデータによって自動的につながる —— 手で並べる必要はありません。ここでは勧められている [DuckDB](../../integrations/duckdb.md) ＋ [DuckLake](../../core_concepts/11_persistent_storage/ducklake.mdx) の道筋を使い、各段がテーブルを書き出す形にします（これが、書き込みを冪等かつ版付きで、試験できるものにします）。所要は 5 分ほどです。
 
-DuckLake is not required, though. Pipelines wire scripts in any language (Python, TypeScript, ...) by the plain [assets](../../core_concepts/52_assets/index.mdx) they exchange - S3 objects, resources, data tables or volumes - with the same `-- on` model and no materialization. See [inputs and outputs](../../core_concepts/63_pipelines/index.mdx#inputs-and-outputs-assets) for that path; this guide shows DuckLake because it is the most powerful default.
+とはいえ DuckLake は必須ではありません。パイプラインは、やり取りする素の[資産](../../core_concepts/52_assets/index.mdx) —— S3 のオブジェクト、リソース、データのテーブル、ボリューム —— を通じて、どの言語のスクリプト（Python・TypeScript など）でもつなげます。`-- on` の考え方は同じで、書き出しは要りません。その道筋は[入力と出力](../../core_concepts/63_pipelines/index.mdx#inputs-and-outputs-assets)を参照してください。ここで DuckLake を使うのは、それが最も強力な既定だからです。
 
-Already using dbt? You do not have to port the project into a pipeline. Windmill runs an unmodified dbt project as [a script of its own kind](../0_scripts_quickstart/16_dbt_quickstart/index.mdx), with dbt still owning its models, refs and tests, and shows its models in the asset graph as `dbt://` nodes beside whatever pipelines you build. Windmill's own pipelines page (`/pipeline`) points there too, next to the [warehouse settings](../0_scripts_quickstart/16_dbt_quickstart/index.mdx#configure-a-warehouse) a dbt project needs.
+既に dbt を使っていますか。プロジェクトをパイプラインへ移す必要はありません。Windmill は手を加えていない dbt プロジェクトを[それ自体で 1 つの種類のスクリプト](../0_scripts_quickstart/16_dbt_quickstart/index.mdx)として実行します。model・ref・test は dbt が持ったままで、資産のグラフには `dbt://` の節点として、あなたが組んだパイプラインと並んで出ます。Windmill のパイプラインのページ（`/pipeline`）からもそこへ辿れますし、隣には dbt プロジェクトに要る[ウェアハウスの設定](../0_scripts_quickstart/16_dbt_quickstart/index.mdx#configure-a-warehouse)もあります。
 
-:::info Prerequisite
-Because this guide uses DuckLake, you need a [workspace storage and a DuckLake](../../core_concepts/11_persistent_storage/ducklake.mdx) configured. The default DuckLake is named `main`; this guide uses it. (A plain S3-based pipeline needs only the [workspace storage](../../core_concepts/38_object_storage_in_windmill/index.mdx#workspace-object-storage).)
+:::info 前提
+この手引きは DuckLake を使うので、[ワークスペースの保管領域と DuckLake](../../core_concepts/11_persistent_storage/ducklake.mdx) の設定が要ります。既定の DuckLake の名前は `main` で、ここではそれを使います。（S3 だけを使う素のパイプラインなら、[ワークスペースの保管領域](../../core_concepts/38_object_storage_in_windmill/index.mdx#workspace-object-storage)だけで足ります。）
 
-On a fresh workspace the pipelines page shows a **setup checklist** whenever either prerequisite is missing, with a link straight to the [workspace object storage](../../core_concepts/38_object_storage_in_windmill/index.mdx#workspace-object-storage) and [DuckLake](../../core_concepts/11_persistent_storage/ducklake.mdx) settings that fix it. Nothing materializes until both are set.
+作りたてのワークスペースでは、どちらかの前提が欠けているあいだ、パイプラインのページに**準備の一覧**が出ます。そこから[ワークスペースのオブジェクト保管](../../core_concepts/38_object_storage_in_windmill/index.mdx#workspace-object-storage)と [DuckLake](../../core_concepts/11_persistent_storage/ducklake.mdx) の設定へ直接行けます。両方が揃うまで、何も書き出されません。
 :::
 
-## 1. Create a pipeline
+## 1. パイプラインを作る
 
-On the home page, click **New** and select **Data pipelines** (badged _Alpha_) in the popover.
+ホーム画面で **新規（New）** をクリックし、ポップオーバーから **データパイプライン（Data pipelines）**（_Alpha_ の印付き）を選びます。
 
 <!-- SCREENSHOT PLACEHOLDER: the "New" popover on the home page with the "Data pipelines" option (Alpha badge) highlighted, its description showing in the left pane. Replaces the outdated create_pipeline_menu.png (which showed the old "+ Flow" dropdown). Save as create_pipeline_menu.png (+ .webp) next to this file. -->
 ![Create a pipeline from the New popover](./create_pipeline_menu.png 'Create a pipeline from the New popover')
 
-You can also open the pipelines index page at `/pipeline`: it lists existing pipelines with their script counts and lets you pick or create a folder. When you edit a SQL or DuckDB script that is not yet part of a pipeline, a dismissible hint below the toolbar links there too.
+`/pipeline` のパイプライン一覧ページを開くこともできます。既存のパイプラインがスクリプトの数とともに並び、フォルダを選ぶか新しく作れます。まだどのパイプラインにも属していない SQL や DuckDB のスクリプトを編集していると、ツールバーの下に、そこへ導く（閉じられる）案内が出ます。
 
 ![The pipelines index page](./pipeline_index_page.png 'The pipelines index page')
 
-Pipelines live in a [folder](../../core_concepts/8_groups_and_folders/index.mdx) (for example `f/demo`); every script you add to it and mark with `-- pipeline` becomes part of the same pipeline graph.
+パイプラインは[フォルダ](../../core_concepts/8_groups_and_folders/index.mdx)（たとえば `f/demo`）の中に置かれます。そのフォルダに入れて `-- pipeline` を付けたスクリプトは、すべて同じパイプラインのグラフの一部になります。
 
-## 2. Add a producer script
+## 2. 作る側のスクリプトを足す
 
-Create a DuckDB script `f/demo/ingest`. The `-- pipeline` line places it in the folder's pipeline, and `-- materialize` tells Windmill to own the write: it creates the `ducklake://main/events` table from the trailing `SELECT` and records a snapshot and row count.
+DuckDB のスクリプト `f/demo/ingest` を作ります。`-- pipeline` の行がそれをフォルダのパイプラインに置き、`-- materialize` が「書き込みは Windmill が受け持つ」ことを伝えます。末尾の `SELECT` から `ducklake://main/events` のテーブルを作り、スナップショットと行数を記録します。
 
 ```sql
 -- pipeline
@@ -52,9 +51,9 @@ SELECT * FROM (VALUES
 ) AS t(id, kind, ts);
 ```
 
-## 3. Add a consumer script
+## 3. 使う側のスクリプトを足す
 
-Create a DuckDB script `f/demo/rollup`. The `-- on ducklake://main/events` annotation declares the table it reads, which becomes an incoming edge: this script runs automatically whenever `events` is materialized. It materializes its own aggregate table.
+DuckDB のスクリプト `f/demo/rollup` を作ります。`-- on ducklake://main/events` の注釈が、読み込むテーブルを宣言します。これが入ってくる辺になり、`events` が書き出されるたびにこのスクリプトが自動で走ります。そして自分自身の集計テーブルを書き出します。
 
 ```sql
 -- pipeline
@@ -68,25 +67,25 @@ FROM dl.events
 GROUP BY kind;
 ```
 
-## 4. Open the pipeline graph
+## 4. パイプラインのグラフを開く
 
-Open the folder and select the pipeline view. You will see the lineage:
+フォルダを開いてパイプラインの表示を選びます。系譜が見えます。
 
 `ingest` → `ducklake://main/events` → `rollup` → `ducklake://main/events_by_kind`
 
-## 5. Run it
+## 5. 動かす
 
-On the `ingest` node, choose "Run + downstream". `ingest` materializes `events`, and the asset cascade automatically fires `rollup`, which materializes `events_by_kind`. Each node shows live status, its DuckLake snapshot and row count as the run progresses, and the result panel previews the materialized table.
+`ingest` の節点で「実行と下流（Run + downstream）」を選びます。`ingest` が `events` を書き出し、資産の連鎖が `rollup` を自動で起こし、それが `events_by_kind` を書き出します。実行が進むにつれて、各節点に状態・DuckLake のスナップショット・行数が出ます。結果の欄には書き出されたテーブルの下見が出ます。
 
-That is the whole model: mark scripts with `-- pipeline`, declare inputs with `-- on`, and Windmill infers and runs the graph from asset lineage. Adding `-- materialize` (the optional DuckLake layer used here) is what also gives you idempotent re-runs, time-travel, [data tests](../../core_concepts/63_pipelines/materialization.mdx#data-tests) and [backfill](../../core_concepts/63_pipelines/materialization.mdx#partition-status-and-backfill) with no extra work.
+これが全体の考え方です —— スクリプトに `-- pipeline` を付け、入力を `-- on` で宣言すれば、Windmill が資産の系譜からグラフを推論して実行します。ここで使った `-- materialize`（任意の DuckLake の層）を足すと、冪等な再実行・時間をさかのぼった参照・[データの試験](../../core_concepts/63_pipelines/materialization.mdx#data-tests)・[遡っての埋め直し](../../core_concepts/63_pipelines/materialization.mdx#partition-status-and-backfill)まで、追加の手間なしに手に入ります。
 
-## Next steps
+## 次は
 
-Add materialization strategies (merge, append, SCD2 history), partitions, schedules, AND/OR joins, data tests and debounce. Every annotation and option is documented, with examples, on the concept page.
+書き出しの方式（merge・append・SCD2 の履歴）、区画、スケジュール、AND / OR の結合、データの試験、抑制などを足せます。注釈と選択肢はすべて、例つきで概念のページに書かれています。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Pipelines](https://www.windmill.dev/docs/core_concepts/pipelines) —— Full reference: every annotation and option with examples (materialize, partitions, joins, data tests, debounce).
-	- [DuckLake](https://www.windmill.dev/docs/core_concepts/persistent_storage/ducklake) —— The managed lakehouse tables your pipeline steps materialize into: catalog, versioning and ACID transactions on S3.
-	- [Assets](https://www.windmill.dev/docs/core_concepts/assets) —— How Windmill detects and tracks the S3 objects, resources and tables your scripts read and write.
-	- [dbt](https://www.windmill.dev/docs/getting_started/scripts_quickstart/dbt) —— Run an existing dbt project on Windmill unchanged, as a script of its own, with its models in the asset graph.
+	- [パイプライン](https://www.windmill.dev/docs/core_concepts/pipelines) —— 全体の参照: 注釈と選択肢を例つきで（materialize・区画・結合・データの試験・抑制）。
+	- [DuckLake](https://www.windmill.dev/docs/core_concepts/persistent_storage/ducklake) —— パイプラインの各段が書き出す、管理されたレイクハウスのテーブル。S3 上のカタログ・版管理・ACID なトランザクション。
+	- [資産](https://www.windmill.dev/docs/core_concepts/assets) —— スクリプトが読み書きする S3 のオブジェクト・リソース・テーブルを、Windmill がどう見つけて追うか。
+	- [dbt](https://www.windmill.dev/docs/getting_started/scripts_quickstart/dbt) —— 既存の dbt プロジェクトを手を加えずに Windmill で動かし、その model を資産のグラフに出す。
 </div>

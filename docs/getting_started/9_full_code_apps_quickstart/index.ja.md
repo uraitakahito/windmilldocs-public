@@ -1,58 +1,56 @@
 ---
-description: How do I build a full-code app with Windmill? Step-by-step guide to create a React or Svelte app with backend runnables.
+description: Windmill でフルコードのアプリを作るには。React か Svelte のアプリを作り、背後の実行対象につなぐまでを順を追って。
 ---
 > **[原文](./index.mdx)の日本語訳。** 相違があれば原文が正。
 > 原典 © Windmill Labs, Inc. — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。この訳も同じライセンスで提供します。
->
-> **未訳。** 以下は原文のままです。
 
-# Full-code apps quickstart
+# フルコードのアプリのクイックスタート
 
-This guide walks you through building your first [full-code app](../../full_code_apps/index.mdx). We'll create a React app from the Windmill UI, explore the scaffolded code, add a second backend runnable, and wire both into a polished frontend.
+このページでは、最初の[フルコードのアプリ](../../full_code_apps/index.mdx)を作ります。Windmill の画面から React のアプリを作り、雛形のコードを読み、背後の実行対象をもう 1 つ足して、その両方を整えた UI につなぎます。
 
-![Full code apps](./full_code_app_demo.png 'Full code apps')
+![フルコードのアプリ](./full_code_app_demo.png 'Full code apps')
 
-Full-code apps give you complete control over your UI with React or Svelte, while Windmill handles backend execution, permissions and deployment.
+フルコードのアプリでは、UI を React か Svelte で完全に自分の手で書けます。実行・権限・配備は Windmill が引き受けます。
 
-| | Full-code apps | Low-code apps |
+| | フルコードのアプリ | ローコードのアプリ |
 |---|---|---|
-| **UI** | Custom React/Svelte components | Drag-and-drop component library |
-| **Frontend logic** | Full framework features (hooks, stores, routing) | Connecting components + inline scripts |
-| **Backend** | Scripts in `backend/` folder, any language | Runnables panel, inline or workspace scripts |
-| **Local dev** | `wmill app dev` with hot reload | Web-based editor only |
-| **Best for** | Custom UIs, complex interactions, existing codebases | Quick dashboards, forms, CRUD interfaces |
+| **UI** | 自分で書く React／Svelte の部品 | ドラッグ＆ドロップの部品一覧 |
+| **画面側のロジック** | フレームワークの機能をすべて（hook、store、routing） | 部品をつなぐ ＋ その場のスクリプト |
+| **背後** | `backend/` フォルダのスクリプト。言語は自由 | 実行対象のパネル。その場かワークスペースのスクリプト |
+| **手元での開発** | `wmill app dev` で自動再読み込み | web のエディタのみ |
+| **向いているもの** | 作り込んだ UI、込み入った操作、既にあるコード | 手早いダッシュボード、フォーム、CRUD の画面 |
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Low-code apps quickstart](https://www.windmill.dev/docs/getting_started/apps_quickstart) —— Prefer drag-and-drop? Build apps with the low-code editor.
+	- [ローコードのアプリのクイックスタート](https://www.windmill.dev/docs/getting_started/apps_quickstart) —— ドラッグ＆ドロップのほうがよいですか。ローコードのエディタでアプリを作る。
 </div>
 
-## Step 1: Create the app
+## 手順 1: アプリを作る
 
-### From the platform
+### 画面から
 
-From your [Windmill](../00_how_to_use_windmill/index.mdx) home page, click **New** and select **App (full-code)**.
+[Windmill](../00_how_to_use_windmill/index.mdx) のホーム画面で **新規（New）** をクリックし、**アプリ（フルコード）** を選びます。
 
-![Pick full-code app](./pick_raw_app.png 'Pick full-code app')
+![フルコードのアプリを選ぶ](./pick_raw_app.png 'Pick full-code app')
 
-In the setup dialog:
+設定の対話で、
 
-1. Pick a framework (React or Svelte 5), for the example we'll use React 19
-2. Choose a Data configuration. Here we'll use a new datatable. It's not required for apps to have a datatable, it will be used only in a [dedicated section](#step-5-use-a-data-table-for-persistence) of the quickstart.
-3. Start the app 'without AI'. Or just enter a prompt and start with AI, and you're done for the quickstart :)
+1. フレームワークを選びます（React か Svelte 5）。ここでは React 19 を使います
+2. データの設定を選びます。ここでは新しいデータテーブルにします。アプリにデータテーブルは必須ではなく、このクイックスタートでは[専用の節](#手順-5-データテーブルで残す)でしか使いません
+3. 「AI なし（without AI）」で始めます。あるいは指示を 1 つ書いて AI に任せれば、クイックスタートはそこで終わりです :)
 
-![Pick React framework](./pick_react.png 'Pick React framework')
+![React を選ぶ](./pick_react.png 'Pick React framework')
 
-The [UI editor](../../full_code_apps/6_ui_editor/index.mdx) opens with a scaffolded project.
+雛形の入った状態で [UI エディタ](../../full_code_apps/6_ui_editor/index.mdx)が開きます。
 
-### From the CLI
+### CLI から
 
-You can do the same from the [Windmill CLI](../../advanced/3_cli/index.mdx):
+同じことが [Windmill の CLI](../../advanced/3_cli/index.mdx) からもできます。
 
 ```bash
 wmill app new
 ```
 
-The wizard prompts for the same choices. Then install dependencies and start the dev server:
+同じ選択を対話で訊かれます。そのあと依存を入れ、開発用のサーバを起動します。
 
 ```bash
 cd f/folder/my_app.raw_app
@@ -60,15 +58,15 @@ npm install
 wmill app dev
 ```
 
-This starts a local server with hot reload at `http://localhost:4000`.
+`http://localhost:4000` に、自動再読み込み付きの手元のサーバが立ちます。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [CLI workflow](https://www.windmill.dev/docs/full_code_apps/cli_workflow) —— Full guide to scaffold, develop and deploy from your terminal.
+	- [CLI での進め方](https://www.windmill.dev/docs/full_code_apps/cli_workflow) —— 端末から雛形を作り、開発し、配備するまでの案内。
 </div>
 
-## Step 2: Explore the scaffolded project
+## 手順 2: 雛形を読む
 
-The created app has this structure:
+作られたアプリはこういう構成です。
 
 ```
 f/folder/my_app.raw_app/
@@ -82,11 +80,11 @@ f/folder/my_app.raw_app/
     └── a.ts              # Sample backend runnable code
 ```
 
-![Default App.tsx](./default_tsx.png 'Default App.tsx')
+![既定の App.tsx](./default_tsx.png 'Default App.tsx')
 
-### The default App.tsx
+### 既定の App.tsx
 
-The scaffolded `App.tsx` looks like this:
+雛形の `App.tsx` はこうなっています。
 
 ```tsx
 import React, { useState } from 'react'
@@ -121,11 +119,11 @@ const App = () => {
 export default App
 ```
 
-It imports `backend` from `./wmill` - this is an auto-generated module that provides typed functions to call your [backend runnables](../../full_code_apps/2_backend_runnables/index.mdx). Here, clicking the button calls `backend.a()` which runs the sample runnable `a` in the `backend/` folder.
+`./wmill` から `backend` を読み込んでいます。これは自動生成される module で、[背後の実行対象](../../full_code_apps/2_backend_runnables/index.mdx)を型付きの関数として呼べるようにします。ここではボタンを押すと `backend.a()` が呼ばれ、`backend/` フォルダにある見本の実行対象 `a` が動きます。
 
-### The default backend runnable
+### 既定の実行対象
 
-The sample runnable `backend/a.ts` is a simple TypeScript function:
+見本の `backend/a.ts` は、ただの TypeScript の関数です。
 
 ```typescript
 // import * as wmill from "windmill-client"
@@ -136,21 +134,21 @@ export async function main(x: string) {
 
 ```
 
-You can preview your UI by selecting 'App.tsx' to see it in the right pane, or by clicking 'Preview' in the UI editor for a fullscreen view. If you're using the CLI, open `http://localhost:4000` in your browser to access the app. When you click the button, it sends a request to the backend and displays the returned result.
+UI は 'App.tsx' を選べば右側の枠に見えますし、UI エディタで「下見（Preview）」を押せば全画面で見られます。CLI を使っているなら、ブラウザで `http://localhost:4000` を開いてください。ボタンを押すと、背後に要求が飛び、返ってきた結果が表示されます。
 
-![Default backend runnable](./default_backend.png 'Default backend runnable')
+![既定の実行対象](./default_backend.png 'Default backend runnable')
 
-### How it works
+### 仕組み
 
-The key concept: `backend.a({ x: 42 })` sends the call to a Windmill worker that executes `backend/a.ts` and returns the result. Your frontend never runs the backend code directly - it goes through Windmill's execution engine via WebSocket, which means you get logging, permissions and error handling for free.
+肝は、`backend.a({ x: 42 })` がその呼び出しを Windmill の worker へ送り、そこで `backend/a.ts` が実行され、結果が返る、という点です。**画面側が背後のコードを直に走らせることはありません。** WebSocket 越しに Windmill の実行機構を通るので、記録・権限・誤りの扱いが何もせずに付いてきます。
 
-## Step 3: Edit and add backend runnables
+## 手順 3: 実行対象を直す・足す
 
-The scaffolded app comes with one runnable (`a`). Let's update it and add a second one.
+雛形のアプリには実行対象が 1 つ（`a`）あります。これを書き換え、もう 1 つ足します。
 
-### From the UI editor
+### UI エディタから
 
-Click on the `a` runnable in the runnables panel. Give it the summary "Multiply" and replace the code with:
+実行対象のパネルで `a` をクリックします。要約に「Multiply」と付け、コードをこう入れ替えます。
 
 ```typescript
 // backend/a.ts
@@ -161,17 +159,17 @@ export async function main(x: number) {
 }
 ```
 
-![Multiply runnable](./multiply.png 'Multiply runnable')
+![Multiply の実行対象](./multiply.png 'Multiply runnable')
 
-Now add a second runnable - this time in [Python](../../getting_started/0_scripts_quickstart/2_python_quickstart/index.mdx) as you can mix languages within the same app:
+次に 2 つ目の実行対象を足します。今度は [Python](../../getting_started/0_scripts_quickstart/2_python_quickstart/index.mdx) です —— 1 つのアプリの中で言語を混ぜられます。
 
-1. In the runnables panel on the right, click the `+` button
-2. Select **Python** as the language
-3. Name it `b` and give it the summary "Get timestamp"
+1. 右側の実行対象のパネルで `+` をクリックします
+2. 言語に **Python** を選びます
+3. 名前を `b`、要約を「Get timestamp」とします
 
-![Choose language](./choose_language.png 'Choose language')
+![言語を選ぶ](./choose_language.png 'Choose language')
 
-Paste this code:
+このコードを貼ります。
 
 ```python
 # backend/b.py
@@ -187,30 +185,30 @@ def main(format: str):
         return str(now)
 ```
 
-![Get timestamp runnable](./get_timestamp.png 'Get timestamp runnable')
+![Get timestamp の実行対象](./get_timestamp.png 'Get timestamp runnable')
 
-As you can see, the [auto-generated UI](../../core_concepts/6_auto_generated_uis/index.mdx) updated with the new input name (`format`).
+見てのとおり、[自動生成される UI](../../core_concepts/6_auto_generated_uis/index.mdx) が新しい入力の名前（`format`）で更新されました。
 
-You now have two runnables in different languages: `a` (TypeScript) doubles a number, `b` (Python) returns a formatted date. The frontend calls them the exact same way - it doesn't need to know which language runs behind the scenes.
+これで、別々の言語で書かれた実行対象が 2 つあります。`a`（TypeScript）は数を 2 倍にし、`b`（Python）は整えた日時を返します。**画面側からの呼び方はまったく同じ**で、背後でどの言語が動いているかを知る必要はありません。
 
-### From local files
+### 手元のファイルから
 
-Alternatively, work directly in `backend/`:
+代わりに、`backend/` で直に作業してもかまいません。
 
-- Edit `backend/a.ts` with the multiply code above
-- Create `backend/b.py` with the Python code above
+- `backend/a.ts` を上の multiply のコードに書き換える
+- `backend/b.py` を作り、上の Python のコードを入れる
 
-The language is auto-detected from the file extension (`.ts` for TypeScript, `.py` for Python) and the runnable ID is derived from the filename (`a`, `b`).
+言語は拡張子から判別され（TypeScript なら `.ts`、Python なら `.py`）、実行対象の id はファイル名から取られます（`a`、`b`）。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Backend runnables](https://www.windmill.dev/docs/full_code_apps/backend_runnables) —— All options for defining backend scripts in any language.
+	- [背後の実行対象](https://www.windmill.dev/docs/full_code_apps/backend_runnables) —— 背後のスクリプトを任意の言語で定義するすべての方法。
 </div>
 
-## Step 4: Build the frontend
+## 手順 4: 画面側を作る
 
-Now let's update `App.tsx` to call both runnables. The auto-generated `wmill` module automatically picks up the new `b` runnable, so we can call `backend.a()` and `backend.b()` right away.
+では `App.tsx` を書き換えて、両方の実行対象を呼びます。自動生成される `wmill` module は新しい `b` を自動で拾うので、`backend.a()` と `backend.b()` をすぐに呼べます。
 
-Replace the content of `App.tsx` with:
+`App.tsx` の中身をこう入れ替えます。
 
 ```tsx
 import React, { useState } from 'react'
@@ -311,16 +309,16 @@ const App = () => {
 export default App
 ```
 
-A few things to notice:
+いくつか気に留めておくこと。
 
-- Each button calls a different backend runnable (`backend.a()` or `backend.b()`)
-- **Run both** uses `Promise.all` to call both runnables in parallel - each one runs as a separate Windmill job
-- The `format` parameter on `backend.b()` is passed as an argument, just like `x` on `backend.a()`
-- `a` runs TypeScript on a Bun worker, `b` runs Python - the frontend doesn't need to care
+- ボタンごとに別の実行対象を呼んでいます（`backend.a()` か `backend.b()`）
+- **Run both** は `Promise.all` で両方を並行に呼びます —— それぞれが別々の Windmill の job として動きます
+- `backend.b()` の `format` は、`backend.a()` の `x` と同じように引数として渡します
+- `a` は Bun の worker で TypeScript を、`b` は Python を動かします —— 画面側はそれを気にしなくてよい
 
-### Update the styles
+### 見た目を整える
 
-Replace `index.css` to give the app a cleaner look:
+`index.css` を入れ替えて、見た目を整えます。
 
 ```css
 .container {
@@ -425,135 +423,135 @@ button.primary:hover:not(:disabled) {
 }
 ```
 
-See the preview in the right part of the screen of App.tsx (or click 'Preview' in the UI editor to see it in full screen, or check `http://localhost:4000` if using the CLI) to see the result. Try clicking each button individually, then "Run both" to see parallel execution.
+結果は App.tsx の画面右側の下見で見られます（UI エディタで「下見（Preview）」を押せば全画面、CLI なら `http://localhost:4000`）。ボタンを 1 つずつ押してみて、そのあと「Run both」で並行に動くところを見てください。
 
-![Updated App.tsx](./updated_tsx.png 'Updated App.tsx')
+![書き換えた App.tsx](./updated_tsx.png 'Updated App.tsx')
 
-![Index CSS](./index_css.png 'Index CSS')
+![index.css](./index_css.png 'Index CSS')
 
 :::info Svelte
-If you chose Svelte 5 instead of React, the same pattern applies. Import `backend` from `./wmill` and use Svelte's `$state` and `$effect` for reactivity. See the [frontend reference](../../full_code_apps/3_frontend/index.mdx) for Svelte examples.
+React ではなく Svelte 5 を選んだ場合も、やり方は同じです。`./wmill` から `backend` を読み込み、反応の仕組みには Svelte の `$state` と `$effect` を使います。Svelte の例は[画面側の参照](../../full_code_apps/3_frontend/index.mdx)にあります。
 :::
 
-### How backend calls work
+### 背後の呼び出しの仕組み
 
-Every call to `backend.a()` or `backend.b()` is a real Windmill job execution:
+`backend.a()` や `backend.b()` の呼び出しは、どれも本物の Windmill の job の実行です。
 
-- `backend.xxx(args)` - calls a runnable and waits for the result (synchronous)
-- `backendAsync.xxx(args)` - starts a runnable and returns a job ID immediately (for long-running tasks)
-- `waitJob(jobId)` - waits for an async job to complete
-
-<div className="grid grid-cols-2 gap-6 mb-4">
-	- [Frontend](https://www.windmill.dev/docs/full_code_apps/frontend) —— React/Svelte support and the wmill.ts API reference.
-</div>
-
-## Step 5: Use a data table for persistence
-
-So far our runnables compute values on the fly. Full-code apps can also read and write to Windmill [data tables](../../core_concepts/11_persistent_storage/data_tables.mdx) - a built-in storage layer.
+- `backend.xxx(args)` —— 実行対象を呼び、結果を待つ（同期）
+- `backendAsync.xxx(args)` —— 実行対象を起こし、job の id をすぐ返す（長くかかる処理向け）
+- `waitJob(jobId)` —— 非同期の job が終わるのを待つ
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Data tables](https://www.windmill.dev/docs/full_code_apps/data_tables) —— Whitelist and query Windmill data tables from your app.
+	- [画面側](https://www.windmill.dev/docs/full_code_apps/frontend) —— React／Svelte の対応と wmill.ts の API 参照。
 </div>
 
-### Set up a database
+## 手順 5: データテーブルで残す
 
-First, make sure a database is configured in your workspace. Go to **Workspace settings** > **Data Tables** and set up a database connection (or use the [Custom instance database](../../core_concepts/53_custom_instance_database/index.mdx) if available).
+ここまでの実行対象は、値をその場で計算するだけでした。フルコードのアプリは Windmill の[データテーブル](../../core_concepts/11_persistent_storage/data_tables.mdx)（組み込みの保存の層）を読み書きすることもできます。
 
-![Create table](./create_table.png 'Create table')
+<div className="grid grid-cols-2 gap-6 mb-4">
+	- [データテーブル](https://www.windmill.dev/docs/full_code_apps/data_tables) —— アプリから Windmill のデータテーブルを許可し、問い合わせる。
+</div>
 
-### Add a table to your app
+### データベースを用意する
 
-In the raw app editor, open the **Data** section on the left panel and click the `+` button. You can either pick an existing table (public or from other apps) or create a new one for your app.
+まず、ワークスペースにデータベースが設定されていることを確かめます。**ワークスペースの設定（Workspace settings）** > **データテーブル（Data Tables）** で接続を設定してください（使えるなら[インスタンス専用のデータベース](../../core_concepts/53_custom_instance_database/index.mdx)でもかまいません）。
 
-Let's create a new table:
+![テーブルを作る](./create_table.png 'Create table')
 
-1. Click `+` in the Data section
-2. Select **Create new table**
-3. Name it `computation_logs`
-4. Define the columns:
-   - `id` — `BIGSERIAL` (primary key, added by default)
+### アプリにテーブルを足す
+
+raw app のエディタで、左の枠の **データ（Data）** の節を開き、`+` をクリックします。既にあるテーブル（公開のものか、他のアプリのもの）を選ぶことも、このアプリ用に新しく作ることもできます。
+
+ここでは新しく作ります。
+
+1. データの節で `+` をクリック
+2. **新しいテーブルを作る（Create new table）** を選ぶ
+3. 名前を `computation_logs` にする
+4. 列を決める
+   - `id` — `BIGSERIAL`（主キー。既定で付く）
    - `input` — `INT`
    - `result` — `TEXT`
-   - `created_at` — `TIMESTAMP`, default `now()`
-5. Click **Create table**
+   - `created_at` — `TIMESTAMP`、既定値は `now()`
+5. **テーブルを作る（Create table）** をクリック
 
-![Create table columns](./create_table_2.png 'Create table columns')
+![テーブルの列を作る](./create_table_2.png 'Create table columns')
 
-The table is now whitelisted for your app. You can view its schema and data from the Data section.
+これでテーブルがこのアプリに許可されました。スキーマと中身はデータの節から見られます。
 
-### Add a SQL runnable
+### SQL の実行対象を足す
 
-Now create a backend runnable that queries this table. In the runnables panel, click `+` and select **PostgreSQL** as the language. Name it `get_logs`.
+次に、このテーブルに問い合わせる実行対象を作ります。実行対象のパネルで `+` をクリックし、言語に **PostgreSQL** を選びます。名前は `get_logs` にします。
 
-For the database resource, pick the same resource as the one configured in your workspace Data Tables settings.
+データベースのリソースには、ワークスペースのデータテーブルの設定で選んだものと同じリソースを指定します。
 
 ```sql
 -- backend/get_logs.pg.sql
 SELECT * FROM app_demo.computation_logs ORDER BY created_at DESC LIMIT 10;
 ```
 
-![Get logs runnable](./get_logs.png 'Get logs runnable')
+![get_logs の実行対象](./get_logs.png 'Get logs runnable')
 
-From the frontend, call it like any other runnable:
+画面側からは、他の実行対象と同じように呼びます。
 
 ```typescript
 const logs = await backend.get_logs();
 ```
 
-The frontend code doesn't need to know whether a runnable is TypeScript, Python or SQL - the `wmill` module handles them all the same way.
+画面側のコードは、実行対象が TypeScript なのか Python なのか SQL なのかを知る必要がありません。`wmill` module がすべて同じ形で扱います。
 
 :::tip CLI
-From local files, the `.pg.sql` extension tells Windmill to run the script as a PostgreSQL query. Other SQL dialects are supported too (`.my.sql` for MySQL, `.bq.sql` for BigQuery, etc.). See the [backend runnables](../../full_code_apps/2_backend_runnables/index.mdx) reference for the full list.
+手元のファイルでは、`.pg.sql` という拡張子が「PostgreSQL の問い合わせとして実行せよ」という指示になります。他の SQL の方言にも対応しています（MySQL なら `.my.sql`、BigQuery なら `.bq.sql` など）。すべての一覧は[背後の実行対象](../../full_code_apps/2_backend_runnables/index.mdx)の参照にあります。
 :::
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Data tables](https://www.windmill.dev/docs/full_code_apps/data_tables) —— Whitelist and query Windmill data tables from your app.
-	- [Data tables (core concept)](https://www.windmill.dev/docs/core_concepts/persistent_storage/data_tables) —— Store and query relational data with near-zero setup.
+	- [データテーブル](https://www.windmill.dev/docs/full_code_apps/data_tables) —— アプリから Windmill のデータテーブルを許可し、問い合わせる。
+	- [データテーブル（中核の考え方）](https://www.windmill.dev/docs/core_concepts/persistent_storage/data_tables) —— ほとんど準備なしに、関係のあるデータを保存し問い合わせる。
 </div>
 
-## Step 6: Deploy
+## 手順 6: 配備する
 
-### From the UI editor
+### UI エディタから
 
-Click the **Deploy** button in the toolbar. Each deployment creates a new version of your app.
+ツールバーの **配備（Deploy）** ボタンをクリックします。配備のたびに新しい版ができます。
 
-![Deploy](./deploy.png 'Deploy')
+![配備する](./deploy.png 'Deploy')
 
-![Deployed app](./deployed_app.png 'Deployed app')
+![配備されたアプリ](./deployed_app.png 'Deployed app')
 
-### From the CLI
+### CLI から
 
-Generate lock files for your runnables and push:
+実行対象の lockfile を作り、送ります。
 
 ```bash
 wmill generate-metadata
 wmill sync push
 ```
 
-### Make it public
+### 誰でも見られるようにする
 
-To make the app accessible without login, add `public: true` to `raw_app.yaml`:
+ログインなしでアプリを開けるようにするには、`raw_app.yaml` に `public: true` を足します。
 
 ```yaml
 summary: "Full-code app demo"
 public: true
 ```
 
-Admins can also set a custom URL path:
+管理者なら、URL の道筋を自分で決めることもできます。
 
 ```yaml
 custom_path: "my-demo"
 ```
 
-The app is then accessible at `https://<instance>/apps/custom/my-demo`.
+そのアプリは `https://<instance>/apps/custom/my-demo` で開けるようになります。
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Deployment](https://www.windmill.dev/docs/full_code_apps/deployment) —— Deploy, configure public access and custom paths.
+	- [配備](https://www.windmill.dev/docs/full_code_apps/deployment) —— 配備し、公開の可否と URL の道筋を設定する。
 </div>
 
-## Runnable configuration
+## 実行対象の設定
 
-So far we've used code-only runnables (just a file in `backend/`). For more control, you can add a `.yaml` config file alongside the code to pre-fill inputs:
+ここまでは、コードだけの実行対象（`backend/` にファイルが 1 つあるだけ）を使ってきました。もっと細かく決めたいときは、コードの隣に `.yaml` の設定ファイルを置いて、入力をあらかじめ埋められます。
 
 ```yaml
 # backend/a.yaml
@@ -564,7 +562,7 @@ fields:
     value: 100
 ```
 
-This pre-fills the `x` parameter so the frontend doesn't need to pass it. You can also reference existing workspace [scripts](../../script_editor/index.mdx) or [flows](../../flows/1_flow_editor.mdx) instead of writing inline code:
+こうすると `x` があらかじめ埋まるので、画面側から渡す必要がなくなります。その場にコードを書く代わりに、ワークスペースにある[スクリプト](../../script_editor/index.mdx)や[フロー](../../flows/1_flow_editor.mdx)を指すこともできます。
 
 ```yaml
 # backend/send_notification.yaml
@@ -573,21 +571,21 @@ path: f/production/send_slack_notification
 ```
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Backend runnables](https://www.windmill.dev/docs/full_code_apps/backend_runnables) —— All runnable types, YAML config and supported languages.
+	- [背後の実行対象](https://www.windmill.dev/docs/full_code_apps/backend_runnables) —— 実行対象のすべての種類、YAML の設定、対応する言語。
 </div>
 
-## Next steps
+## 次にすること
 
-You now have a working full-code app with a custom React frontend calling multiple backend runnables. From here you can:
+これで、自分で書いた React の画面から複数の実行対象を呼ぶ、動くフルコードのアプリができました。ここからは、
 
-- Add [backend runnables](../../full_code_apps/2_backend_runnables/index.mdx) in any language (Python, SQL, Go, etc.)
-- Style your app with CSS, Tailwind or any React library
-- Set up [CI/CD with git sync](../../advanced/11_git_sync/index.mdx) for team workflows
-- Use [Windmill AI](../../core_concepts/22_ai_generation/index.mdx) to generate apps from prompts
+- 任意の言語で[背後の実行対象](../../full_code_apps/2_backend_runnables/index.mdx)を足す（Python、SQL、Go など）
+- CSS や Tailwind、好きな React のライブラリで見た目を作る
+- 複数人で進めるために [git sync による CI/CD](../../advanced/11_git_sync/index.mdx) を用意する
+- [Windmill AI](../../core_concepts/22_ai_generation/index.mdx) で、指示からアプリを作らせる
 
 <div className="grid grid-cols-2 gap-6 mb-4">
-	- [Full-code apps](../../full_code_apps/index.mdx) —— Complete reference for full-code apps.
-	- [Frontend](https://www.windmill.dev/docs/full_code_apps/frontend) —— React/Svelte support and the wmill.ts API.
-	- [UI editor](https://www.windmill.dev/docs/full_code_apps/ui_editor) —— Edit full-code apps in the browser.
-	- [CLI workflow](https://www.windmill.dev/docs/full_code_apps/cli_workflow) —— Scaffold, develop and deploy from your terminal.
+	- [フルコードのアプリ](../../full_code_apps/index.mdx) —— フルコードのアプリの完全な参照。
+	- [画面側](https://www.windmill.dev/docs/full_code_apps/frontend) —— React／Svelte の対応と wmill.ts の API。
+	- [UI エディタ](https://www.windmill.dev/docs/full_code_apps/ui_editor) —— ブラウザでフルコードのアプリを編集する。
+	- [CLI での進め方](https://www.windmill.dev/docs/full_code_apps/cli_workflow) —— 端末から雛形を作り、開発し、配備する。
 </div>

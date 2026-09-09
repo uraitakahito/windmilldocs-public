@@ -103,10 +103,11 @@ export const convert = (src) => {
 
   // MDX の import を落とす。
   //
-  // `@theme/` も落とす —— `<Tabs>` / `<TabItem>` は下で見出しに変えるので、
-  // import だけが残ると GitHub に生の JS の行として出る (実際に残っていた)。
+  // `@theme/` と `@docusaurus/` も落とす —— 対応する部品は下で見出しや註記に
+  // 変えるので、import だけが残ると GitHub に生の JS の行として出る
+  // (Bash と apps のページで実際に残っていた)。
   s = s.replace(
-    /^import\s+[\s\S]*?from\s+['"](@site|@theme|lucide-react|react-icons)[^'"]*['"];?\s*$/gm,
+    /^import\s+[\s\S]*?from\s+['"](@site|@theme|@docusaurus|lucide-react|react-icons)[^'"]*['"];?\s*$/gm,
     "",
   );
 
