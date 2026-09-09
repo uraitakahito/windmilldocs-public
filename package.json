@@ -6,6 +6,7 @@
   "engines": {
     "node": ">=20"
   },
+  "packageManager": "pnpm@11.23.0",
   "scripts": {
     "start": "docusaurus start",
     "build": "docusaurus build",
