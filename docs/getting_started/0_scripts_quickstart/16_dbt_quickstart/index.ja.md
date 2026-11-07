@@ -123,7 +123,7 @@ dbt のスクリプトはコードの本体ではなくプロジェクトなの�
 
 `Models` の枠はプロジェクトのグラフを描き、そのグラフがどこから来たのかも示します —— 配備済みのプロジェクトなら `as of last deploy`、一度も配備も取り直しもしていないなら `never parsed`。
 
-`Refresh models` を押すと、いまエディタにあるプロジェクトから描き直します。ファイルに対して本物の `dbt parse` の job を走らせ（`dbt deps` のあと `dbt parse`。build も warehouse への書き込みもありません）、札が `parsed from the editor at 01:18 PM` に変わります。編集中のグラフと配備のグラフはまったく同じように描かれるので、見分けるのはこの札です。グラフは常に dbt 自身のものです —— `ref()` の呼び出しを走査したものではなく、dbt が出した manifest から来るので、`enabled`、マクロが組み立てた ref、繰り返し、パッケージのモデルについて dbt と食い違いません。
+`Refresh models` を押すと、いまエディタにあるプロジェクトから描き直します。ファイルに対して本物の `dbt parse` の job を走らせ（`dbt deps` のあと `dbt parse`。build も warehouse への書き込みもありません）、ラベルが `parsed from the editor at 01:18 PM` に変わります。編集中のグラフと配備のグラフはまったく同じように描かれるので、見分けるのはこのラベルです。グラフは常に dbt 自身のものです —— `ref()` の呼び出しを走査したものではなく、dbt が出した manifest から来るので、`enabled`、マクロが組み立てた ref、繰り返し、パッケージのモデルについて dbt と食い違いません。
 
 parse は、そのスクリプトの [worker のタグ](../../../core_concepts/9_worker_groups/index.mdx)と制限時間のもとで、自分の worker で走ります。閉じたネットワークにつなぐプロジェクトなら、そこへ届く worker で parse されます。埋めてある実行の引数も一緒に運ばれます —— `vars` は `enabled`、schema、別名、関係の身元を左右するので、それ抜きの parse は、それ付きの build とは別のプロジェクトを描いてしまうからです。
 
